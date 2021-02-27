@@ -1403,7 +1403,7 @@ df_copy3 = pd.DataFrame(data=df_copy.iloc[2:10].values,columns=list(df_copy.iloc
 
 
 
-## 인사이트
+# 인사이트
 ### `결론`
 ### 1) 엑셀 데이터에 불필요한 부분이 있다면, drop([`리스트`]) 한다. (행 삭제 시) _ 열은 axis = 1 추가
 ### 2) 인덱스를 바꾸고 싶다면, reset_index(drop=True)
