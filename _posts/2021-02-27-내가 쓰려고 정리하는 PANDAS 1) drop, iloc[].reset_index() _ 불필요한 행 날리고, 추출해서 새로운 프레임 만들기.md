@@ -1,5 +1,5 @@
 ---
-title: "1) drop, iloc[].reset_index() _ 불필요한 행 날리고, 추출해서 새로운 프레임 만들기"
+title: "1) drop, iloc[].reset_index()-불필요한 행 날리고, 추출해서 새로운 프레임 만들기"
 last_modified_at: 2021-02-27T19:28:00-05:00
 categories:
   - 내가 쓰려고 정리하는 PANDAS
