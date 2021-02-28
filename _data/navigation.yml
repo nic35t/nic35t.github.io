@@ -5,7 +5,7 @@ main:
   - title: "CATEGORIES"
     url: /categories/
   - title: "TAGS"
-    url: /tags-grid/
+    url: /tags/
   # - title: "Sitemap"
   #   url: /sitemap/
   - title: "Updating..."
