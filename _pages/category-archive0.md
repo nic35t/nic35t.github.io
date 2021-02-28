@@ -1,6 +1,6 @@
 ---
 title: "Trial-and-Error"
-layout: trialanderror
+layout: categories
 permalink: /Trial-and-Error/
 author_profile: true
 ---
