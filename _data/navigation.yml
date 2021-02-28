@@ -2,12 +2,10 @@
 main:
   # title: "Quick-Start Guide"
   #  url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  - title: "Trial & Error"
-    url: /Trial-and-Error/
-  - title: "T.I.L"
-    url: /T.I.L/
+  - title: "CATEGORIES"
+    url: /categories/
   - title: "TAGS"
-    url: /tags/
+    url: /tags-grid/
   # - title: "Sitemap"
   #   url: /sitemap/
   - title: "Updating..."

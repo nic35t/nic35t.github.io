@@ -1,6 +1,6 @@
 ---
-title: "T.I.L"
+title: "Category"
 layout: categories
-permalink: /T.I.L/
+permalink: /categories/
 author_profile: true
 ---
