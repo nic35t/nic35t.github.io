@@ -1,5 +1,5 @@
 ---
-title: "Python 3)Tag Recommend"
+title: "[Python] 3)Tag Recommend"
 last_modified_at: 2021-02-28T19:28:00-05:00
 categories:
   - 답답해서 해본 Python
