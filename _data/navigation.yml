@@ -6,8 +6,8 @@ main:
     url: /categories/쓰려고 정리하는 PANDAS/
   - title: "PJT"
     url: /categories/답답해서 해본 Python/
-  - title: "Trial & Error"
-    url: /categories/
+  #- title: "Trial & Error"
+  #  url: /categories/
   - title: "Tags"
     url: /tags/
   # - title: "Sitemap"
