@@ -1,7 +1,7 @@
 ---
 title: "만들어 본 것들"
-layout: category
 permalink: /categories/답답해서 해본 Python/
+layout: category
 author_profile: true
 taxoonomy : PJT
 ---

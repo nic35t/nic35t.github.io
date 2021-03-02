@@ -1,7 +1,7 @@
 ---
 title: "배우고 있는 것들"
-layout: category
 permalink: /categories/쓰려고 정리하는 PANDAS/
+layout: category
 author_profile: true
 taxoonomy : TIL
 ---
