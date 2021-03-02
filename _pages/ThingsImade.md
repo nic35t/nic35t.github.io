@@ -1,9 +1,9 @@
 ---
 title: "만들어 본 것들"
-permalink: /categories/답답해서 해본 Python/
-layout: category
+permalink: /tags/Python/
+layout: tag
 author_profile: true
-taxonomy : 답답해서 해본 Python
+taxonomy : Python
 ---
 
 만들어 본 것들을 모읍니다.
