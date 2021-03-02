@@ -7,6 +7,7 @@ categories:
 tags:
   - PANDAS
   - Data Analysis
+  - TIL
 ---
 
 # Pandas 사용법 _ 서비스 데이터 분석

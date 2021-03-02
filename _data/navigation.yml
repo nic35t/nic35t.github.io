@@ -3,9 +3,9 @@ main:
   # title: "Quick-Start Guide"
   #  url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
   - title: "TIL"
-    url: /tags/Data Analysis/
+    url: /tags/TIL/
   - title: "PJT"
-    url: /tags/Python/
+    url: /tags/PJT/
   - title: "Archive"
     url: /categories/
   # - title: "Tags"

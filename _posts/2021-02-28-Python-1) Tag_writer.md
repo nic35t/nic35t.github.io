@@ -1,10 +1,12 @@
 ---
 title: "[Python] 태그를 작성하는 툴 만들기"
+excerpt: "효율적으로 일을 하려고 만들었습니다."
 last_modified_at: 2021-02-28T19:28:00-05:00
 categories:
   - 답답해서 해본 Python
 tags:
   - Python
+  - PJT
 ---
 
 Input
