@@ -1,5 +1,5 @@
 ---
-title: "[Python] 2)Tag Checker"
+title: "[Python] 태그를 양산하는 툴 만들기"
 last_modified_at: 2021-02-28T19:28:00-05:00
 categories:
   - 답답해서 해본 Python

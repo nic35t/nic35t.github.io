@@ -1,5 +1,5 @@
 ---
-title: "[Python] 검색API 써서 문장 바로 뒤에 오는 단어 모으기"
+title: "[Python] 검색 API로 패턴 문장 바로 뒷 단어 모으기"
 last_modified_at: 2021-02-28T19:28:00-05:00
 categories:
   - 답답해서 해본 Python

@@ -1,5 +1,5 @@
 ---
-title: "[Python] 1)Tag Writer"
+title: "[Python] 태그를 작성하는 툴 만들기"
 last_modified_at: 2021-02-28T19:28:00-05:00
 categories:
   - 답답해서 해본 Python
