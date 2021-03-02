@@ -12,5 +12,5 @@ main:
     url: /tags/
   # - title: "Sitemap"
   #   url: /sitemap/
-  - title: "Updating..."
+  # - title: "Updating..."
   #   url: https://mmistakes.github.io/minimal-mistakes/about/
