@@ -9,6 +9,7 @@ categories:
 tags:
   - Python
   - PJT
+toc: true
 ---
 
 Input
