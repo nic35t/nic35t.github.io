@@ -1,6 +1,8 @@
 ---
 title: "1) drop, iloc[].reset_index()-불필요한 행 없애고, 추출해서 새로운 프레임 만들기"
 excerpt: "부스트코스에서 제공하는 데이터 분석 강의 중 꼭 사용할 것 같은 내용만 정리했습니다."
+header:
+  teaser: /assets/images/noteaser.jpg
 last_modified_at: 2021-02-27T19:28:00-05:00
 categories:
   - 쓰려고 정리하는 PANDAS
