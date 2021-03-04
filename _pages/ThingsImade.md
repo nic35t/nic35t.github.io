@@ -1,5 +1,5 @@
 ---
-title: "🥨만들어 본 것들"
+title: "🥨 만들어 본 것들"
 permalink: /tags/PJT/
 layout: tag
 author_profile: true
