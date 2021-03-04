@@ -1,5 +1,5 @@
 ---
-title: "아카이브💕"
+title: "categories"
 layout: categories
 permalink: /categories/
 author_profile: true
