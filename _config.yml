@@ -98,7 +98,7 @@ author:
   avatar           : "/assets/images/bio-photo.jpg"
   bio              : "I am not a **Know-IT-All**, just a PD."
   location         : "Korea"
-  email            : "nicest@kakao.com"
+  email            :
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
