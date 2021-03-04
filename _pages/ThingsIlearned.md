@@ -1,5 +1,5 @@
 ---
-title: "배우고 있는 것들"
+title: "✍배우고 있는 것들"
 permalink: /tags/TIL/
 layout: tag
 author_profile: true
