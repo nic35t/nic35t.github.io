@@ -34,7 +34,7 @@
 .archive__subtitle {
   margin: 1.414em 0 0.5em;
   padding-bottom: 0.5em;
-  font-size: 1.3em; # 홈메인글자색
+  font-size: 1.3em;
   color: $muted-text-color;
   border-bottom: 1px solid $border-color;
 
@@ -211,7 +211,7 @@
 
   .archive__item-title {
     margin-top: 0.5em;
-    font-size: $type-size-5;
+    font-size: $type-size-4;
   }
 
   .archive__item-excerpt {
