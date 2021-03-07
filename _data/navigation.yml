@@ -2,7 +2,9 @@
 main:
   # title: "Quick-Start Guide"
   #  url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  - title: "TIL"
+  - title: "Logs"
+    url: /tags/Diary/
+  - title: "TILs"
     url: /tags/TIL/
   - title: "Works"
     url: /tags/PJT/
