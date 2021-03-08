@@ -1,5 +1,5 @@
 ---
-title: "✒ 기록하고 싶은 것들"
+title: "📹 기록하고 싶은 것들"
 permalink: /tags/Diary/
 layout: tag
 author_profile: true
