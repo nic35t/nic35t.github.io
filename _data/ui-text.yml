@@ -620,7 +620,7 @@ ko: &DEFAULT_KO
   related_label              : "참고"
   # follow_label               : ""
   feed_label                 : "Feed"
-  powered_by                 : "All rights reserved."
+  powered_by                 : "Powered by 😘Me &"
   website_label              : "웹사이트"
   email_label                : "이메일"
   recent_posts               : "📃 최근 포스트"
