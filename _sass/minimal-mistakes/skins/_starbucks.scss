@@ -9,10 +9,10 @@ $muted-text-color: $text-color !default;
 $primary-color: #287050 !default;
 $border-color: mix(#fff, $text-color, 75%) !default;
 $footer-background-color: #282820 !default;
-$link-color: #6666cc !default;
-$link-color-hover: mix(#fff, $link-color, 25%) !default;
-$masthead-link-color: $text-color !default;
-$masthead-link-color-hover: mix(#fff, $text-color, 80%) !default;
+$link-color: #282820 !default;
+$link-color-hover: mix(#fff, $link-color, 30%) !default;
+$masthead-link-color: #282820 !default;
+$masthead-link-color-hover: mix(#fff, #282820, 80%) !default;
 $navicon-link-color-hover: mix(#fff, #282820, 80%) !default;
 
 /* contrast syntax highlighting (base16) */
