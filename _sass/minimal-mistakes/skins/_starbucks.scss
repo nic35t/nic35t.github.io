@@ -13,7 +13,7 @@ $link-color: #282820 !default;
 $link-color-hover: mix(#fff, $link-color, 30%) !default;
 $masthead-link-color: #282820 !default;
 $masthead-link-color-hover: mix(#fff, #282820, 80%) !default;
-$navicon-link-color-hover: #282820, 80%
+$navicon-link-color-hover: mix(#fff, #282820, 80%) !default;
 
 /* contrast syntax highlighting (base16) */
 $base00: #000000 !default;
