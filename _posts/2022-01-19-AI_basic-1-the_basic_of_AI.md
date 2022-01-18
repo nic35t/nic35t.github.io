@@ -8,7 +8,7 @@ categories:
   - AI 기초 다지기 by 부스트코스
 tags:
   - Python
-  - AI
+  - TIL
 toc: true
 toc_sticky: true
 ---
