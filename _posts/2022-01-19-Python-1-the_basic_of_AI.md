@@ -3,7 +3,7 @@ title: "[AI 기초] 자료형 & 파이써닉 코드"
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
-last_modified_at: 2022-01-19T19:28:00-05:00
+last_modified_at: 2021-03-11T23:28:00-05:00
 categories:
   - AI 기초 다지기 by 부스트코스
 tags:
