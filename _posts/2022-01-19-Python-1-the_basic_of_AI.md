@@ -47,7 +47,9 @@ txt2 = f"Hello, {name:>10}, {age} years old."
 #소숫점 숫자
 txt3 = f"Hello, {name:<10}, {age:10.3f} years old."
 
-```   
+```
+
+
 ```
 배운 내용 : Class
 ```
@@ -100,7 +102,6 @@ read_csv = ReadCsv(path)
 print(read_csv.read_f())
 print(read_csv.merge_l())
 ```
-
 
 Output
 =====
