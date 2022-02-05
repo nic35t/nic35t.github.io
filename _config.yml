@@ -96,7 +96,7 @@ analytics:
 author:
   name             : "Jeremy LEE"
   avatar           : "/assets/images/bio-photo.jpg"
-  bio              : "I am not a Know-IT-All, just a Design Thinker."
+  bio              : "I am not a **Know-IT-All**,"<br>"just a **Design Thinker**."
   location         : "Somewhere"
   email            :
   links:

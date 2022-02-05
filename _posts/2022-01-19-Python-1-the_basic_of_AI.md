@@ -17,9 +17,9 @@ Input
 ====
 
 네이버 커넥트재단 **부스트코스**에서 제공하는 **AI 기초 다지기 과정**에 선발되었습니다.   
-일전에 `PY4E`를 통해 기초를 다지고, 인공지능 과정을 수강 신청을 했지만   
+일전에 `PY4E`를 통해 기초를 다지고, 인공지능 과정을 수강했지만   
 일정에 쫓겨 재대로 수강하지 못하고 아직도 나의 강의에 등록되어 있는데   
-주단위 미션과 코칭가지 받을 수 있는 프로그램이라 멱살잡혀 공부를 하게 될 거 같습니다.   
+주단위 미션과 코칭까지 받을 수 있는 프로그램이라 멱살잡혀 공부를 하게 될 거 같습니다.   
 
 > **_다시 시작하는 인공지능 공부_**   
 
@@ -32,7 +32,7 @@ Process
 배운 내용 : f-string
 ```
 ```python
-name = 'sanghyo'
+name = 'Jeremy Lee'
 age = 36
 
 #가운데 정렬
@@ -48,6 +48,58 @@ txt2 = f"Hello, {name:>10}, {age} years old."
 txt3 = f"Hello, {name:<10}, {age:10.3f} years old."
 
 ```   
+```
+배운 내용 : Class
+```
+```python
+#함수와 유사한 방식으로 처리
+#단, def는 snake_case, Class는 CamelCase로 작명
+
+class Monster(object):
+    def __init__(self, name, level):
+        self.name = name
+        self.level = level
+        
+    
+    def __str__(self):
+        return f"This is {self.name}, level {self.level}"
+
+#클래스 상속 _ super
+class Monster:
+    def __init__(self, name, level):
+        self.name = name
+        self.level = level
+
+
+class Slime(Monster):
+    def __init__(self, name, level, size):
+        super().__init__(name, level)
+        self.size = size
+
+#클래스 內 함수 간 호출 _ self
+import csv
+
+class ReadCsv():
+    def __init__(self, path):
+        self.path = path
+
+        
+    def read_f(self):
+        with open(self.path, 'r', encoding='utf-8') as f:
+            lines = csv.reader(f)
+            return [list(map(int, line)) for line in lines]
+
+
+    def merge_l(self):
+        with open(self.path, 'r', encoding='utf-8') as f:
+            lines = self.read_f() #클래스 內 선언한 함수 호출
+            return [sum(map_lines) for map_lines in lines]
+
+path = "./****.csv"
+read_csv = ReadCsv(path)
+print(read_csv.read_f())
+print(read_csv.merge_l())
+```
 
 
 Output
