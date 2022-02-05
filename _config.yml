@@ -94,9 +94,9 @@ analytics:
 
 # Site Author
 author:
-  name             : "Your Name"
-  avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "I am an **amazing** person."
+  name             : "Jeremy LEE"
+  avatar           : "/assets/images/bio-photo.jpg"
+  bio              : "I am not a Know-IT-All, just a Design Thinker."
   location         : "Somewhere"
   email            :
   links:
