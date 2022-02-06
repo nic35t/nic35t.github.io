@@ -49,62 +49,8 @@ txt3 = f"Hello, {name:<10}, {age:10.3f} years old."
 
 ```
 
-
-```
-배운 내용 : Class
-```
-```python
-#함수와 유사한 방식으로 처리
-#단, def는 snake_case, Class는 CamelCase로 작명
-
-class Monster(object):
-    def __init__(self, name, level):
-        self.name = name
-        self.level = level
-        
-    
-    def __str__(self):
-        return f"This is {self.name}, level {self.level}"
-
-#클래스 상속 _ super
-class Monster:
-    def __init__(self, name, level):
-        self.name = name
-        self.level = level
-
-
-class Slime(Monster):
-    def __init__(self, name, level, size):
-        super().__init__(name, level)
-        self.size = size
-
-#클래스 內 함수 간 호출 _ self
-import csv
-
-class ReadCsv():
-    def __init__(self, path):
-        self.path = path
-
-        
-    def read_f(self):
-        with open(self.path, 'r', encoding='utf-8') as f:
-            lines = csv.reader(f)
-            return [list(map(int, line)) for line in lines]
-
-
-    def merge_l(self):
-        with open(self.path, 'r', encoding='utf-8') as f:
-            lines = self.read_f() #클래스 內 선언한 함수 호출
-            return [sum(map_lines) for map_lines in lines]
-
-path = "./****.csv"
-read_csv = ReadCsv(path)
-print(read_csv.read_f())
-print(read_csv.merge_l())
-```
-
 Output
 =====
-과제를 코치 분들이 검토 및 코멘트를 달아주시는데,    
-예전에 코드가 좋은지 나쁜지 몰랐던 때와 달리,   
-깔끔한 풀이라는 말을 들으니 기분이 좋습니다 :)))
+1주는 기초 겸 기본 개념을 배워, 예전에 배운 것과 겹치는 부분도 많았지만,   
+포맷팅을 처음 배우는 내용이라 기존에 힘들게 포맷을 잡아 넣었던 기억을 생각하면,   
+많이 배우고 들어야 편해질수 있겠구나라는 생각이 들었습니다 :)   
