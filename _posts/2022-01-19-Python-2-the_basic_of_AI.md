@@ -5,7 +5,7 @@ header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-01-29T19:28:00-05:00
 categories:
-  - AI 기초 다지기 by 부스트코스
+  - AI 기초 by 부스트코스
 tags:
   - Python
   - TIL
