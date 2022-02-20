@@ -145,7 +145,7 @@ li = list(enumerate(df3.Type.unique())) #유니크에 번호 붙이기
 dic = dict([(v, k) for (k, v) in li]) # 키/값 순서 바꾸기 - dict로 바꾸기
 dic
 df3.Type.map(dic) #데이터프레임 Type 칼럼에 mapping 적용
-```
+```    
 
 Output
 =====

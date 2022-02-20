@@ -97,7 +97,9 @@ for epoch in range(nb_epochs+1):
             print(f"Epoch : {epoch:>5}/{nb_epochs}, Cost : {error.item()}")
             print(f"Hypothesis : {pred.squeeze()}")
 
-```
+```     
+    
+    
 Output
 =====
 처음부터 바로 이 내용을 봤다면, 이게 뭔소린가 정도의 내용이었습니다.    
