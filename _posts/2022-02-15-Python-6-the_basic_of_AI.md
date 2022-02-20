@@ -1,6 +1,6 @@
 ---
 title: "[AI 기초] Pandas"
-excerpt: "5주 과정으로 조별과제 중입니다."
+excerpt: "4주차 Pandas 활용법을 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-14T19:28:00-05:00

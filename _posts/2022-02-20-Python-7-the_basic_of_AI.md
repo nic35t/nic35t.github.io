@@ -1,6 +1,6 @@
 ---
 title: "[AI 기초] Linear Regression w.Pytorch"
-excerpt: "5주 과정으로 조별과제 중입니다."
+excerpt: "5주차 모델 구현을 배우고 있습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-20T19:28:00-05:00
@@ -29,14 +29,6 @@ Process
 ```
 배운 내용 : 선형 회귀 torch로 세우기
 ```
-
-$$ H(x) = Wx + b $$
-
-$$ cost(W, b) = \frac{1}{m} \sum^m_{i=1} \left( H(x^{(i)}) - y^{(i)} \right)^2 $$
-
- - $H(x)$: 주어진 $x$ 값에 대해 예측을 어떻게 할 것인가
- - $cost(W, b)$: $H(x)$ 가 $y$ 를 얼마나 잘 예측했는가 ex) Error    
-
 ```python
 import torch
 import torch.nn as nn
@@ -62,9 +54,6 @@ b = torch.zeros(1, requires_grad = True)
     (tensor([0.], requires_grad=True), tensor([0.], requires_grad=True))
     
 #### 3. 예측 모델 만들기 
-
-$$ H(x) = Wx + b $$
-
 ```python
 pred = W * x_train + b
 ```

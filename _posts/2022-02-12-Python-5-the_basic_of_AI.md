@@ -1,6 +1,6 @@
 ---
 title: "[AI 기초] Linear Regression"
-excerpt: "5주 과정으로 조별과제 중입니다."
+excerpt: "3주차 머신러닝 기초를 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-12T19:28:00-05:00
