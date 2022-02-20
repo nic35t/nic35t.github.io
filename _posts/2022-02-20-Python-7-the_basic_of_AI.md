@@ -45,27 +45,28 @@ torch.manual_seed(1)
 x_train = torch.FloatTensor([[1], [2], [3]])
 y_train = torch.FloatTensor([[2], [4], [6]])
 ```
-     
-#### 2. 가설 수립을 위한 W와 b 설정하기
+    
+#### 2. 모델 초기화 _ Weight / bias
 ```python
 W = torch.zeros(1, requires_grad = True)
 b = torch.zeros(1, requires_grad = True)
 ```
     (tensor([0.], requires_grad=True), tensor([0.], requires_grad=True))
     
-#### 3. 예측 모델 만들기 
+#### 3. 예측 모델 
 ```python
 pred = W * x_train + b
 ```
     
-#### 4. 비용 함수 세우기
+#### 4. 비용 함수
 ```python
 error = torch.mean((pred - y_train) ** 2) # 제곱의 평균
 ```
     tensor(18.6667, grad_fn=<MeanBackward1>)
 
-#### 5. 경사 하강 - optimizer 이용 ex) numpy로 구현 시, 편미분 사용
+#### 5. 경사 하강 - optimizer
 ```python
+# numpy로 구현 시, 편미분을 사용함
 optimizer = optim.SGD([W, b], lr=0.01)
 
 # optimizer와 세트
