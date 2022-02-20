@@ -54,8 +54,8 @@ for i in range(50000):
     b -= lr * 2 * (pred - y).mean() 
     
     print(f"error : {error}, w : {w}, b : {b}")
-```    
-    
+```
+
 Output
 =====
 강의는 좋지만 천재들이 말하는 걸 이해하기에는 추가 학습과   
