@@ -13,7 +13,7 @@ toc: true
 toc_sticky: true
 ---
 
-Input
+# Input
 =====
 
 네이버 커넥트재단 **부스트코스**에서 제공하는 **AI 기초 다지기 과정**에 5주차입니다.    
@@ -26,7 +26,7 @@ Input
 미니배치를 통해 원활히 학습시키는 방법입니다.                
 
 
-Process
+# Process
 =====
 ```
 배운 내용 : 다항 선형 회귀 w. nn.Module / DataLoader (minibatch)
@@ -98,7 +98,7 @@ for epoch in range(nb_epochs+1):
             print(f"Hypothesis : {pred.squeeze()}")
 ```
     
-Output
+# Output
 =====
 처음부터 바로 이 내용을 봤다면, 이게 뭔소린가 정도의 내용이었습니다.    
 기본 모델을 라이브러리로 단순화시키다보면, 단순하지만 보기에는 이해가 필요한,    
