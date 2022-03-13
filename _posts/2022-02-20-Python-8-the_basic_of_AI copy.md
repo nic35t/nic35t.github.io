@@ -40,7 +40,7 @@ from torch.utils.data import Dataset #데이터로더 사용을 위한 데이터
 from torch.utils.data import DataLoader # 데이터 로더
 ```
 
-#### 1. Class - Dataset / nn.Module 
+1. Class - Dataset / nn.Module 
 ```python
 # 데이터로더에 쓰일 데이터셋 준비
 class CustomDataset(Dataset): 
@@ -67,7 +67,7 @@ class MultivariableLinearRegressionModel(nn.Module): # 입출력 데이터 사�
 dataloader = DataLoader(dataset, batch_size= 2, shuffle = True)
 ```
 
-#### 2. Full Code
+2. Full Code
 ```python
 # 데이터 - 예시 데이터 : 일반적으로 어디서 가져올 것이고, Pandas 전처리 필요
 x_data = torch.FloatTensor([[60, 70, 80],[70, 80, 90], [80, 90, 100]]) # 입력 데이터 
