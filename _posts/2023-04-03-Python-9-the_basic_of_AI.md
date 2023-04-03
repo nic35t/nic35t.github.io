@@ -42,7 +42,7 @@ class Child(Parent):
 ```
 
 위의 코드에서 Child 클래스는 Parent 클래스를 상속받습니다. Child 클래스의 생성자에서   
-super().__init__(name)을 호출하여 Parent 클래스의 생성자를 호출합니다.    
+super().\_\_init__(name)을 호출하여 Parent 클래스의 생성자를 호출합니다.    
 이를 통해 Parent 클래스에서 구현한 name 속성을 초기화하고, Child 클래스에서 추가한 age 속성을 초기화합니다.   
    
 또한 Child 클래스에서 speak 메소드에서는 super().speak()을 호출하여 Parent 클래스의 speak 메소드를 호출합니다.    
