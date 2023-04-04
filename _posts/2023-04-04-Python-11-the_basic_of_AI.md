@@ -1,5 +1,5 @@
 ---
-title: "[Python] 활용한 데이터 분석: pandas, NumPy, Matplotlib [Not a Know-IT-All]"
+title: "[Python] 데이터 분석: pandas, NumPy, Matplotlib [Not a Know-IT-All]"
 excerpt: "이번 글에서는 파이썬을 이용한 데이터 분석에 필요한 pandas, NumPy, Matplotlib 라이브러리들에 대해 소개하고, 간단한 사용 예제를 제공합니다."
 header:
   teaser: /assets/images/noteaser.jpg
