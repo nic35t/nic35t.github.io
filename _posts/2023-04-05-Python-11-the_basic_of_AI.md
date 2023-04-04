@@ -3,7 +3,7 @@ title: "[Python] 활용한 데이터 분석: pandas, NumPy, Matplotlib [Not a Kn
 excerpt: "이번 글에서는 파이썬을 이용한 데이터 분석에 필요한 pandas, NumPy, Matplotlib 라이브러리들에 대해 소개하고, 간단한 사용 예제를 제공합니다. 데이터 분석을 시작하려는 개발자들에게 유용한 정보를 제공합니다."
 header:
   teaser: /assets/images/noteaser.jpg
-last_modified_at: 2023-04-05T00:28:00-05:00
+last_modified_at: 2023-04-05T01:28:00-02:00
 categories:
   - Python 보강
 tags:
