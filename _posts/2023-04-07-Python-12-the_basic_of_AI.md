@@ -40,7 +40,7 @@ img_resized.save('image_resized.jpg')
 img_filtered.save('image_filtered.jpg')
 ```
 
-# Pillow를 이용한 이미지 필터링
+## Pillow를 이용한 이미지 필터링
 
 Pillow는 이미지 처리를 위한 라이브러리로,    
 이미지 필터링을 위한 다양한 기능을 제공합니다.   
@@ -88,7 +88,7 @@ img_edge_enhance.save('image_edge_enhance.jpg')
 img_sharpen.save('image_sharpen.jpg')
 ```
 
-
+## Pillow의 유용성
 Pillow는 이미지를 다루는 작업에서 매우 유용합니다. 이미지 크기 조정, 필터 적용,      
 포맷 변환 등 다양한 작업을 간단한 코드로 수행할 수 있습니다.   
       
