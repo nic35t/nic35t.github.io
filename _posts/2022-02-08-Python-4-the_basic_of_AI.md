@@ -5,7 +5,7 @@ header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-08T19:28:00-05:00
 categories:
-  categories: [AI/ML]
+  categories: [AI-ML]
 tags:
   - Python
   - TIL
