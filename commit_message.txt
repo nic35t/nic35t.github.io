@@ -1,0 +1,1 @@
+Fix: Update Gemfile, remove duplicate post, and correct categories in AI posts

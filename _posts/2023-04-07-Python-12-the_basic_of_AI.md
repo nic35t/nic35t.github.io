@@ -4,7 +4,7 @@ excerpt: "파이썬으로 다양한 작업을 쉽게 처리할 수 있도록 도
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2023-04-07T12:00:00-05:00
-categories: [AI-ML]
+categories: [AI]
 tags:
   - Python
   - TIL

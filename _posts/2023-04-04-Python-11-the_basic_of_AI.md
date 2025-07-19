@@ -4,7 +4,7 @@ excerpt: "이번 글에서는 파이썬을 이용한 데이터 분석에 필요�
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2023-04-04T20:28:00-05:00
-categories: [AI-ML]
+categories: [AI]
 tags:
   - Python
   - TIL

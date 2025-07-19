@@ -1,9 +1,9 @@
 ---
-title: "AI-ML Posts"
-permalink: /categories/ai-ml/
+title: "AI Posts"
+permalink: /categories/ai/
 layout: category
 author_profile: true
-taxonomy: AI-ML
+taxonomy: AI
 ---
 
 AI/ML 관련 게시물들을 모아놓은 페이지입니다.

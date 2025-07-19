@@ -4,7 +4,7 @@ excerpt: "4주차 Pandas 활용법을 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-14T19:28:00-05:00
-categories: [AI-ML]
+categories: [AI]
 tags:
   - Python
   - TIL
