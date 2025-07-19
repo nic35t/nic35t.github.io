@@ -1,1 +1,1 @@
-Fix: Correct duplicate categories field in two posts
+Remove: Post titled '구글의 스테이블코인 정책 변화: 규제 준수와 광고 전략'
