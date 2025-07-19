@@ -4,8 +4,7 @@ excerpt: "Python에서 클래스 상속을 구현할 때 super() 함수를 사�
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2023-04-03T20:28:00-05:00
-categories:
-  - Python 보강
+categories: [AI/ML]
 tags:
   - Python
   - TIL

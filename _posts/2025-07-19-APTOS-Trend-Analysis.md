@@ -1,7 +1,7 @@
 ---
 title: "앱토스(APTOS), 블록체인 시장의 새로운 강자로 부상"
 date: 2025-07-19 11:00:00 +0900
-categories: [Tech]
+categories: [Web3]
 tags: [APTOS, Blockchain, Crypto, Tech, Diary]
 ---
 

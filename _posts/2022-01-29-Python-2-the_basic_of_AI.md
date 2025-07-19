@@ -4,8 +4,7 @@ excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-01-29T19:28:00-05:00
-categories:
-  - AI 기초 by 부스트코스
+categories: [AI/ML]
 tags:
   - Python
   - TIL

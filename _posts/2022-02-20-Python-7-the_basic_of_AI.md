@@ -4,8 +4,7 @@ excerpt: "5주차 모델 구현을 배우고 있습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-20T19:28:00-05:00
-categories:
-  - AI 기초 by 부스트코스
+categories: [AI/ML]
 tags:
   - Python
   - TIL

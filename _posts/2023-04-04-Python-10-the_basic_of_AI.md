@@ -4,8 +4,7 @@ excerpt: "파이썬 데코레이터는 함수의 기능을 확장하면서 코�
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2023-04-04T20:28:00-05:00
-categories:
-  - Python 보강
+categories: [AI/ML]
 tags:
   - Python
   - TIL

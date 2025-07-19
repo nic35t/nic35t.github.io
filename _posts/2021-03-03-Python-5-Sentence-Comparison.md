@@ -5,7 +5,7 @@ header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2021-03-03T23:28:00-05:00
 categories:
-  - 답답해서 해본 Python
+  categories: [Projects]
 tags:
   - Python
   - PJT

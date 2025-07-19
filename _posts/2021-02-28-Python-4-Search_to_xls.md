@@ -4,8 +4,7 @@ excerpt: "대신 일하게 하려고 만들었습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2021-02-28T19:28:00-05:00
-categories:
-  - 답답해서 해본 Python
+categories: [Projects]
 tags:
   - Python
   - PJT

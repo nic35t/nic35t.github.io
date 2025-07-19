@@ -1,18 +1,13 @@
 # main links
 main:
-  # title: "Quick-Start Guide"
-  #  url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
-  - title: "Logs"
-    url: /tags/Diary/
-  - title: "TILs"
-    url: /tags/TIL/
-  - title: "Works"
-    url: /tags/PJT/
+  - title: "AI/ML"
+    url: /categories/AI/ML/
+  - title: "Web3"
+    url: /categories/Web3/
+  - title: "Projects"
+    url: /categories/Projects/
+  - title: "Diary"
+    url: /categories/Diary/
   - title: "Archive"
     url: /categories/
-  # - title: "Tags"
-  #  url: /tags/
-  # - title: "Sitemap"
-  #   url: /sitemap/
-  # - title: "Updating..."
-  #   url: https://mmistakes.github.io/minimal-mistakes/about/
+
