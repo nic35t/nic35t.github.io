@@ -1,13 +1,9 @@
 # main links
 main:
-  - title: "AI/ML"
-    url: /categories/ai-ml/
+  - title: "Tech"
+    url: /categories/tech/
   - title: "Web3"
     url: /categories/web3/
-  - title: "Projects"
-    url: /categories/projects/
-  - title: "Diary"
-    url: /categories/diary/
   - title: "Archive"
     url: /categories/
 
