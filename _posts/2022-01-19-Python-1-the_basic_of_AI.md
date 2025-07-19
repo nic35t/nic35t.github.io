@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-1: 자료형 & 파이써닉 코드"
+title: "[AI 기초] 자료형 & 파이써닉 코드"
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,9 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - AI
-  - Data Type
-  - Pythonic Code
 toc: true
 toc_sticky: true
 ---

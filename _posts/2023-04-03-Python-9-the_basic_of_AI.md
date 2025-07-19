@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-9: 클래스 상속 (super() 함수 활용)"
+title: "[Python] 클래스 상속에서 super() 함수 활용 방법"
 excerpt: "Python에서 클래스 상속을 구현할 때 super() 함수를 사용하는 방법에 대해 알아봅니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,9 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - Class
-  - Inheritance
-  - Super
 toc: true
 toc_sticky: true
 ---

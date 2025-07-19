@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-12: Pillow를 이용한 이미지 처리"
+title: "[Python] Pillow를 이용한 이미지 처리"
 excerpt: "파이썬으로 다양한 작업을 쉽게 처리할 수 있도록 도와주는 라이브러리를 추천합니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,8 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - Pillow
-  - Image Processing
 toc: true
 toc_sticky: true
 ---

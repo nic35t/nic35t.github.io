@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-2: 클래스 (super, self)"
+title: "[AI 기초] 클래스 - super, self"
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,10 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - AI
-  - Class
-  - Super
-  - Self
 toc: true
 toc_sticky: true
 ---

@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-4: Vector & Array"
+title: "[AI 기초] Vector / Array"
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,9 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - AI
-  - Vector
-  - Array
 toc: true
 toc_sticky: true
 ---

@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Python-5: Linear Regression (머신러닝 기초)"
+title: "[AI 기초] Linear Regression"
 excerpt: "3주차 머신러닝 기초를 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,9 +8,6 @@ categories: [AI]
 tags:
   - Python
   - TIL
-  - AI
-  - Machine Learning
-  - Linear Regression
 toc: true
 toc_sticky: true
 ---
