@@ -1,1 +1,1 @@
-Refactor: Enhance titles and tags for AI basic posts
+Fix: Correct duplicate categories field in two posts
