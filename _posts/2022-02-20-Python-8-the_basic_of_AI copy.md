@@ -4,7 +4,7 @@ excerpt: "5주차 다항 선형 회귀 구현을 배우고 있습니다."
 header:
   teaser: /assets/images/noteaser.jpg
 last_modified_at: 2022-02-20T20:28:00-05:00
-categories: [AI-ML]
+categories: [AI]
 tags:
   - Python
   - TIL
