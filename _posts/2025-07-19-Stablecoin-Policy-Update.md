@@ -2,7 +2,7 @@
 title: "스테이블코인 규제의 새로운 시대: 주요 국가별 정책 동향"
 date: 2025-07-19 10:00:00 +0900
 categories: [Tech]
-tags: [stablecoin, policy, regulation, crypto]
+tags: [stablecoin, policy, regulation, crypto, Diary]
 ---
 
 ## 스테이블코인 규제의 새로운 시대: 주요 국가별 정책 동향
