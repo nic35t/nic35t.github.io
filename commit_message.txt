@@ -1,1 +1,1 @@
-Fix: Update Gemfile, remove duplicate post, and correct categories in AI posts
+Refactor: Enhance titles and tags for AI basic posts
