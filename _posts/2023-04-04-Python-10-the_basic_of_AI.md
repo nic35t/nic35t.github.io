@@ -1,5 +1,5 @@
 ---
-title: "[Python] 데코레이터: 함수 기능 확장하는 고급 기술"
+title: "[AI 기초] Python-10: 데코레이터 (함수 기능 확장)"
 excerpt: "파이썬 데코레이터는 함수의 기능을 확장하면서 코드 수정을 최소화하는 고급 기술입니다. 이 글에서는 데코레이터의 기본 개념과 사용법을 소개합니다. 예제 코드와 함께 쉽게 따라해보세요."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,6 +8,8 @@ categories: [AI]
 tags:
   - Python
   - TIL
+  - Decorator
+  - Function
 toc: true
 toc_sticky: true
 ---

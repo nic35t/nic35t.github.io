@@ -1,5 +1,5 @@
 ---
-title: "[Python] 데이터 분석: pandas, NumPy, Matplotlib"
+title: "[AI 기초] Python-11: 데이터 분석 (Pandas, NumPy, Matplotlib)"
 excerpt: "이번 글에서는 파이썬을 이용한 데이터 분석에 필요한 pandas, NumPy, Matplotlib 라이브러리들에 대해 소개하고, 간단한 사용 예제를 제공합니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,6 +8,10 @@ categories: [AI]
 tags:
   - Python
   - TIL
+  - Data Analysis
+  - Pandas
+  - NumPy
+  - Matplotlib
 toc: true
 toc_sticky: true
 ---

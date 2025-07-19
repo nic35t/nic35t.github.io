@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Numpy"
+title: "[AI 기초] Python-3: NumPy (수치 계산 라이브러리)"
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,6 +8,9 @@ categories: [AI]
 tags:
   - Python
   - TIL
+  - AI
+  - NumPy
+  - Data Analysis
 toc: true
 toc_sticky: true
 ---

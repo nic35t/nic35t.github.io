@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Linear Regression w.Pytorch"
+title: "[AI 기초] Python-7: Linear Regression with PyTorch"
 excerpt: "5주차 모델 구현을 배우고 있습니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,6 +8,10 @@ categories: [AI]
 tags:
   - Python
   - TIL
+  - AI
+  - Machine Learning
+  - Linear Regression
+  - PyTorch
 toc: true
 toc_sticky: true
 ---

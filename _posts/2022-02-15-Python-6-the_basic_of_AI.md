@@ -1,5 +1,5 @@
 ---
-title: "[AI 기초] Pandas"
+title: "[AI 기초] Python-6: Pandas 활용법"
 excerpt: "4주차 Pandas 활용법을 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg
@@ -8,6 +8,9 @@ categories: [AI]
 tags:
   - Python
   - TIL
+  - AI
+  - Data Analysis
+  - Pandas
 toc: true
 toc_sticky: true
 ---
