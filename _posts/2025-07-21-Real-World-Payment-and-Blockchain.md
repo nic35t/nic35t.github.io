@@ -1,10 +1,9 @@
 
 ---
-_posts/2025-07-21-Real-World-Payment-and-Blockchain.md
 title: "실제 세계 결제와 블록체인의 연결: 2025년 6월 이후 최신 동향"
 date: 2025-07-21
 categories: [Tech]
-tags: [Blockchain, Payments, Real-World Assets, Tokenization, Tech, Diary]
+tags: [블록체인, 결제, 실물자산, 토큰화, 기술, 일기]
 ---
 
 ## 들어가는 말
