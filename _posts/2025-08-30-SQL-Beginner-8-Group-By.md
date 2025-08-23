@@ -2,7 +2,6 @@
 title: "데이터 그룹화: GROUP BY의 개념과 활용"
 date: 2025-08-30 16:00:00 +0900
 categories: [SQL]
-
 ---
 
 # 데이터 그룹화: GROUP BY의 개념과 활용

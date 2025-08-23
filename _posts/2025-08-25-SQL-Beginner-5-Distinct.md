@@ -2,7 +2,6 @@
 title: "중복은 이제 그만: DISTINCT로 고유한 값만 보기"
 date: 2025-08-25 11:30:00 +0900
 categories: [SQL]
-
 ---
 
 # 중복은 이제 그만: DISTINCT로 고유한 값만 보기
