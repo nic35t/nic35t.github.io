@@ -2,7 +2,7 @@
 title: "원하는 데이터만 쏙! WHERE 절로 필터링하기"
 date: 2025-08-20 13:00:00 +0900
 categories: [SQL]
-tags: [SQL, Database, Beginner, Diary, WHERE]
+tags: ['SQL', 'Database', 'Beginner', 'Diary', 'WHERE']
 ---
 
 # 원하는 데이터만 쏙! WHERE 절로 필터링하기
