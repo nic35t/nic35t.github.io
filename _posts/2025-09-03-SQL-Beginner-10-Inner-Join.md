@@ -2,7 +2,7 @@
 title: "테이블 합치기: INNER JOIN으로 관계의 힘을 배우다"
 date: 2025-09-03 18:00:00 +0900
 categories: [SQL]
-tags: [SQL, Database, Beginner, Diary, JOIN]
+
 ---
 
 # 테이블 합치기: INNER JOIN으로 관계의 힘을 배우다
