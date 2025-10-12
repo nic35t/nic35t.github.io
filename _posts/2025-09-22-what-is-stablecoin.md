@@ -3,6 +3,8 @@ title: "디지털 머니 27조 달러 시대: 스테이블코인이란 무엇이
 date: 2025-09-22 14:00:00 +0900
 categories: [Tech]
 tags: ['스테이블코인', '디지털화폐', '금융', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 디지털 머니 27조 달러 시대

@@ -3,6 +3,8 @@ title: "최적의 회의록 분석 자동화 프롬프트 작성 가이드"
 date: 2025-07-21 10:00:00 +0900
 categories: [Tech, AI]
 tags: [meeting_minutes, AI, NLP, prompt_engineering, automation, productivity]
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 ## 최적의 회의록 분석 자동화 프롬프트 작성 가이드

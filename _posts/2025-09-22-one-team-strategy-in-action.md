@@ -3,6 +3,8 @@ title: "다시 ‘원팀’으로: BC카드 모델은 어떻게 작동해야 하
 date: 2025-09-22 14:55:00 +0900
 categories: [Tech]
 tags: ['원팀', 'BC카드', '전략', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 다시 ‘원팀’으로: BC카드 모델은 어떻게 작동해야 하는가?

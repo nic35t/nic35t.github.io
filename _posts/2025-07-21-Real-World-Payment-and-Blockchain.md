@@ -3,6 +3,8 @@ title: "실제 세계 결제와 블록체인의 연결"
 date: 2025-07-21 10:00:00 +0900
 categories: [Web3]
 tags: [blockchain, payments, rwa, tokenization, tech, diary]
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 ## 실제 세계 결제와 블록체인의 연결: 2025년 6월 이후 최신 동향

@@ -3,6 +3,8 @@ title: "그룹화된 데이터 필터링: HAVING은 WHERE와 뭐가 다를까?"
 date: 2025-09-01 11:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary', 'HAVING']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 그룹화된 데이터 필터링: HAVING은 WHERE와 뭐가 다를까?

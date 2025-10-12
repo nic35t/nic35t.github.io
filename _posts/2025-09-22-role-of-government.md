@@ -3,6 +3,8 @@ title: "정부와 국회의 역할: 선수가 뛰려면 경기장을 만들어�
 date: 2025-09-22 15:00:00 +0900
 categories: [Tech]
 tags: ['정부', '국회', '규제개선', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 정부와 국회의 역할: 선수가 뛰려면 경기장을 만들어야 한다

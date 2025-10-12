@@ -3,6 +3,8 @@ title: "우리가 원화 스테이블코인을 만들어야 하는 진짜 이유
 date: 2025-09-22 15:10:00 +0900
 categories: [Tech]
 tags: ['통화주권', '미래', '스테이블코인', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 우리가 원화 스테이블코인을 만들어야 하는 진짜 이유

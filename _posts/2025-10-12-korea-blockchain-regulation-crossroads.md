@@ -3,6 +3,8 @@ title: "갈림길에 선 K-블록체인: 혁신인가, 고립인가?"
 date: 2025-10-12 11:00:00 +0900
 categories: [Web3, Policy]
 tags: [Blockchain, Regulation, Digital Assets, Stablecoin, RWA, Fintech, Diary]
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 ### 시작하며: 기회와 위기의 교차로

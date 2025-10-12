@@ -3,6 +3,8 @@ title: "스테이블코인 규제의 새로운 시대: 한국 시장의 전환�
 date: 2025-07-19 10:00:00 +0900
 categories: [Web3]
 tags: [stablecoin, regulation, korea, crypto, policy]
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 스테이블코인 규제의 새로운 시대: 한국 시장의 전환점은?

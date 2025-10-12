@@ -3,6 +3,8 @@ title: "트럼프 코인의 성공: 자본과 영향력이 만났을 때 생기�
 date: 2025-09-22 14:50:00 +0900
 categories: [Tech]
 tags: ['트럼프', '자본유치', '스테이블코인', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 트럼프 코인의 성공: 자본과 영향력이 만났을 때 생기는 일
