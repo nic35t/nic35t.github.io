@@ -1,6 +1,6 @@
 ---
 title: "K-스테이블코인 성공 전략, 첫 단추는 '기관 참여' 허용이다"
-date: 2025-10-13 11:00:00 +0900
+date: 2025-10-11 11:01:00 +0900
 categories: [Web3, Policy]
 tags: [Blockchain, Regulation, Stablecoin, Institutional Adoption, RWA, Fintech, Diary]
 ---
