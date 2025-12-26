@@ -36,6 +36,8 @@ body {
 }
 
 .page {
+  padding-right: 0; // Mobile reset
+
   @include breakpoint($large) {
     float: right;
     width: calc(100% - #{$right-sidebar-width-narrow});
@@ -556,4 +558,16 @@ body {
       padding-right: 0;
     }
   }
+}
+
+/*
+   Responsive Code Blocks & Tables
+   ========================================================================== */
+
+div.highlighter-rouge,
+table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }

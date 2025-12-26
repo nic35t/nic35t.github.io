@@ -22,7 +22,7 @@
 
 {%- assign seo_description = page.description | default: page.excerpt | default: site.description -%}
 {%- if seo_description -%}
-  {%- assign seo_description = seo_description | markdownify | strip_html | newline_to_br | strip_newlines | replace: '<br />', ' ' | escape_once | strip -%}
+  {%- assign seo_description = seo_description | markdownify | strip_html | strip_newlines | escape_once | truncate: 160 | strip -%}
 {%- endif -%}
 
 {%- assign author = page.author | default: page.authors[0] | default: site.author -%}
@@ -32,14 +32,16 @@
   {%- assign author_twitter = author.twitter | replace: "@", "" -%}
 {%- endif -%}
 
-{%- assign page_large_image = page.header.og_image | default: page.header.overlay_image | default: page.header.image | absolute_url -%}
-{%- assign page_large_image = page_large_image | escape -%}
+{%- comment -%}
+  Improved OG Image Logic:
+  1. page.header.og_image
+  2. page.header.overlay_image
+  3. page.header.teaser
+  4. site.og_image
+{%- endcomment -%}
 
-{%- assign page_teaser_image = page.header.teaser | default: site.og_image | absolute_url -%}
-{%- assign page_teaser_image = page_teaser_image | escape -%}
-
-{%- assign site_og_image = site.og_image | absolute_url -%}
-{%- assign site_og_image = site_og_image | escape -%}
+{%- assign og_image_path = page.header.og_image | default: page.header.overlay_image | default: page.header.teaser | default: site.og_image -%}
+{%- assign seo_image = og_image_path | absolute_url | escape -%}
 
 {%- if page.date -%}
   {%- assign og_type = "article" -%}
@@ -67,10 +69,8 @@
   <meta property="og:description" content="{{ seo_description }}">
 {% endif %}
 
-{% if page_large_image %}
-  <meta property="og:image" content="{{ page_large_image }}">
-{% elsif page_teaser_image %}
-  <meta property="og:image" content="{{ page_teaser_image }}">
+{% if seo_image %}
+  <meta property="og:image" content="{{ seo_image }}">
 {% endif %}
 
 {% if site.twitter.username %}
@@ -78,15 +78,12 @@
   <meta name="twitter:title" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
   <meta name="twitter:description" content="{{ seo_description }}">
   <meta name="twitter:url" content="{{ canonical_url }}">
-
-  {% if page_large_image %}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="{{ page_large_image }}">
-  {% else %}
-    <meta name="twitter:card" content="summary">
-    {% if page_teaser_image %}
-      <meta name="twitter:image" content="{{ page_teaser_image }}">
-    {% endif %}
+  
+  {% comment %} Force Large Image Card {% endcomment %}
+  <meta name="twitter:card" content="summary_large_image">
+  
+  {% if seo_image %}
+    <meta name="twitter:image" content="{{ seo_image }}">
   {% endif %}
 
   {% if author_twitter %}
@@ -127,7 +124,7 @@
     {% if site.social.type == "Organization" %}
       "@type": "Organization",
       "url": {{ '/' | absolute_url | jsonify }}{% if site.og_image %},
-      "logo": {{ site_og_image | jsonify }}{% endif %}
+      "logo": {{ site.og_image | absolute_url | jsonify }}{% endif %}
     {% else %}
       "@type": "Person",
       "name": {{ site.social.name | default: site.name | jsonify }},

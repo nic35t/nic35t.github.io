@@ -24,6 +24,7 @@
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
+    flex-wrap: wrap; // Mobile safety
     font-family: $sans-serif-narrow;
 
     @include breakpoint($x-large) {
@@ -86,6 +87,7 @@
   display: block;
   list-style-type: none;
   white-space: nowrap;
+  padding: 0.5em 0.75em; // Touch target optimization
 
   &--lg {
     padding-right: 2em;
