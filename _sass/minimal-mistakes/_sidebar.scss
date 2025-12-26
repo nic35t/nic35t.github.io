@@ -10,7 +10,7 @@
   @include clearfix();
 
   // Mobile & Tablet: Force stack
-  @include breakpoint(max-width $large - 1px) {
+  @media screen and (max-width: #{$large - 1px}) {
     float: none;
     width: 100%;
     clear: both;
