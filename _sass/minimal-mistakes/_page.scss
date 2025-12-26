@@ -37,11 +37,14 @@ body {
 
 .page {
   padding-right: 0; // Mobile reset
+  padding-left: 1rem; // Safety margin left
+  padding-right: 1rem; // Safety margin right
 
   @include breakpoint($large) {
     float: right;
     width: calc(100% - #{$right-sidebar-width-narrow});
     padding-right: $right-sidebar-width-narrow;
+    padding-left: 0; // Reset mobile padding
   }
 
   @include breakpoint($x-large) {
@@ -73,6 +76,10 @@ body {
 .page__title {
   margin-top: 0;
   line-height: 1;
+
+  @include breakpoint(max-width $small) {
+    font-size: 1.75em; // Reduced from default ~2.5em
+  }
 
   & + .page__meta {
     margin-top: -0.5em;
