@@ -3,6 +3,8 @@ title: "대한민국 경제 10위, 원화의 위상은?: 데이터로 본 원화
 date: 2025-09-22 14:05:00 +0900
 categories: [Tech]
 tags: ['원화', '외환시장', '금융', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 대한민국 경제 10위, 원화의 위상은?

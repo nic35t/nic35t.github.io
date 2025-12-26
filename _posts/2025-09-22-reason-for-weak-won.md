@@ -3,6 +3,8 @@ title: "‘안정’의 대가: 원화가 국제 시장에서 힘을 쓰지 못�
 date: 2025-09-22 14:10:00 +0900
 categories: [Tech]
 tags: ['원화', '금융정책', '자본유출', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # ‘안정’의 대가: 원화가 국제 시장에서 힘을 쓰지 못하는 이유

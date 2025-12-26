@@ -3,6 +3,8 @@ title: "깔끔하게 정리하기: ORDER BY로 데이터 정렬하기"
 date: 2025-08-23 15:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary', 'ORDER BY']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 깔끔하게 정리하기: ORDER BY로 데이터 정렬하기

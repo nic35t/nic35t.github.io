@@ -3,6 +3,8 @@ title: "SQL 왕초보의 첫걸음, SELECT와 FROM을 만나다!"
 date: 2025-08-19 11:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # SQL 왕초보의 첫걸음, SELECT와 FROM을 만나다!

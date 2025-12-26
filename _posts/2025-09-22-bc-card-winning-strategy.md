@@ -3,6 +3,8 @@ title: "승리의 기억: BC카드는 어떻게 글로벌 공룡을 이겼을까
 date: 2025-09-22 14:20:00 +0900
 categories: [Tech]
 tags: ['BC카드', '전략', '원팀', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 승리의 기억: BC카드는 어떻게 글로벌 공룡을 이겼을까?

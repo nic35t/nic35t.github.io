@@ -3,6 +3,8 @@ title: "손해 보는 장사가 아니다: 스테이블코인의 수익 모델 �
 date: 2025-09-22 14:35:00 +0900
 categories: [Tech]
 tags: ['수익모델', '국채', '스테이블코인', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 손해 보는 장사가 아니다: 스테이블코인의 수익 모델 파헤치기

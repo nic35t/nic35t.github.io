@@ -3,6 +3,8 @@ title: "누구는 되고 누구는 안된다?: 혁신의 발목을 잡는 규제
 date: 2025-09-22 14:45:00 +0900
 categories: [Tech]
 tags: ['규제', '금융법', '스테이블코인', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 누구는 되고 누구는 안된다?: 혁신의 발목을 잡는 규제의 역설

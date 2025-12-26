@@ -3,6 +3,8 @@ title: "우리가 지금 당장 시작해야 할 일: 구체적인 액션 플랜
 date: 2025-09-22 15:05:00 +0900
 categories: [Tech]
 tags: ['액션플랜', '정책제안', '스테이블코인', '원화 스테이블코인 심층분석']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 우리가 지금 당장 시작해야 할 일: 구체적인 액션 플랜 제안

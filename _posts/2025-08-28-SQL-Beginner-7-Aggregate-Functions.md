@@ -3,6 +3,8 @@ title: "숫자 데이터 요리하기: SUM, AVG, MAX, MIN 함수"
 date: 2025-08-28 14:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary', 'Aggregate']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 숫자 데이터 요리하기: SUM, AVG, MAX, MIN 함수

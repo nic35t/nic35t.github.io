@@ -3,6 +3,8 @@ title: "더 똑똑한 필터링: AND, OR, LIKE 연산자"
 date: 2025-08-22 10:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary', 'Operators']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 더 똑똑한 필터링: AND, OR, LIKE 연산자

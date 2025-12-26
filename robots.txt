@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nic35t.github.io/sitemap.xml

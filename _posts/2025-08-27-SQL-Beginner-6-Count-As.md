@@ -3,6 +3,8 @@ title: "데이터 개수 세기: COUNT 함수와 AS로 별명 붙이기"
 date: 2025-08-27 09:00:00 +0900
 categories: [SQL]
 tags: ['SQL', 'Database', 'Beginner', 'Diary', 'Functions']
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 데이터 개수 세기: COUNT 함수와 AS로 별명 붙이기

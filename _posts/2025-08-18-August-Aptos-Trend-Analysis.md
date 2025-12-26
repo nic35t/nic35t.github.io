@@ -3,6 +3,8 @@ title: "8월 앱토스(APTOS) 분석: 위기인가, 기회인가?"
 date: 2025-08-18 10:00:00 +0900
 categories: [Web3]
 tags: [Aptos, Web3, Crypto, Tokenomics, Blockchain, Market Analysis]
+header:
+  teaser: /assets/images/noteaser.jpg
 ---
 
 # 8월 앱토스(APTOS) 분석: 위기인가, 기회인가?
