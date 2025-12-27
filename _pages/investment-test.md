@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "" # Jekyll page title is now controlled internally for better UI integration
+title: ""
 permalink: /investment-test/
 classes: wide
 author_profile: false
@@ -9,257 +9,343 @@ sidebar:
 ---
 
 <style>
-  /* Local Styles for Investment Test */
+  /* Global Resets & Variables */
   :root {
     --toss-blue: #3182f6;
-    --bg-gray: #f2f4f6;
     --text-dark: #191f28;
     --text-gray: #8b95a1;
+    --bg-pink: #fff0f6;
+    --checker-color: #ffdeeb;
+    --btn-yellow: #ffdc3c;
+    --btn-green: #28d05a;
+    --btn-black: #191f28;
   }
 
-  /* Reset box-sizing for this component */
-  .investment-test-container, .investment-test-container * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
+  /* Main Container Override */
   .investment-test-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px; /* App-like width */
     margin: 0 auto;
-    padding: 30px 20px;
+    padding: 0;
     font-family: "Pretendard", -apple-system, sans-serif;
     text-align: center;
     background-color: #fff;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden; /* Prevent overflow */
+    border-radius: 0; /* Reset for mobile feel */
+    overflow: hidden;
     position: relative;
-    min-height: 550px;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
   }
 
-  /* Screens */
-  .screen {
-    display: none;
+  /* 
+   * SCREEN 1: START SCREEN DESIGN 
+   * Pink Checkered Background & Specific Layout
+   */
+  #start-screen {
     width: 100%;
-    animation: fadeIn 0.5s ease-out;
-  }
-
-  .screen.active {
+    height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    background-color: var(--bg-pink);
+    background-image:
+      linear-gradient(45deg, var(--checker-color) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--checker-color) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--checker-color) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--checker-color) 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+    padding: 20px;
+    position: relative;
   }
 
-  /* Typography */
-  h1.test-title {
-    font-size: 2rem;
-    font-weight: 800;
+  /* Top Nav */
+  .app-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
     color: var(--text-dark);
-    margin-bottom: 1rem;
-    line-height: 1.3;
-    word-keep: keep-all; /* Korean typography */
+    font-size: 1.2rem;
+  }
+  .nav-center {
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.5);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .nav-right { display: flex; gap: 15px; }
+
+  /* Main Title */
+  .main-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 0px #fff;
+    word-keep: keep-all;
   }
 
-  p.test-desc {
-    font-size: 1.1rem;
+  /* Yellow Badge Button */
+  .yellow-badge {
+    background-color: var(--btn-yellow);
+    color: var(--text-dark);
+    font-weight: 800;
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 1rem;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: inline-block;
+    border: 2px solid #fff;
+  }
+
+  /* Central Card Section */
+  .central-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    width: 100%;
+    border-radius: 30px;
+    padding: 25px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card-row {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .mini-card {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 16px;
+    padding: 15px 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  }
+  .mini-card h4 {
+    font-size: 0.85rem;
     color: var(--text-gray);
-    margin-bottom: 2rem;
-    line-height: 1.6;
+    margin: 0 0 8px 0;
+  }
+  .mini-card p {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+    line-height: 1.3;
     word-break: keep-all;
   }
 
-  /* Buttons */
-  .btn-primary {
-    background-color: var(--toss-blue);
+  .green-btn {
+    background-color: var(--btn-green);
     color: white;
-    border: none;
-    padding: 16px 32px;
-    font-size: 1.1rem;
     font-weight: 700;
-    border-radius: 16px;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
-    width: 100%;
-    max-width: 300px;
-    box-shadow: 0 4px 12px rgba(49, 130, 246, 0.3);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 1rem;
+    box-shadow: 0 4px 0px #1e9e45; /* 3D effect */
+    margin-bottom: 5px;
   }
 
-  .btn-primary:hover {
-    background-color: #1b64da;
-    transform: translateY(-2px);
+  .hashtag-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  .hashtag {
+    background: #fff;
+    border: 1px solid var(--text-dark);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
   }
 
-  .btn-option {
-    background-color: #ffffff;
-    border: 2px solid #e5e8eb;
-    color: var(--text-dark);
-    padding: 18px 20px;
-    margin-bottom: 12px;
-    border-radius: 16px;
-    cursor: pointer;
-    width: 100%;
+  /* Sub Text & Stats */
+  .sub-text-msg {
     font-size: 1rem;
     font-weight: 600;
-    transition: all 0.2s;
-    text-align: left;
-    line-height: 1.5;
-    word-break: keep-all; /* Prevent awkward word breaks */
-    word-wrap: break-word; /* Safety wrap */
-  }
-
-  .btn-option:hover {
-    border-color: var(--toss-blue);
-    background-color: #f9fbff;
-    color: var(--toss-blue);
-  }
-
-  /* Progress Bar */
-  .progress-container {
-    width: 100%;
-    background-color: #e5e8eb;
-    height: 8px;
-    border-radius: 4px;
-    margin-bottom: 30px;
-    overflow: hidden;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background-color: var(--toss-blue);
-    width: 0%;
-    transition: width 0.3s ease;
-  }
-
-  /* Result Section */
-  .result-emoji {
-    font-size: 5rem;
-    margin-bottom: 1rem;
-    animation: bounce 2s infinite;
-  }
-
-  .result-type {
-    font-size: 1.2rem;
-    color: var(--toss-blue);
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-
-  .result-name {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    word-break: keep-all;
-    line-height: 1.3;
-  }
-
-  .result-box {
-    background-color: #f9fafb;
-    padding: 20px;
-    border-radius: 16px;
+    color: var(--text-dark);
     margin-bottom: 20px;
-    width: 100%;
-    text-align: left;
-    box-sizing: border-box; /* Explicit safety */
   }
 
-  .result-box h3 {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    margin-top: 0;
+  .participant-info {
+    margin-bottom: 30px;
   }
-
-  .result-box ul {
-    padding-left: 20px;
-    margin: 0;
-    font-size: 0.95rem;
-    color: var(--text-gray);
-  }
-  
-  .result-box li {
-    margin-bottom: 6px;
-  }
-
-  .recommend-link {
+  .participant-label {
     display: block;
-    margin-top: 10px;
-    color: var(--toss-blue);
-    font-weight: 700;
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 4px;
   }
-  
-  .recommend-link:hover {
-    border-bottom: 1px solid var(--toss-blue);
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  .participant-count {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text-dark);
+    font-family: 'Roboto', sans-serif; /* For nice numbers */
   }
 
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-    40% {transform: translateY(-10px);}
-    60% {transform: translateY(-5px);}
+  /* Bottom Black Start Button */
+  .start-btn-black {
+    width: 100%;
+    background-color: var(--btn-black);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 20px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+    margin-top: auto; /* Push to bottom */
+  }
+  .start-btn-black:active { transform: scale(0.98); }
+  
+  .btn-main-text {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .btn-sub-text {
+    display: block;
+    font-size: 0.9rem;
+    color: #aaa;
+    font-weight: 400;
+  }
+
+
+  /* 
+   * QUIZ & RESULT SCREEN STYLES (Keep Clean White)
+   */
+  .screen:not(#start-screen) {
+    padding: 30px 20px;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    flex-grow: 1;
+    display: none; /* Hidden by default */
   }
   
-  /* Mobile optimization */
-  @media (max-width: 600px) {
-    .investment-test-container {
-      padding: 20px 15px; /* Reduced padding */
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      min-height: 450px;
-    }
-    h1.test-title { 
-      font-size: 1.5rem; 
-      margin-top: 0;
-    }
-    .btn-option {
-      padding: 15px;
-      font-size: 0.95rem;
-    }
-    .result-name {
-      font-size: 1.5rem;
-    }
+  .screen.active {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
+
+  /* Re-using existing styles for quiz/result */
+  .test-title { font-size: 1.4rem; font-weight: 800; color: var(--text-dark); margin-bottom: 1rem; }
+  .btn-option {
+    background: #fff; border: 2px solid #e5e8eb; color: var(--text-dark);
+    padding: 18px 20px; margin-bottom: 12px; border-radius: 16px;
+    cursor: pointer; width: 100%; font-size: 1rem; font-weight: 600;
+    text-align: left; transition: all 0.2s;
+  }
+  .btn-option:hover { border-color: var(--toss-blue); background: #f9fbff; color: var(--toss-blue); }
+  
+  .progress-container { width: 100%; background: #e5e8eb; height: 6px; border-radius: 3px; margin-bottom: 30px; }
+  .progress-bar { height: 100%; background: var(--toss-blue); width: 0%; transition: width 0.3s; }
+
+  /* Result Screen Specifics */
+  .result-emoji { font-size: 4rem; margin-bottom: 10px; animation: bounce 2s infinite; }
+  .result-type { font-size: 1rem; color: var(--toss-blue); font-weight: 700; margin-bottom: 5px; }
+  .result-name { font-size: 1.6rem; font-weight: 800; margin-bottom: 20px; word-break: keep-all; line-height: 1.3; }
+  .result-box { background: #f9fafb; padding: 20px; border-radius: 16px; margin-bottom: 20px; width: 100%; text-align: left; }
+  .result-box h3 { font-size: 1rem; margin: 0 0 10px 0; }
+  .result-box ul { padding-left: 20px; margin: 0; font-size: 0.9rem; color: #666; }
+  .result-box li { margin-bottom: 5px; }
+  .btn-action { background: var(--toss-blue); color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 700; flex: 1; cursor: pointer; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
 </style>
 
 <div class="investment-test-container">
-  <!-- 1. Start Screen -->
-  <div id="start-screen" class="screen active">
-    <div style="font-size: 4rem; margin-bottom: 20px;">💰</div>
-    <h1 class="test-title">2025 실전형<br>투자 성향 테스트</h1>
-    <p class="test-desc">나는 어떤 투자 동물일까?<br>행동 경제학 기반으로 분석하는<br>나의 진짜 투자 DNA 찾기</p>
-    <button class="btn-primary" onclick="startTest()">테스트 시작하기</button>
+
+  <!-- 1. START SCREEN (Redesigned) -->
+  <div id="start-screen">
+    <!-- Nav -->
+    <nav class="app-nav">
+      <i class="fas fa-bars"></i>
+      <span class="nav-center">2025년 특징</span>
+      <div class="nav-right">
+        <i class="fas fa-search"></i>
+        <i class="fas fa-user"></i>
+      </div>
+    </nav>
+
+    <!-- Title -->
+    <h1 class="main-title">2025년 연말<br>투자 성향 테스트</h1>
+
+    <!-- Yellow CTA -->
+    <div class="yellow-badge">내 투자 동물 유형 찾기!</div>
+
+    <!-- Central Card -->
+    <div class="central-card">
+      <div class="card-row">
+        <div class="mini-card">
+          <h4>투자 스타일</h4>
+          <p>돌격대장<br>일단 사고 본다<br>급등주 추격</p>
+        </div>
+        <div class="mini-card">
+          <h4>멘탈 관리</h4>
+          <p>유리멘탈<br>파란불에 덜덜<br>하루종일 차트봄</p>
+        </div>
+      </div>
+      <div class="green-btn">2025 목표 수익률</div>
+      <div class="hashtag-row">
+        <div class="hashtag">#안전제일</div>
+        <div class="hashtag">#인생한방</div>
+      </div>
+    </div>
+
+    <!-- Text & Stats -->
+    <p class="sub-text-msg">당신의 2025년 투자 운세는?</p>
+    
+    <div class="participant-info">
+      <span class="participant-label">현재까지 참여자 수</span>
+      <span class="participant-count">186,004 명</span>
+    </div>
+
+    <!-- Black Start Button -->
+    <button class="start-btn-black" onclick="startTest()">
+      <span class="btn-main-text">시작하기</span>
+      <span class="btn-sub-text">3분 만에 확인하는 나의 투자 성향</span>
+    </button>
   </div>
 
-  <!-- 2. Quiz Screen -->
+
+  <!-- 2. QUIZ SCREEN -->
   <div id="quiz-screen" class="screen">
-    <div class="progress-container">
-      <div id="progress-bar" class="progress-bar"></div>
-    </div>
-    <h2 id="question-text" class="test-title" style="font-size: 1.4rem;">질문 내용</h2>
-    <div id="options-container" style="width: 100%; margin-top: 20px;">
-      <!-- Options will be injected here -->
-    </div>
+    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+    <h2 id="question-text" class="test-title">질문 내용</h2>
+    <div id="options-container" style="width: 100%; margin-top: 20px;"></div>
   </div>
 
-  <!-- 3. Loading Screen -->
-  <div id="loading-screen" class="screen">
-    <div style="font-size: 3rem;">🧠</div>
-    <h2 style="margin-top: 20px;">투자 패턴 분석 중...</h2>
-    <p>FOMO 지수 계산 중...</p>
-    <p>손실 회피 성향 파악 중...</p>
+
+  <!-- 3. LOADING SCREEN -->
+  <div id="loading-screen" class="screen" style="text-align: center;">
+    <div style="font-size: 3rem; margin-bottom: 20px;">🧠</div>
+    <h2 style="margin-bottom: 10px;">투자 패턴 분석 중...</h2>
+    <p style="color: #888;">AI가 당신의 뇌구조를 스캔하고 있습니다.</p>
   </div>
 
-  <!-- 4. Result Screen -->
+
+  <!-- 4. RESULT SCREEN -->
   <div id="result-screen" class="screen">
     <div id="result-emoji" class="result-emoji">🦁</div>
     <div id="result-type" class="result-type">TYPE A</div>
@@ -267,32 +353,31 @@ sidebar:
     
     <div class="result-box">
       <h3>📊 당신의 투자 스타일</h3>
-      <p id="result-desc" style="line-height: 1.6; color: #4e5968;">설명</p>
+      <p id="result-desc" style="line-height: 1.5; color: #555;">설명</p>
     </div>
 
-    <!-- AdSense Placeholder -->
-    <div style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: 8px; color: #aaa;">
+    <!-- AdSense Space (Clean) -->
+    <div style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
       <!-- AdSense Code Here -->
     </div>
 
     <div class="result-box" style="background-color: #e8f3ff;">
       <h3 style="color: var(--toss-blue);">💡 승리를 위한 솔루션</h3>
-      <ul id="result-advice">
-        <li>조언 1</li>
-      </ul>
+      <ul id="result-advice"></ul>
       <br>
-      <a href="/categories/" class="recommend-link">👉 이 성향을 위한 추천 글 읽기</a>
+      <a href="/categories/" class="recommend-link">👉 추천 투자 아티클 읽기</a>
     </div>
 
     <div style="display: flex; gap: 10px; width: 100%;">
-      <button class="btn-primary" style="flex: 1; background-color: #333;" onclick="shareTest()">결과 공유</button>
-      <button class="btn-primary" style="flex: 1;" onclick="location.reload()">다시하기</button>
+      <button class="btn-action" style="background: #333;" onclick="shareTest()">공유하기</button>
+      <button class="btn-action" onclick="location.reload()">다시하기</button>
     </div>
   </div>
+
 </div>
 
 <script>
-  // Advanced Quiz Data (Based on Behavioral Finance)
+  // Advanced Quiz Data (Same as before)
   const questions = [
     {
       q: "친구가 '이 코인(주식) 사서 2배 벌었어!'라며 수익 인증을 했다. 나의 솔직한 심정은?",
@@ -354,7 +439,6 @@ sidebar:
   ];
 
   // 5 Investment Archetypes
-  // Score Range: 7 ~ 35
   const results = {
     turtle: {
       range: [7, 13],
@@ -402,7 +486,7 @@ sidebar:
   let totalScore = 0;
 
   function startTest() {
-    document.getElementById('start-screen').classList.remove('active');
+    document.getElementById('start-screen').style.display = 'none'; // CSS handles layout, JS just toggles
     document.getElementById('quiz-screen').classList.add('active');
     showQuestion();
   }
@@ -445,16 +529,15 @@ sidebar:
     setTimeout(() => {
       document.getElementById('loading-screen').classList.remove('active');
       showResult();
-    }, 1800); // 1.8s delay for suspense
+    }, 1800);
   }
 
   function showResult() {
     const finalScreen = document.getElementById('result-screen');
     finalScreen.classList.add('active');
 
-    let resultKey = 'owl'; // default
+    let resultKey = 'owl';
     
-    // Logic based on score range
     if (totalScore <= 13) resultKey = 'turtle';
     else if (totalScore <= 20) resultKey = 'owl';
     else if (totalScore <= 26) resultKey = 'lion';
