@@ -9,6 +9,11 @@ sidebar:
 ---
 
 <style>
+  /* Minimal Mistakes 테마의 기본 제목 영역 숨기기 */
+  .page__title, .page__header {
+    display: none !important;
+  }
+
   /* Local Styles for Investment Test */
   :root {
     --toss-blue: #3182f6;
