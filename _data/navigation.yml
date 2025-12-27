@@ -10,4 +10,6 @@ main:
     url: /categories/diary/
   - title: "Archive"
     url: /categories/
+  - title: "투자 테스트"
+    url: /investment-test/
 
