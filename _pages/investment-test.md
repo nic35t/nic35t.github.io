@@ -17,16 +17,22 @@ sidebar:
     --text-gray: #8b95a1;
   }
 
+  /* Reset box-sizing for this component */
+  .investment-test-container, .investment-test-container * {
+    box-sizing: border-box;
+  }
+
   .investment-test-container {
+    width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 30px 20px;
     font-family: "Pretendard", -apple-system, sans-serif;
     text-align: center;
     background-color: #fff;
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    overflow: hidden;
+    overflow: hidden; /* Prevent overflow */
     position: relative;
     min-height: 500px;
     display: flex;
@@ -56,6 +62,7 @@ sidebar:
     color: var(--text-dark);
     margin-bottom: 1rem;
     line-height: 1.3;
+    word-keep: keep-all; /* Korean typography */
   }
 
   p.test-desc {
@@ -63,6 +70,7 @@ sidebar:
     color: var(--text-gray);
     margin-bottom: 2rem;
     line-height: 1.6;
+    word-break: keep-all;
   }
 
   /* Buttons */
@@ -90,7 +98,7 @@ sidebar:
     background-color: #ffffff;
     border: 2px solid #e5e8eb;
     color: var(--text-dark);
-    padding: 20px;
+    padding: 18px 20px;
     margin-bottom: 12px;
     border-radius: 16px;
     cursor: pointer;
@@ -99,6 +107,9 @@ sidebar:
     font-weight: 600;
     transition: all 0.2s;
     text-align: left;
+    line-height: 1.5;
+    word-break: keep-all; /* Prevent awkward word breaks */
+    word-wrap: break-word; /* Safety wrap */
   }
 
   .btn-option:hover {
@@ -139,10 +150,11 @@ sidebar:
   }
 
   .result-name {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     word-break: keep-all;
+    line-height: 1.3;
   }
 
   .result-box {
@@ -152,11 +164,13 @@ sidebar:
     margin-bottom: 20px;
     width: 100%;
     text-align: left;
+    box-sizing: border-box; /* Explicit safety */
   }
 
   .result-box h3 {
     font-size: 1.1rem;
     margin-bottom: 10px;
+    margin-top: 0;
   }
 
   .result-box ul {
@@ -194,11 +208,22 @@ sidebar:
   /* Mobile optimization */
   @media (max-width: 600px) {
     .investment-test-container {
-      padding: 15px;
-      border-radius: 0;
-      box-shadow: none;
+      padding: 20px 15px; /* Reduced padding */
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      min-height: 450px;
     }
-    h1.test-title { font-size: 1.6rem; }
+    h1.test-title { 
+      font-size: 1.5rem; 
+      margin-top: 0;
+    }
+    .btn-option {
+      padding: 15px;
+      font-size: 0.95rem;
+    }
+    .result-name {
+      font-size: 1.5rem;
+    }
   }
 </style>
 
