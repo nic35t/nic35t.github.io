@@ -549,10 +549,13 @@ body {
   .page {
     @include breakpoint($large) {
       padding-right: 0;
+      width: 100%;
+      float: none;
     }
 
     @include breakpoint($x-large) {
       padding-right: 0;
+      width: 100%;
     }
   }
 
