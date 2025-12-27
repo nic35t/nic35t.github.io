@@ -275,10 +275,11 @@ sidebar:
       <p id="result-desc" style="line-height: 1.6; color: #4e5968;">설명</p>
     </div>
 
-    <!-- AdSense Placeholder -->
+    <!-- AdSense Placeholder (Hidden) 
     <div style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: 8px; color: #aaa;">
-      <!-- AdSense Code Here -->
+      AdSense Code Here
     </div>
+    -->
 
     <div class="result-box" style="background-color: #e8f3ff;">
       <h3 style="color: var(--toss-blue);">💡 승리를 위한 솔루션</h3>
