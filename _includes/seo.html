@@ -32,14 +32,6 @@
   {%- assign author_twitter = author.twitter | replace: "@", "" -%}
 {%- endif -%}
 
-{%- comment -%}
-  Improved OG Image Logic:
-  1. page.header.og_image
-  2. page.header.overlay_image
-  3. page.header.teaser
-  4. site.og_image
-{%- endcomment -%}
-
 {%- assign og_image_path = page.header.og_image | default: page.header.overlay_image | default: page.header.teaser | default: site.og_image -%}
 {%- assign seo_image = og_image_path | absolute_url | escape -%}
 
@@ -71,6 +63,7 @@
 
 {% if seo_image %}
   <meta property="og:image" content="{{ seo_image }}">
+  <meta property="og:image:alt" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
 {% endif %}
 
 {% if site.twitter.username %}
@@ -78,12 +71,11 @@
   <meta name="twitter:title" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
   <meta name="twitter:description" content="{{ seo_description }}">
   <meta name="twitter:url" content="{{ canonical_url }}">
-  
-  {% comment %} Force Large Image Card {% endcomment %}
   <meta name="twitter:card" content="summary_large_image">
   
   {% if seo_image %}
     <meta name="twitter:image" content="{{ seo_image }}">
+    <meta name="twitter:image:alt" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
   {% endif %}
 
   {% if author_twitter %}
@@ -103,7 +95,6 @@
   {% if site.facebook.publisher %}
     <meta property="article:publisher" content="{{ site.facebook.publisher }}">
   {% endif %}
-
   {% if site.facebook.app_id %}
     <meta property="fb:app_id" content="{{ site.facebook.app_id }}">
   {% endif %}
@@ -119,8 +110,38 @@
 {% endif %}
 
 <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
+{
+  "@context": "https://schema.org",
+  {% if og_type == "article" %}
+    "@type": "BlogPosting",
+    "headline": {{ page.title | markdownify | strip_html | strip_newlines | escape_once | jsonify }},
+    "datePublished": {{ page.date | date_to_xmlschema | jsonify }},
+    "dateModified": {{ page.last_modified_at | default: page.date | date_to_xmlschema | jsonify }},
+    "description": {{ seo_description | jsonify }},
+    "url": {{ canonical_url | jsonify }},
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": {{ canonical_url | jsonify }}
+    },
+    "author": {
+      "@type": "Person",
+      "name": {{ author.name | default: author | jsonify }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ site.title | jsonify }},
+      "logo": {
+        "@type": "ImageObject",
+        "url": {{ site.og_image | absolute_url | jsonify }}
+      }
+    }
+    {% if seo_image %}
+    ,"image": {
+      "@type": "ImageObject",
+      "url": {{ seo_image | jsonify }}
+    }
+    {% endif %}
+  {% else %}
     {% if site.social.type == "Organization" %}
       "@type": "Organization",
       "url": {{ '/' | absolute_url | jsonify }}{% if site.og_image %},
@@ -128,10 +149,11 @@
     {% else %}
       "@type": "Person",
       "name": {{ site.social.name | default: site.name | jsonify }},
-      "url": {{ '/' | absolute_url |jsonify }}{% if site.social.links %},
+      "url": {{ '/' | absolute_url | jsonify }}{% if site.social.links %},
       "sameAs": {{ site.social.links | jsonify }}{% endif %}
     {% endif %}
-  }
+  {% endif %}
+}
 </script>
 
 {% if site.google_site_verification %}
