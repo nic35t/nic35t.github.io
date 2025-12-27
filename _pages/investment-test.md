@@ -242,8 +242,7 @@ sidebar:
 
     <!-- AdSense Placeholder -->
     <div style="width: 100%; height: 100px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: 8px; color: #aaa;">
-      광고 영역 (AdSense)
-    </div>
+      </div>
 
     <div class="result-box" style="background-color: #e8f3ff;">
       <h3 style="color: var(--toss-blue);">💡 추천하는 전략</h3>
