@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "2025 새해 투자 성향 테스트"
+title: "" # Jekyll page title is now controlled internally for better UI integration
 permalink: /investment-test/
 classes: wide
 author_profile: false
