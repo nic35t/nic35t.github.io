@@ -271,7 +271,7 @@ sidebar:
     </div>
 
     <!-- AdSense Placeholder -->
-    <div style="width: 100%; height: 100px; background: #eee; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: 8px; color: #aaa;">
+    <div style="width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: 8px; color: #aaa;">
       <!-- AdSense Code Here -->
     </div>
 
