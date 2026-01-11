@@ -167,3 +167,15 @@ $navicon-width: 1.5rem !default;
 $navicon-height: 0.25rem !default;
 $global-transition: all 0.2s ease-in-out !default;
 $intro-transition: intro 0.3s both !default;
+
+/*
+   Z-index layers
+   ========================================================================== */
+
+$z-index-base: 1;
+$z-index-sidebar: 20;
+$z-index-masthead: 100;
+$z-index-navigation-mobile: 110;
+$z-index-modal-overlay: 999;
+$z-index-modal: 1000;
+$z-index-skip-link: 2000;

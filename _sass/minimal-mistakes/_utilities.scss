@@ -67,7 +67,7 @@ body:hover .visually-hidden button {
 
 .skip-link {
   position: fixed;
-  z-index: 20;
+  z-index: $z-index-skip-link;
   margin: 0;
   font-family: $sans-serif;
   white-space: nowrap;

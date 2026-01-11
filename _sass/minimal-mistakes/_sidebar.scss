@@ -84,7 +84,7 @@
     width: $right-sidebar-width-narrow;
     margin-right: -1 * $right-sidebar-width-narrow;
     padding-left: 1em;
-    z-index: 10;
+    z-index: $z-index-sidebar;
 
     &.sticky {
       @include clearfix();
