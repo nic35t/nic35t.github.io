@@ -25,14 +25,8 @@
     -ms-flex-pack: justify;
     justify-content: space-between;
     flex-wrap: nowrap; // Keep single line
-    overflow-x: auto; // Horizontal scroll
+    overflow: visible; // Allow dropdown to overflow
     -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: none; // Hide scrollbar IE/Edge
-    scrollbar-width: none; // Hide scrollbar Firefox
-    
-    &::-webkit-scrollbar {
-      display: none; // Hide scrollbar Chrome/Safari
-    }
 
     font-family: $sans-serif-narrow;
 
@@ -41,6 +35,7 @@
     }
 
     nav {
+      position: relative;
       z-index: 10;
     }
 
