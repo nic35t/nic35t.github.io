@@ -1,4 +1,6 @@
 ---
+lang: ko
+translation_key: ai-business-planning-havruta-method
 title: "[비즈니스 기획] AI가 써준 사업계획서가 뻔한 이유? '하브루타식 문답 기획법'으로 해결하세요"
 excerpt: "AI를 작가가 아닌 인터뷰어로 활용하여 나만의 고유한 사업 논리를 추출하는 프롬프트 하네스 전략"
 header:

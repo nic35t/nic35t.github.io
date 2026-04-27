@@ -1,4 +1,6 @@
 ---
+lang: ko
+translation_key: won-as-big-hand-in-crypto
 title: "의외의 발견: 암호화폐 시장의 ‘큰 손’이 원화인 이유"
 date: 2025-09-22 14:15:00 +0900
 categories: [Tech]

@@ -1,0 +1,28 @@
+{% assign current_lang = page.lang | default: site.locale | default: "ko" | slice: 0, 2 %}
+{% assign current_translation_key = page.translation_key %}
+{% assign paired_doc = nil %}
+
+{% if current_translation_key %}
+  {% assign translation_docs = site.posts | concat: site.pages %}
+  {% for doc in translation_docs %}
+    {% assign doc_lang = doc.lang | default: site.locale | default: "ko" | slice: 0, 2 %}
+    {% if doc.translation_key == current_translation_key and doc.url != page.url and doc_lang != current_lang %}
+      {% assign paired_doc = doc %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if paired_doc %}
+  <nav class="page__language-switcher" aria-label="Language switcher">
+    {% if current_lang == "ko" %}
+      <strong>한국어</strong>
+      <span aria-hidden="true">|</span>
+      <a href="{{ paired_doc.url | relative_url }}">English</a>
+    {% else %}
+      <a href="{{ paired_doc.url | relative_url }}">한국어</a>
+      <span aria-hidden="true">|</span>
+      <strong>English</strong>
+    {% endif %}
+  </nav>
+{% endif %}

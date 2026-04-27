@@ -1,13 +1,15 @@
-{% if post.header.teaser %}
-  {% capture teaser %}{{ post.header.teaser }}{% endcapture %}
+{% assign document = include.post | default: post | default: page %}
+
+{% if document.header.teaser %}
+  {% capture teaser %}{{ document.header.teaser }}{% endcapture %}
 {% else %}
   {% assign teaser = site.teaser %}
 {% endif %}
 
-{% if post.id %}
-  {% assign title = post.title | markdownify | remove: "<p>" | remove: "</p>" %}
+{% if document.id %}
+  {% assign title = document.title | markdownify | remove: "<p>" | remove: "</p>" %}
 {% else %}
-  {% assign title = post.title %}
+  {% assign title = document.title %}
 {% endif %}
 
 <div class="{{ include.type | default: 'list' }}__item">
@@ -18,13 +20,13 @@
       </div>
     {% endif %}
     <h3 class="archive__item-title no_toc" itemprop="headline">
-      {% if post.link %}
-        <a href="{{ post.link }}">{{ title }}</a> <a href="{{ post.url | relative_url }}" rel="permalink"><i class="fas fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
+      {% if document.link %}
+        <a href="{{ document.link }}">{{ title }}</a> <a href="{{ document.url | relative_url }}" rel="permalink"><i class="fas fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
       {% else %}
-        <a href="{{ post.url | relative_url }}" rel="permalink">{{ title }}</a>
+        <a href="{{ document.url | relative_url }}" rel="permalink">{{ title }}</a>
       {% endif %}
     </h3>
-    {% include page__meta.html type=include.type %}
-    {% if post.excerpt %}<p class="archive__item-excerpt" itemprop="description">{{ post.excerpt | markdownify | strip_html | truncate: 160 }}</p>{% endif %}
+    {% include page__meta.html post=document type=include.type %}
+    {% if document.excerpt %}<p class="archive__item-excerpt" itemprop="description">{{ document.excerpt | markdownify | strip_html | truncate: 160 }}</p>{% endif %}
   </article>
 </div>

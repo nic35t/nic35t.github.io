@@ -1,4 +1,6 @@
 ---
+lang: ko
+translation_key: korea-blockchain-regulation-crossroads
 title: "갈림길에 선 K-블록체인: 혁신인가, 고립인가?"
 date: 2025-10-11 11:00:00 +0900
 categories: [Web3, Policy]
