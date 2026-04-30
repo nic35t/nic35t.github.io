@@ -6,30 +6,6 @@
 
 {% assign title_separator = site.title_separator | default: '-' | replace: '|', '&#124;' %}
 
-{%- assign page_lang = page.lang | default: site.locale | default: "ko-KR" -%}
-{%- assign page_lang_short = page_lang | slice: 0, 2 -%}
-{%- assign page_locale = "ko-KR" -%}
-{%- if page_lang_short == "en" -%}
-  {%- assign page_locale = "en" -%}
-{%- endif -%}
-{%- assign og_locale = "en_US" -%}
-{%- if page_lang_short == "ko" -%}
-  {%- assign og_locale = "ko_KR" -%}
-{%- endif -%}
-
-{%- assign translation_key = page.translation_key -%}
-{%- assign paired_doc = nil -%}
-{%- if translation_key -%}
-  {%- assign translation_docs = site.posts | concat: site.pages -%}
-  {%- for doc in translation_docs -%}
-    {%- assign doc_lang = doc.lang | default: site.locale | default: "ko-KR" | slice: 0, 2 -%}
-    {%- if doc.translation_key == translation_key and doc.url != page.url and doc_lang != page_lang_short -%}
-      {%- assign paired_doc = doc -%}
-      {%- break -%}
-    {%- endif -%}
-  {%- endfor -%}
-{%- endif -%}
-
 {%- if page.title -%}
   {%- assign seo_title = page.title | append: " " | append: title_separator | append: " " | append: site.title -%}
 {%- endif -%}
@@ -56,7 +32,7 @@
   {%- assign author_twitter = author.twitter | replace: "@", "" -%}
 {%- endif -%}
 
-{%- assign og_image_path = page.header.og_image | default: page.header.overlay_image | default: page.header.teaser | default: site.og_image | default: site.logo -%}
+{%- assign og_image_path = page.header.og_image | default: page.header.overlay_image | default: page.header.teaser | default: site.og_image -%}
 {%- assign seo_image = og_image_path | absolute_url | escape -%}
 
 {%- if page.date -%}
@@ -65,11 +41,7 @@
   {%- assign og_type = "website" -%}
 {%- endif -%}
 
-{% if paired_doc %}
-  {%- assign paired_url = paired_doc.url | replace: "index.html", "" | absolute_url -%}
-{% endif %}
-
-<title>{{ seo_title | default: site.title }}{% if paginator %}{% unless paginator.page == 1 %} {{ title_separator }} {{ site.data.ui-text[page_locale].page | default: "Page" }} {{ paginator.page }}{% endunless %}{% endif %}</title>
+<title>{{ seo_title | default: site.title }}{% if paginator %}{% unless paginator.page == 1 %} {{ title_separator }} {{ site.data.ui-text[site.locale].page | default: "Page" }} {{ paginator.page }}{% endunless %}{% endif %}</title>
 <meta name="description" content="{{ seo_description }}">
 
 {% if author.name %}
@@ -80,7 +52,7 @@
 {% endif %}
 
 <meta property="og:type" content="{{ og_type }}">
-<meta property="og:locale" content="{{ og_locale }}">
+<meta property="og:locale" content="{{ site.locale | replace: "-", "_" | default: "en_US" }}">
 <meta property="og:site_name" content="{{ site.title }}">
 <meta property="og:title" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
 <meta property="og:url" content="{{ canonical_url }}">
@@ -100,7 +72,7 @@
   <meta name="twitter:description" content="{{ seo_description }}">
   <meta name="twitter:url" content="{{ canonical_url }}">
   <meta name="twitter:card" content="summary_large_image">
-
+  
   {% if seo_image %}
     <meta name="twitter:image" content="{{ seo_image }}">
     <meta name="twitter:image:alt" content="{{ page.title | default: site.title | markdownify | strip_html | strip_newlines | escape_once }}">
@@ -119,10 +91,6 @@
   <meta property="article:modified_time" content="{{ page.last_modified_at | date_to_xmlschema }}">
 {% endif %}
 
-{% if page.categories and page.categories.first %}
-  <meta property="article:section" content="{{ page.categories.first }}">
-{% endif %}
-
 {% if site.facebook %}
   {% if site.facebook.publisher %}
     <meta property="article:publisher" content="{{ site.facebook.publisher }}">
@@ -133,16 +101,6 @@
 {% endif %}
 
 <link rel="canonical" href="{{ canonical_url }}">
-
-{% if paired_doc %}
-  {% if page_lang_short == "ko" %}
-    <link rel="alternate" hreflang="ko-KR" href="{{ canonical_url }}">
-    <link rel="alternate" hreflang="en" href="{{ paired_url }}">
-  {% else %}
-    <link rel="alternate" hreflang="en" href="{{ canonical_url }}">
-    <link rel="alternate" hreflang="ko-KR" href="{{ paired_url }}">
-  {% endif %}
-{% endif %}
 
 {% if paginator.previous_page %}
   <link rel="prev" href="{{ paginator.previous_page_path | absolute_url }}">
@@ -161,17 +119,9 @@
     "dateModified": {{ page.last_modified_at | default: page.date | date_to_xmlschema | jsonify }},
     "description": {{ seo_description | jsonify }},
     "url": {{ canonical_url | jsonify }},
-    "inLanguage": {{ page_lang_short | jsonify }},
-    "keywords": {{ page.tags | join: ", " | jsonify }},
-    "articleSection": {{ page.categories.first | jsonify }},
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": {{ canonical_url | jsonify }}
-    },
-    "isPartOf": {
-      "@type": "Blog",
-      "name": {{ site.title | jsonify }},
-      "url": {{ '/' | absolute_url | jsonify }}
     },
     "author": {
       "@type": "Person",
@@ -179,13 +129,11 @@
     },
     "publisher": {
       "@type": "Organization",
-      "name": {{ site.title | jsonify }}
-      {% if site.logo %}
-      ,"logo": {
+      "name": {{ site.title | jsonify }},
+      "logo": {
         "@type": "ImageObject",
-        "url": {{ site.logo | absolute_url | jsonify }}
+        "url": {{ site.og_image | absolute_url | jsonify }}
       }
-      {% endif %}
     }
     {% if seo_image %}
     ,"image": {
@@ -194,16 +142,16 @@
     }
     {% endif %}
   {% else %}
-    "@type": "WebPage",
-    "name": {{ page.title | default: site.title | jsonify }},
-    "description": {{ seo_description | jsonify }},
-    "url": {{ canonical_url | jsonify }},
-    "inLanguage": {{ page_lang_short | jsonify }},
-    "isPartOf": {
-      "@type": "Blog",
-      "name": {{ site.title | jsonify }},
-      "url": {{ '/' | absolute_url | jsonify }}
-    }
+    {% if site.social.type == "Organization" %}
+      "@type": "Organization",
+      "url": {{ '/' | absolute_url | jsonify }}{% if site.og_image %},
+      "logo": {{ site.og_image | absolute_url | jsonify }}{% endif %}
+    {% else %}
+      "@type": "Person",
+      "name": {{ site.social.name | default: site.name | jsonify }},
+      "url": {{ '/' | absolute_url | jsonify }}{% if site.social.links %},
+      "sameAs": {{ site.social.links | jsonify }}{% endif %}
+    {% endif %}
   {% endif %}
 }
 </script>

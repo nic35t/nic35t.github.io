@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: k-stablecoin-opportunities
 title: "K-스테이블코인이 성공할 수밖에 없는 3가지 이유"
 date: 2025-10-11 11:02:00 +0900
 categories: [Web3, Policy]

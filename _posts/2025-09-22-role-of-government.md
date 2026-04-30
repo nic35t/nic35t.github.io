@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: role-of-government
 title: "정부와 국회의 역할: 선수가 뛰려면 경기장을 만들어야 한다"
 date: 2025-09-22 15:00:00 +0900
 categories: [Tech]

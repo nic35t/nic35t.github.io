@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: what-is-stablecoin
 title: "디지털 머니 27조 달러 시대: 스테이블코인이란 무엇이고 어떻게 쓰일까?"
 date: 2025-09-22 14:00:00 +0900
 categories: [Tech]

@@ -12,6 +12,4 @@ main:
     url: /categories/
   - title: "Inv. Test"
     url: /investment-test/
-  - title: "English"
-    url: /en/
 

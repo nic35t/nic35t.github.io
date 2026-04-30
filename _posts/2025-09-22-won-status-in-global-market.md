@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: won-status-in-global-market
 title: "대한민국 경제 10위, 원화의 위상은?: 데이터로 본 원화의 현주소"
 date: 2025-09-22 14:05:00 +0900
 categories: [Tech]

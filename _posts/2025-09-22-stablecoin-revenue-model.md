@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: stablecoin-revenue-model
 title: "손해 보는 장사가 아니다: 스테이블코인의 수익 모델 파헤치기"
 date: 2025-09-22 14:35:00 +0900
 categories: [Tech]

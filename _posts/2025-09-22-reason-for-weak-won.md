@@ -1,6 +1,4 @@
 ---
-lang: ko
-translation_key: reason-for-weak-won
 title: "‘안정’의 대가: 원화가 국제 시장에서 힘을 쓰지 못하는 이유"
 date: 2025-09-22 14:10:00 +0900
 categories: [Tech]
