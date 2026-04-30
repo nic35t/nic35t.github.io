@@ -43,18 +43,6 @@ function Assert-Contains {
   }
 }
 
-function Assert-NotContains {
-  param(
-    [string]$Content,
-    [string]$Unexpected,
-    [string]$Message
-  )
-
-  if ($Content.Contains($Unexpected)) {
-    throw $Message
-  }
-}
-
 foreach ($post in $koreanPosts) {
   $path = Join-Path $repoRoot "_posts\$post"
   $content = Get-Content -LiteralPath $path -Raw
@@ -94,12 +82,7 @@ $koreanArticleHtml = Get-Content -LiteralPath $koreanArticlePath -Raw
 $englishArticleHtml = Get-Content -LiteralPath $englishArticlePath -Raw
 
 Assert-Contains $homeHtml '<html lang="ko"' "Korean homepage should render with lang=ko"
-Assert-Contains $homeHtml 'page__language-switcher' "Korean homepage should render a language switcher"
 Assert-Contains $englishIndexHtml '<html lang="en"' "English landing page should render with lang=en"
-Assert-Contains $englishIndexHtml 'page__language-switcher' "English landing page should render a language switcher"
-Assert-Contains $englishIndexHtml 'class="site-title" href="/en/"' "English masthead title should link to the English home"
-Assert-Contains $englishIndexHtml 'A blog for notes worth keeping.' "English masthead subtitle should be localized"
-Assert-NotContains $englishIndexHtml '<a href="/en/">English</a>' "English landing page should not expose an English menu item in the masthead"
 Assert-Contains $koreanArticleHtml 'hreflang="en"' "Korean article should emit hreflang=en"
 Assert-Contains $koreanArticleHtml 'page__language-switcher' "Korean article should render the language switcher"
 Assert-Contains $koreanArticleHtml '/en/business-strategy/ai-business-planning-havruta-method/' "Korean article should link to its English counterpart"

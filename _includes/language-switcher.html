@@ -16,11 +16,11 @@
 {% if paired_doc %}
   <nav class="page__language-switcher" aria-label="Language switcher">
     {% if current_lang == "ko" %}
-      <strong>&#54620;&#44397;&#50612;</strong>
+      <strong>한국어</strong>
       <span aria-hidden="true">|</span>
       <a href="{{ paired_doc.url | relative_url }}">English</a>
     {% else %}
-      <a href="{{ paired_doc.url | relative_url }}">&#54620;&#44397;&#50612;</a>
+      <a href="{{ paired_doc.url | relative_url }}">한국어</a>
       <span aria-hidden="true">|</span>
       <strong>English</strong>
     {% endif %}
