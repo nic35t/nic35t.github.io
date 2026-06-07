@@ -1,3 +1,5 @@
 User-agent: *
+User-agent: Mediapartners-Google
+User-agent: Google-Display-Ads-Bot
 Allow: /
 Sitemap: https://nic35t.github.io/sitemap.xml
