@@ -173,6 +173,13 @@ exclude:
   - tmp
   - /docs # ignore Minimal Mistakes /docs
   - /test # ignore Minimal Mistakes /test
+  - minimal-mistakes-jekyll.gemspec
+  - banner.js
+  - commit_message.txt
+  - .travis.yml
+  - scripts
+  - debug-report
+  - vendor/bundle
 keep_files:
   - .git
   - .svn
@@ -210,14 +217,13 @@ sass:
 permalink: /:categories/:title/
 paginate: 5 # amount of posts to show
 paginate_path: /page:num/
-timezone: Asis/Seoul # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: Asia/Seoul # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
 # Plugins (previously gems:)
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll/figure
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
@@ -226,7 +232,6 @@ plugins:
 whitelist:
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll/figure
   - jekyll-gist
   - jekyll-feed
   - jekyll-include-cache
