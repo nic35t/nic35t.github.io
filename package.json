@@ -28,6 +28,7 @@
     "pixelmatch": "^7.1.0",
     "playwright": "^1.56.0",
     "pngjs": "^7.0.0",
+    "sharp": "^0.34.4",
     "uglify-js": "^3.13.6"
   },
   "scripts": {

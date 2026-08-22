@@ -14,7 +14,7 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { AUDIT, MIN_TAP_TARGET } from "./diagnose.mjs";
 import { compare as compareVisual } from "./lib/visual.mjs";
-import { signature, partitionKnown } from "./lib/known.mjs";
+import { entryOf, partitionKnown } from "./lib/known.mjs";
 
 const BASE_CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -165,7 +165,7 @@ const lcpSlow = { level: "error", check: "web-vitals", message: "LCP 12624ms is 
 const lcpSlower = { level: "error", check: "web-vitals", message: "LCP 13901ms is poor (good \u2264 2500)" };
 
 const onePage = (findings) => [{ path: "/", viewport: "mobile", findings }];
-const baseline = new Set([signature("/", "mobile", a11yTwo), signature("/", "mobile", lcpSlow)]);
+const baseline = [entryOf("/", "mobile", a11yTwo), entryOf("/", "mobile", lcpSlow)];
 
 const RATCHET_CASES = [
   {
@@ -187,6 +187,11 @@ const RATCHET_CASES = [
     name: "an unrecorded check is caught",
     results: onePage([{ level: "error", check: "click-blocked", message: "1 interactive element(s) are covered" }]),
     expect: { unexpected: 1, known: 0 },
+  },
+  {
+    name: "fixing one of two rules is not punished",
+    results: onePage([{ level: "error", check: "a11y", message: "1 blocking accessibility violation(s)", details: [{ rule: "color-contrast" }] }]),
+    expect: { unexpected: 0, known: 1 },
   },
   {
     name: "warnings are never ratcheted",

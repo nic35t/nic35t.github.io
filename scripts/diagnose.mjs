@@ -415,7 +415,11 @@ async function auditPage(context, urlPath, viewport) {
         message: "paint timing unavailable — the browser never recorded a contentful paint",
         details: blocking.length
           ? ["likely the render-blocking resources above; re-run without --external to stub them"]
-          : ["no render-blocking third-party resources found; investigate manually"],
+          : [
+              "the page does render, so this is the browser not emitting paint entries rather than a slow page.",
+              "headless Chromium does this intermittently, more often at wider viewports. Treat the metric as",
+              "unmeasured, not as fast. CLS and INP are unaffected.",
+            ],
       });
     }
 

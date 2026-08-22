@@ -5,7 +5,13 @@
     <div class="masthead__menu">
       <nav id="site-nav" class="greedy-nav">
         {% unless logo_path == empty %}
-          <a class="site-logo" href="{{ '/' | relative_url }}"><img src="{{ logo_path | relative_url }}" alt=""></a>
+          {%- comment -%}
+            The image is decorative next to the site title beside it, so its alt
+            stays empty — but the link then has no accessible name at all, which
+            axe flags as a serious link-name violation. The label goes on the
+            link rather than the image.
+          {%- endcomment -%}
+          <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="{{ site.title | markdownify | strip_html | strip_newlines | escape_once }} 홈"><img src="{{ logo_path | relative_url }}" alt=""></a>
         {% endunless %}
         <a class="site-title" href="{{ '/' | relative_url }}">
           {{ site.masthead_title | default: site.title }}
