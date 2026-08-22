@@ -14,6 +14,7 @@ import path from "node:path";
 import { PNG } from "pngjs";
 import { AUDIT, MIN_TAP_TARGET } from "./diagnose.mjs";
 import { compare as compareVisual } from "./lib/visual.mjs";
+import { signature, partitionKnown } from "./lib/known.mjs";
 
 const BASE_CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -154,6 +155,58 @@ for (const testCase of VISUAL_CASES) {
 
 await rm(tmp, { recursive: true, force: true });
 
-const total = FIXTURES.length + VISUAL_CASES.length;
+// --- known-issue ratchet ---------------------------------------------------
+// The ratchet must forgive what was already broken and still catch what breaks
+// next. Both halves are load-bearing: forgive too much and the gate is decor.
+
+const a11yTwo = { level: "error", check: "a11y", message: "2 blocking accessibility violation(s)", details: [{ rule: "color-contrast" }, { rule: "link-name" }] };
+const a11yThree = { level: "error", check: "a11y", message: "3 blocking accessibility violation(s)", details: [{ rule: "color-contrast" }, { rule: "link-name" }, { rule: "aria-alt" }] };
+const lcpSlow = { level: "error", check: "web-vitals", message: "LCP 12624ms is poor (good \u2264 2500)" };
+const lcpSlower = { level: "error", check: "web-vitals", message: "LCP 13901ms is poor (good \u2264 2500)" };
+
+const onePage = (findings) => [{ path: "/", viewport: "mobile", findings }];
+const baseline = new Set([signature("/", "mobile", a11yTwo), signature("/", "mobile", lcpSlow)]);
+
+const RATCHET_CASES = [
+  {
+    name: "recorded issue does not fail the build",
+    results: onePage([a11yTwo]),
+    expect: { unexpected: 0, known: 1 },
+  },
+  {
+    name: "same metric, different measurement, still known",
+    results: onePage([lcpSlower]),
+    expect: { unexpected: 0, known: 1 },
+  },
+  {
+    name: "an additional axe rule is caught",
+    results: onePage([a11yThree]),
+    expect: { unexpected: 1, known: 0 },
+  },
+  {
+    name: "an unrecorded check is caught",
+    results: onePage([{ level: "error", check: "click-blocked", message: "1 interactive element(s) are covered" }]),
+    expect: { unexpected: 1, known: 0 },
+  },
+  {
+    name: "warnings are never ratcheted",
+    results: onePage([{ level: "warning", check: "tap-target", message: "3 tap target(s) smaller than 44px" }]),
+    expect: { unexpected: 0, known: 0 },
+  },
+];
+
+for (const testCase of RATCHET_CASES) {
+  const { unexpected, known } = partitionKnown(testCase.results, baseline);
+  if (unexpected.length === testCase.expect.unexpected && known.length === testCase.expect.known) {
+    console.log(`ok    ${testCase.name}`);
+  } else {
+    failures += 1;
+    console.log(`FAIL  ${testCase.name}`);
+    console.log(`        expected ${testCase.expect.unexpected} new / ${testCase.expect.known} known,`
+      + ` got ${unexpected.length} new / ${known.length} known`);
+  }
+}
+
+const total = FIXTURES.length + VISUAL_CASES.length + RATCHET_CASES.length;
 console.log(failures ? `\n${failures} check(s) failed` : `\nAll ${total} checks passed`);
 process.exit(failures ? 1 : 0);

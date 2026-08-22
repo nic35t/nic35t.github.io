@@ -15,14 +15,14 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: true
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -48,11 +48,14 @@ jobs:
           # Visual baselines are pixel-compared, and a CI runner rasterises
           # fonts differently from a developer machine, so the committed
           # baselines cannot match here. Regression checking stays local.
-          node scripts/diagnose.mjs --url http://127.0.0.1:4000 --throttle --skip-visual
+          # --known keeps the build honest about what was already broken when
+          # this gate went in, so a red build means something new broke.
+          node scripts/diagnose.mjs --url http://127.0.0.1:4000 --throttle --skip-visual \
+            --known debug-known-issues.json
 
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debug-report
           path: debug-report/

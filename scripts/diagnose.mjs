@@ -13,6 +13,8 @@
  *                             [--throttle]         emulate Slow 4G + 4x CPU (real vitals)
  *                             [--update-baseline]  accept current screenshots as the baseline
  *                             [--skip-a11y] [--skip-visual] [--skip-vitals]
+ *                             [--known <file>]   do not fail on already-recorded issues
+ *                             [--update-known]   re-record the current issues as known
  *
  * Exits non-zero when any ERROR-level finding is reported.
  */
@@ -24,6 +26,7 @@ import { fileURLToPath } from "node:url";
 import { COLLECTOR, READ_VITALS, THRESHOLDS, SLOW_4G, CPU_SLOWDOWN, rate, exerciseInteractions, stubThirdParty, FIND_RENDER_BLOCKING, WEIGHT_BUDGET_KB } from "./lib/vitals.mjs";
 import { runAxe, toFindings as axeFindings } from "./lib/a11y.mjs";
 import { compare as compareVisual, toFinding as visualFinding } from "./lib/visual.mjs";
+import { loadKnown, signature, partitionKnown, writeKnown } from "./lib/known.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const BASE_URL = (args.url ?? "http://127.0.0.1:4000").replace(/\/$/, "");
@@ -570,13 +573,29 @@ async function main() {
   await writeFile(path.join(OUT_DIR, "report.json"), JSON.stringify(results, null, 2));
   await writeFile(path.join(OUT_DIR, "report.md"), renderMarkdown(results));
 
-  const errors = results.flatMap((r) => r.findings.filter((f) => f.level === "error"));
+  let errors = results.flatMap((r) => r.findings.filter((f) => f.level === "error"));
   const warnings = results.flatMap((r) => r.findings.filter((f) => f.level === "warning"));
+
+  // A gate dropped onto an existing site is red from the first run and stays
+  // red, which teaches everyone to ignore it. Recording what is already broken
+  // lets the build fail on what gets broken next.
+  let known = [];
+  if (args.known) {
+    if (args["update-known"]) {
+      await writeKnown(args.known, results);
+      console.log(`\nRecorded ${errors.length} known issue(s) to ${args.known}`);
+      process.exit(0);
+    }
+    const knownSignatures = await loadKnown(args.known);
+    const split = partitionKnown(results, knownSignatures);
+    known = split.known;
+    errors = split.unexpected;
+  }
 
   const visualChanged = results.filter((r) => r.visual && r.visual.status === "changed");
   const baselinesWritten = results.filter((r) => r.visual && (r.visual.status === "created" || r.visual.status === "updated"));
 
-  console.log(`\n${errors.length} error(s), ${warnings.length} warning(s)`);
+  console.log(`\n${errors.length} new error(s), ${warnings.length} warning(s)` + (args.known ? `, ${known.length} known` : ""));
   if (baselinesWritten.length) console.log(`  \u{1F4F8} ${baselinesWritten.length} visual baseline(s) written`);
   if (visualChanged.length) console.log(`  \u{1F441}  ${visualChanged.length} page(s) changed visually \u2014 see ${DIFF_DIR}/`);
   console.log(`Report: ${path.join(OUT_DIR, "report.md")}`);

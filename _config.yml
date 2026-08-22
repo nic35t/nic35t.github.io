@@ -180,6 +180,7 @@ exclude:
   - scripts
   - debug-report
   - debug-baseline
+  - debug-known-issues.json
   - vendor/bundle
 keep_files:
   - .git
