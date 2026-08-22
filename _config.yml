@@ -179,6 +179,7 @@ exclude:
   - .travis.yml
   - scripts
   - debug-report
+  - debug-baseline
   - vendor/bundle
 keep_files:
   - .git

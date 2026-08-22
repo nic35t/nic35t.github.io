@@ -8,7 +8,12 @@
  */
 
 import { chromium } from "playwright";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { PNG } from "pngjs";
 import { AUDIT, MIN_TAP_TARGET } from "./diagnose.mjs";
+import { compare as compareVisual } from "./lib/visual.mjs";
 
 const BASE_CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -47,6 +52,21 @@ const FIXTURES = [
     expect: { fire: ["tap-target"], quiet: [] },
   },
   {
+    name: "image far larger than its rendered box",
+    html: `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='1000'%3E%3Crect width='1000' height='1000' fill='%23ccc'/%3E%3C/svg%3E" style="width:50px;height:50px" width="1000" height="1000" alt="big">`,
+    expect: { fire: ["oversized-image"], quiet: ["image-dimensions"] },
+  },
+  {
+    name: "right-sized image with intrinsic dimensions",
+    html: `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23ccc'/%3E%3C/svg%3E" width="60" height="60" alt="ok">`,
+    expect: { fire: [], quiet: ["oversized-image", "image-dimensions"] },
+  },
+  {
+    name: "image without width/height reserves no space",
+    html: `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23ccc'/%3E%3C/svg%3E" alt="no dims">`,
+    expect: { fire: ["image-dimensions"], quiet: ["oversized-image"] },
+  },
+  {
     name: "offscreen skip link is not a blocked click",
     html: `<a href="#main" class="screen-reader-shortcut">Skip to content</a>
            <header style="position:sticky;top:0;z-index:100;height:60px;background:#fff">Site</header>`,
@@ -62,6 +82,8 @@ let failures = 0;
 
 for (const fixture of FIXTURES) {
   await page.setContent(`<style>${BASE_CSS}</style>${fixture.html}`);
+  // naturalWidth is 0 until the image decodes, which would hide image findings.
+  await page.evaluate(() => Promise.all([...document.images].map((i) => (i.complete ? null : i.decode().catch(() => {})))));
   const { findings } = await page.evaluate(AUDIT, { minTapTarget: MIN_TAP_TARGET });
   const fired = new Set(findings.map((f) => f.check));
 
@@ -81,5 +103,57 @@ for (const fixture of FIXTURES) {
 
 await browser.close();
 
-console.log(failures ? `\n${failures} fixture(s) failed` : `\nAll ${FIXTURES.length} fixtures passed`);
+// --- visual regression -----------------------------------------------------
+// A pixel baseline is only worth keeping if an unchanged page stays silent and
+// a changed one does not. Both directions are asserted here, along with the
+// condition guard that stops a throttled baseline being judged against an
+// unthrottled run.
+
+function solidPng(width, height, [r, g, b]) {
+  const png = new PNG({ width, height });
+  for (let i = 0; i < width * height; i += 1) {
+    png.data[i * 4] = r;
+    png.data[i * 4 + 1] = g;
+    png.data[i * 4 + 2] = b;
+    png.data[i * 4 + 3] = 255;
+  }
+  return PNG.sync.write(png);
+}
+
+const THROTTLED = { width: 375, height: 667, dpr: 1, throttled: true };
+const UNTHROTTLED = { width: 375, height: 667, dpr: 1, throttled: false };
+
+const tmp = await mkdtemp(path.join(tmpdir(), "visual-selftest-"));
+const dirs = { baselineDir: path.join(tmp, "baseline"), diffDir: path.join(tmp, "diff") };
+
+const white = solidPng(40, 40, [255, 255, 255]);
+const offWhite = solidPng(40, 40, [255, 255, 254]); // within anti-aliasing tolerance
+const red = solidPng(40, 40, [255, 0, 0]);
+const tall = solidPng(40, 80, [255, 255, 255]);
+
+const VISUAL_CASES = [
+  { name: "first run records a baseline", key: "a", buffer: white, conditions: THROTTLED, expect: "created" },
+  { name: "identical page stays silent", key: "a", buffer: white, conditions: THROTTLED, expect: "unchanged" },
+  { name: "imperceptible difference stays silent", key: "a", buffer: offWhite, conditions: THROTTLED, expect: "unchanged" },
+  { name: "changed page is reported", key: "a", buffer: red, conditions: THROTTLED, expect: "changed" },
+  { name: "resized page is reported", key: "a", buffer: tall, conditions: THROTTLED, expect: "size-changed" },
+  { name: "mismatched conditions are skipped, not failed", key: "a", buffer: red, conditions: UNTHROTTLED, expect: "conditions-differ" },
+  { name: "--update-baseline re-records", key: "a", buffer: red, conditions: THROTTLED, expect: "updated", updateBaseline: true },
+];
+
+for (const testCase of VISUAL_CASES) {
+  const result = await compareVisual({ ...dirs, ...testCase });
+  if (result.status === testCase.expect) {
+    console.log(`ok    ${testCase.name}`);
+  } else {
+    failures += 1;
+    console.log(`FAIL  ${testCase.name}`);
+    console.log(`        expected status "${testCase.expect}", got "${result.status}"`);
+  }
+}
+
+await rm(tmp, { recursive: true, force: true });
+
+const total = FIXTURES.length + VISUAL_CASES.length;
+console.log(failures ? `\n${failures} check(s) failed` : `\nAll ${total} checks passed`);
 process.exit(failures ? 1 : 0);

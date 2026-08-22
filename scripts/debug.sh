@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Full local debug pass: static checks, build, then browser diagnostics.
 #
-#   scripts/debug.sh                     # everything
-#   scripts/debug.sh --skip-build        # reuse the existing _site
-#   scripts/debug.sh --viewport mobile   # one viewport only
+#   scripts/debug.sh                       # everything
+#   scripts/debug.sh --skip-build          # reuse the existing _site
+#   scripts/debug.sh --viewport mobile     # one viewport only
+#   scripts/debug.sh --throttle            # Slow 4G + 4x CPU, for real vitals
+#   scripts/debug.sh --update-baseline     # re-record visual baselines
 #
 # Extra arguments are forwarded to scripts/diagnose.mjs.
 set -uo pipefail

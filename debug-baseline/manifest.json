@@ -1,0 +1,149 @@
+{
+  "home.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "investment_test.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "categories.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "tags.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "business_20strategy_AI_Business_Planning_Havruta_Method.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_opportunities.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_strategy_step_one.mobile": {
+    "width": 375,
+    "height": 667,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "home.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "investment_test.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "categories.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "tags.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "business_20strategy_AI_Business_Planning_Havruta_Method.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_opportunities.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_strategy_step_one.tablet": {
+    "width": 768,
+    "height": 1024,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "home.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "investment_test.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "categories.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "tags.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "business_20strategy_AI_Business_Planning_Havruta_Method.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_opportunities.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  },
+  "web3_policy_k_stablecoin_strategy_step_one.desktop": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "throttled": true,
+    "platform": "linux"
+  }
+}

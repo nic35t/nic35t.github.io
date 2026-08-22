@@ -22,9 +22,12 @@
     "node": ">= 0.10.0"
   },
   "devDependencies": {
+    "axe-core": "^4.11.0",
     "npm-run-all": "^4.1.5",
     "onchange": "^7.1.0",
+    "pixelmatch": "^7.1.0",
     "playwright": "^1.56.0",
+    "pngjs": "^7.0.0",
     "uglify-js": "^3.13.6"
   },
   "scripts": {
@@ -32,11 +35,13 @@
     "add-banner": "node banner.js",
     "watch:js": "onchange \"assets/js/**/*.js\" -e \"assets/js/main.min.js\" -- npm run build:js",
     "build:js": "npm run uglify && npm run add-banner",
-    "debug": "scripts/debug.sh",
-    "debug:mobile": "scripts/debug.sh --viewport mobile",
+    "debug": "scripts/debug.sh --throttle",
+    "debug:mobile": "scripts/debug.sh --throttle --viewport mobile",
     "doctor": "bundle exec ruby scripts/doctor.rb",
     "diagnose": "node scripts/diagnose.mjs",
     "selftest": "node scripts/selftest.mjs",
-    "serve": "scripts/serve.sh"
+    "serve": "scripts/serve.sh",
+    "debug:fast": "scripts/debug.sh --skip-build --skip-vitals --skip-a11y",
+    "baseline": "scripts/debug.sh --throttle --update-baseline"
   }
 }

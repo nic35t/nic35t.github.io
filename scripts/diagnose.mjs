@@ -9,7 +9,10 @@
  *
  *   node scripts/diagnose.mjs [--url http://127.0.0.1:4000] [--out debug-report]
  *                             [--paths /,/investment-test/] [--viewport mobile]
- *                             [--external]   also report third-party request failures
+ *                             [--external]          also report third-party request failures
+ *                             [--throttle]         emulate Slow 4G + 4x CPU (real vitals)
+ *                             [--update-baseline]  accept current screenshots as the baseline
+ *                             [--skip-a11y] [--skip-visual] [--skip-vitals]
  *
  * Exits non-zero when any ERROR-level finding is reported.
  */
@@ -18,11 +21,16 @@ import { chromium } from "playwright";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { COLLECTOR, READ_VITALS, THRESHOLDS, SLOW_4G, CPU_SLOWDOWN, rate, exerciseInteractions, stubThirdParty, FIND_RENDER_BLOCKING, WEIGHT_BUDGET_KB } from "./lib/vitals.mjs";
+import { runAxe, toFindings as axeFindings } from "./lib/a11y.mjs";
+import { compare as compareVisual, toFinding as visualFinding } from "./lib/visual.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const BASE_URL = (args.url ?? "http://127.0.0.1:4000").replace(/\/$/, "");
 const OUT_DIR = args.out ?? "debug-report";
 const SHOT_DIR = path.join(OUT_DIR, "screenshots");
+const BASELINE_DIR = path.join("debug-baseline");
+const DIFF_DIR = path.join(OUT_DIR, "visual", "diff");
 
 const ALL_VIEWPORTS = [
   { name: "mobile", width: 375, height: 667, isMobile: true },
@@ -219,6 +227,51 @@ export const AUDIT = ({ minTapTarget }) => {
     });
   }
 
+  // --- oversized images ----------------------------------------------------
+  // Shipping a 1024px asset into a 32px slot is the single most common cause
+  // of a bad LCP on an otherwise light page.
+  const oversized = [];
+  const undimensioned = [];
+  // Phones are DPR 2-3; judge against that rather than the capture DPR.
+  const dpr = vw <= 480 ? 2 : 1;
+  for (const img of document.images) {
+    if (!img.naturalWidth) continue;
+    const rect = img.getBoundingClientRect();
+    if (rect.width < 1) continue;
+
+    const needed = Math.ceil(rect.width * dpr);
+    if (img.naturalWidth > needed * 2) {
+      oversized.push({
+        src: (img.getAttribute("src") || "").slice(0, 70),
+        natural: `${img.naturalWidth}x${img.naturalHeight}`,
+        displayed: `${Math.round(rect.width)}x${Math.round(rect.height)}`,
+        factor: `${(img.naturalWidth / needed).toFixed(1)}x wider than needed`,
+      });
+    }
+
+    // Without intrinsic dimensions the browser cannot reserve space, so the
+    // page reflows when the image lands. That is CLS.
+    if (!img.getAttribute("width") && !img.getAttribute("height") && !img.style.aspectRatio) {
+      undimensioned.push((img.getAttribute("src") || "").slice(0, 70));
+    }
+  }
+  if (oversized.length) {
+    findings.push({
+      level: "warning",
+      check: "oversized-image",
+      message: `${oversized.length} image(s) far larger than their rendered size`,
+      details: oversized.slice(0, 6),
+    });
+  }
+  if (undimensioned.length) {
+    findings.push({
+      level: "warning",
+      check: "image-dimensions",
+      message: `${undimensioned.length} image(s) without width/height — a layout-shift risk`,
+      details: undimensioned.slice(0, 6),
+    });
+  }
+
   // --- stacking context map ------------------------------------------------
   // Not a failure on its own, but the map is what you need in hand the moment
   // a z-index bug shows up.
@@ -240,6 +293,24 @@ async function auditPage(context, urlPath, viewport) {
   const consoleErrors = [];
   const failedRequests = [];
 
+  // Observers must exist before the first paint or every entry is missed.
+  if (!args["skip-vitals"]) await page.addInitScript(COLLECTOR);
+
+  // Unreachable third-party CSS blocks paint indefinitely, which suppresses
+  // paint timing altogether. Stub it unless the run is explicitly testing the
+  // real network.
+  if (!args.external) await stubThirdParty(page, new URL(BASE_URL).origin);
+
+  // Throttling is what makes the numbers mean anything: unthrottled localhost
+  // makes every page look instant regardless of how heavy it is.
+  let cdp = null;
+  if (args.throttle) {
+    cdp = await context.newCDPSession(page);
+    await cdp.send("Network.enable");
+    await cdp.send("Network.emulateNetworkConditions", SLOW_4G);
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: CPU_SLOWDOWN });
+  }
+
   page.on("pageerror", (err) => consoleErrors.push({ type: "pageerror", text: String(err) }));
   page.on("console", (msg) => {
     if (msg.type() === "error") consoleErrors.push({ type: "console", text: msg.text() });
@@ -258,6 +329,9 @@ async function auditPage(context, urlPath, viewport) {
     findings: [],
     stacking: [],
     screenshot: null,
+    vitals: null,
+    visual: null,
+    throttled: false,
   };
 
   try {
@@ -315,10 +389,106 @@ async function auditPage(context, urlPath, viewport) {
     });
   }
 
+  // --- Core Web Vitals ------------------------------------------------------
+  if (!args["skip-vitals"]) {
+    await exerciseInteractions(page);
+    const vitals = await page.evaluate(READ_VITALS);
+    result.vitals = vitals;
+    result.throttled = Boolean(args.throttle);
+
+    const blocking = await page.evaluate(FIND_RENDER_BLOCKING);
+    if (blocking.length) {
+      result.findings.push({
+        level: "warning",
+        check: "render-blocking",
+        message: `${blocking.length} render-blocking third-party resource(s) delay first paint`,
+        details: blocking.map((b) => `${b.type}: ${b.href}`),
+      });
+    }
+    if (vitals.LCP == null && vitals.FCP == null) {
+      result.findings.push({
+        level: "warning",
+        check: "web-vitals",
+        message: "paint timing unavailable — the browser never recorded a contentful paint",
+        details: blocking.length
+          ? ["likely the render-blocking resources above; re-run without --external to stub them"]
+          : ["no render-blocking third-party resources found; investigate manually"],
+      });
+    }
+
+    const totalKb = Math.round(vitals.transferBytes / 1024);
+    if (totalKb > WEIGHT_BUDGET_KB) {
+      result.findings.push({
+        level: "warning",
+        check: "page-weight",
+        message: `${totalKb}KB transferred, over the ${WEIGHT_BUDGET_KB}KB budget`,
+        details: vitals.heaviest.map((r) => `${r.kb}KB  ${r.type}  ${r.url}`),
+      });
+    }
+
+    for (const metric of ["LCP", "CLS", "INP", "FCP", "TTFB"]) {
+      const value = vitals[metric];
+      if (value == null) continue;
+      const verdict = rate(metric, value);
+      if (verdict === "good") continue;
+      // Unthrottled timings measured against a local server are not evidence
+      // of anything, so only CLS — which is layout, not speed — can fail a run.
+      const timing = metric !== "CLS";
+      const meaningful = args.throttle || !timing;
+      result.findings.push({
+        level: verdict === "poor" && meaningful ? "error" : "warning",
+        check: "web-vitals",
+        message: `${metric} ${value}${THRESHOLDS[metric].unit} is ${verdict} (good \u2264 ${THRESHOLDS[metric].good})`,
+        details: [THRESHOLDS[metric].label + (meaningful ? "" : " \u2014 unthrottled local timing, indicative only")],
+      });
+    }
+  }
+
+  // --- accessibility --------------------------------------------------------
+  if (!args["skip-a11y"]) {
+    try {
+      const violations = await runAxe(page);
+      result.findings.push(...axeFindings(violations));
+    } catch (err) {
+      result.findings.push({ level: "warning", check: "a11y", message: `axe failed: ${err.message}` });
+    }
+  }
+
   const slug = urlPath.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "home";
-  const shotPath = path.join(SHOT_DIR, `${slug}.${viewport.name}.png`);
-  await page.screenshot({ path: shotPath, fullPage: true });
+  const key = `${slug}.${viewport.name}`;
+  const shotPath = path.join(SHOT_DIR, `${key}.png`);
+
+  // Two captures with different jobs: the full-page shot is for a human to
+  // look at (local artifact, never committed), while the baseline is clipped
+  // to the viewport so the committed set stays a few MB rather than tens.
+  await page.screenshot({ path: shotPath, fullPage: true, animations: "disabled", caret: "hide" });
   result.screenshot = shotPath;
+  const buffer = await page.screenshot({ fullPage: false, animations: "disabled", caret: "hide" });
+
+  // --- visual regression ----------------------------------------------------
+  if (!args["skip-visual"]) {
+    try {
+      const visual = await compareVisual({
+        baselineDir: BASELINE_DIR,
+        diffDir: DIFF_DIR,
+        key,
+        buffer,
+        updateBaseline: Boolean(args["update-baseline"]),
+        conditions: {
+          width: viewport.width,
+          height: viewport.height,
+          dpr: 1,
+          throttled: Boolean(args.throttle),
+          platform: process.env.CI ? "ci" : process.platform,
+        },
+      });
+      result.visual = visual;
+      const finding = visualFinding(key, visual);
+      if (finding) result.findings.push(finding);
+    } catch (err) {
+      result.findings.push({ level: "warning", check: "visual-regression", message: err.message });
+    }
+  }
 
   await page.close();
   return result;
@@ -342,6 +512,15 @@ function renderMarkdown(results) {
           lines.push(`  - \`${typeof detail === "string" ? detail : JSON.stringify(detail)}\``);
         }
       }
+    }
+    if (result.vitals) {
+      const cells = ["LCP", "CLS", "INP", "FCP", "TTFB"].map((m) => {
+        const value = result.vitals[m];
+        if (value == null) return `${m}: n/a`;
+        const icon = { good: "\u{1F7E2}", "needs-improvement": "\u{1F7E1}", poor: "\u{1F534}" }[rate(m, value)] ?? "";
+        return `${icon} ${m} ${value}${THRESHOLDS[m].unit}`;
+      });
+      lines.push(``, `Vitals${result.throttled ? " (Slow 4G, 4x CPU)" : " (unthrottled)"}: ` + cells.join(" \u00B7 "), ``);
     }
     if (result.stacking.length) {
       lines.push(``, `<details><summary>Stacking order (highest z-index first)</summary>`, ``);
@@ -376,7 +555,8 @@ async function main() {
       viewport: { width: viewport.width, height: viewport.height },
       isMobile: viewport.isMobile,
       hasTouch: viewport.isMobile,
-      deviceScaleFactor: viewport.isMobile ? 2 : 1,
+      // DPR 1 everywhere: baselines stay small and reproducible across machines.
+      deviceScaleFactor: 1,
     });
     for (const urlPath of paths) {
       process.stdout.write(`  ${viewport.name.padEnd(8)} ${urlPath}\n`);
@@ -393,7 +573,12 @@ async function main() {
   const errors = results.flatMap((r) => r.findings.filter((f) => f.level === "error"));
   const warnings = results.flatMap((r) => r.findings.filter((f) => f.level === "warning"));
 
+  const visualChanged = results.filter((r) => r.visual && r.visual.status === "changed");
+  const baselinesWritten = results.filter((r) => r.visual && (r.visual.status === "created" || r.visual.status === "updated"));
+
   console.log(`\n${errors.length} error(s), ${warnings.length} warning(s)`);
+  if (baselinesWritten.length) console.log(`  \u{1F4F8} ${baselinesWritten.length} visual baseline(s) written`);
+  if (visualChanged.length) console.log(`  \u{1F441}  ${visualChanged.length} page(s) changed visually \u2014 see ${DIFF_DIR}/`);
   console.log(`Report: ${path.join(OUT_DIR, "report.md")}`);
 
   for (const finding of errors.slice(0, 10)) {
