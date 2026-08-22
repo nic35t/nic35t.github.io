@@ -1,3 +1,22 @@
+{%- comment -%}
+  Debug overlay. Costs nothing on a normal page load: the script is only
+  requested when ?debug=1 / #debug is in the URL, or the flag is set in
+  localStorage. Loaded before the site's own scripts so it catches their errors.
+{%- endcomment -%}
+<script>
+  (function () {
+    var on = /[?&]debug=1\b/.test(location.search) ||
+             location.hash === "#debug" ||
+             localStorage.getItem("debugOverlay") === "1";
+    if (!on) return;
+    localStorage.setItem("debugOverlay", "1");
+    var s = document.createElement("script");
+    s.src = "{{ '/assets/js/debug-overlay.js' | relative_url }}";
+    s.defer = true;
+    document.head.appendChild(s);
+  })();
+</script>
+
 {% if site.footer_scripts %}
   {% for script in site.footer_scripts %}
     <script src="{{ script | relative_url }}"></script>
