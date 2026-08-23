@@ -394,8 +394,18 @@ async function auditPage(context, urlPath, viewport) {
 
   // --- Core Web Vitals ------------------------------------------------------
   if (!args["skip-vitals"]) {
+    // Load metrics are read before the page is touched. Driving controls to
+    // give INP something to measure can itself provoke a first paint entry that
+    // the browser had not emitted yet, and the timestamp then reflects when the
+    // page was poked rather than when it painted — on this runner that turned a
+    // page measuring 1.6s at mobile width into a fictional 5.1s at desktop.
+    const loadVitals = await page.evaluate(READ_VITALS);
+
+    // Now interact, and take only INP from the second read.
     await exerciseInteractions(page);
-    const vitals = await page.evaluate(READ_VITALS);
+    const afterInteraction = await page.evaluate(READ_VITALS);
+
+    const vitals = { ...loadVitals, INP: afterInteraction.INP ?? loadVitals.INP };
     result.vitals = vitals;
     result.throttled = Boolean(args.throttle);
 

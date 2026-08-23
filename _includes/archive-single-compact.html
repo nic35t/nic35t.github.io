@@ -1,0 +1,13 @@
+{%- comment -%}
+  Compact row for taxonomy pages.
+
+  /tags/ renders every post once per tag it carries — 62 posts became 217
+  renderings — and the full archive-single markup costs ~730 bytes each, two
+  thirds of a 240KB page. A tag index is something you scan for a title, so it
+  gets a title and a date and nothing else.
+
+  A list of links is also better structure than a run of <article> elements for
+  what is really navigation.
+{%- endcomment -%}
+{%- assign compact_title = post.title | markdownify | strip_html | strip_newlines | strip -%}
+<li class="taxonomy__post"><a href="{{ post.url | relative_url }}">{{ compact_title }}</a><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time></li>

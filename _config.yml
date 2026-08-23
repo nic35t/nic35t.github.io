@@ -272,10 +272,22 @@ tag_archive:
 
 # HTML Compression
 # - https://jch.penibelst.de/
+# HTML compression.
+#
+# _layouts/compress.html shipped with the theme but nothing opted into it —
+# _layouts/default.html carried empty front matter — so pages went out as mostly
+# blank lines: /tags/ was 12,017 blank lines out of 16,714.
+#
+# `ignore: envs: development` is deliberately gone. It skipped compression in
+# local builds, which meant the thing being tested was never the thing being
+# served, and the visual baselines were captured from uncompressed output.
+# <pre> content is preserved by the layout itself, so code blocks are safe.
 compress_html:
   clippings: all
-  ignore:
-    envs: development
+  comments: ["<!-- ", " -->"]
+  endings: all
+  blanklines: false
+  profile: false
 
 
 # Defaults

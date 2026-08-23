@@ -1,48 +1,5 @@
 {
   "note": "Errors already present when the gate was introduced. Regenerate with --update-known after fixing some.",
   "recorded": "2026-08-23",
-  "issues": [
-    {
-      "check": "web-vitals",
-      "path": "/",
-      "viewport": "desktop",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    },
-    {
-      "check": "web-vitals",
-      "path": "/business%20strategy/AI-Business-Planning-Havruta-Method/",
-      "viewport": "desktop",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    },
-    {
-      "check": "web-vitals",
-      "path": "/categories/",
-      "viewport": "desktop",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    },
-    {
-      "check": "web-vitals",
-      "path": "/tags/",
-      "viewport": "desktop",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    },
-    {
-      "check": "web-vitals",
-      "path": "/tags/",
-      "viewport": "mobile",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    },
-    {
-      "check": "web-vitals",
-      "path": "/tags/",
-      "viewport": "tablet",
-      "shape": "FCP #ms is poor (good ≤ #)",
-      "rules": []
-    }
-  ]
+  "issues": []
 }

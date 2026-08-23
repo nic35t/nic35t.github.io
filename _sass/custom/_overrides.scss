@@ -214,3 +214,55 @@
     filter: brightness(0.92);
   }
 }
+
+/* ==========================================================================
+   Long taxonomy pages
+   ========================================================================== */
+
+// /tags/ renders every tag and every post beneath it on one page — 2581 DOM
+// nodes and 418 links — because GitHub Pages cannot run jekyll-archives, so
+// per-tag pages are not an option and the anchors all live here.
+//
+// content-visibility lets the browser skip layout and paint for sections that
+// are off screen, and do the work when they scroll into view. The markup is
+// unchanged, so every anchor still resolves and crawlers still see the whole
+// page; only the up-front rendering cost goes away.
+//
+// `auto` on contain-intrinsic-size makes the browser remember each section's
+// real height once measured, so the scrollbar stops jumping on second visit.
+// The 320px is only the first guess for a section never yet rendered.
+.taxonomy__section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
+// Compact taxonomy rows. Title on the left, date on the right, each row a
+// comfortable tap target so /tags/ does not reintroduce the target-size
+// problem the TOC had.
+.taxonomy__posts {
+  margin: 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+
+.taxonomy__post {
+  display: flex;
+  gap: 1em;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border, #f2f3f3);
+
+  a {
+    flex: 1 1 auto;
+    min-height: 24px;
+    padding: 0.45em 0;
+    font-size: $type-size-6;
+  }
+
+  time {
+    flex: 0 0 auto;
+    color: $muted-text-color;
+    font-size: $type-size-7;
+    font-variant-numeric: tabular-nums;
+  }
+}
