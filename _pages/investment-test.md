@@ -6,6 +6,10 @@ classes: wide
 author_profile: false
 sidebar:
   nav: false
+# This is an interactive widget, not an article. The automatic contents list
+# counts headings and was picking up the quiz's own placeholders — it rendered
+# a table of contents reading "질문 내용, 결과 이름".
+toc: false
 ---
 
 <style>
@@ -20,8 +24,15 @@ sidebar:
     --bg-gray: #f2f4f6;
     --card-bg: #ffffff;
     --text-dark: #191f28;
-    --text-gray: #69737f; /* 4.82:1 on white; #8b95a1 was 3.03:1 */
+    --text-gray: #616a75; /* clears 4.5:1 on white, --surface-soft and --accent-soft alike */
     --on-accent: #ffffff;
+    --accent-soft: #e8f3ff;
+    --accent-strong: #1b64da;
+    --surface-soft: #f9fafb;
+    --option-hover: #f9fbff;
+    --line: #e5e8eb;
+    --neutral-btn: #333333;
+    --on-neutral: #ffffff;
   }
 
   /* This widget carries its own palette and used to hardcode white cards. Once
@@ -36,6 +47,13 @@ sidebar:
       --text-gray: #9aa3ab;
       /* The accent is light in dark mode, so its label goes dark. */
       --on-accent: #14171a;
+      --accent-soft: #1a2430;
+      --accent-strong: #9cc4ff;
+      --surface-soft: #1c2024;
+      --option-hover: #22272b;
+      --line: #2b3137;
+      --neutral-btn: #2b3137;
+      --on-neutral: #d7dade;
     }
   }
   :root[data-theme="dark"] {
@@ -45,6 +63,49 @@ sidebar:
     --text-dark: #d7dade;
     --text-gray: #9aa3ab;
     --on-accent: #14171a;
+    --accent-soft: #1a2430;
+    --accent-strong: #9cc4ff;
+    --surface-soft: #1c2024;
+    --option-hover: #22272b;
+    --line: #2b3137;
+    --neutral-btn: #2b3137;
+    --on-neutral: #d7dade;
+  }
+
+  /* Two-axis readout on the result screen */
+  .axis { margin-bottom: 18px; text-align: left; }
+  .axis-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 0.9rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px;
+  }
+  .axis-head span:last-child { color: var(--toss-blue); font-variant-numeric: tabular-nums; }
+  .axis-track {
+    height: 8px; border-radius: 4px; background-color: var(--bg-gray); overflow: hidden;
+  }
+  .axis-fill {
+    height: 100%; width: 0; border-radius: 4px; background-color: var(--toss-blue);
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .axis-ends {
+    display: flex; justify-content: space-between;
+    font-size: 0.75rem; color: var(--text-gray); margin-top: 5px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .axis-fill { transition: none; }
+  }
+
+  .result-desc { line-height: 1.6; color: var(--text-gray); text-align: left; margin-top: 4px; }
+  .bias-intro { font-size: 0.85rem; color: var(--text-gray); text-align: left; margin-bottom: 10px; }
+  .bias-list { text-align: left; }
+  .bias-list li { margin-bottom: 10px; }
+  .bias-list b { color: var(--text-dark); }
+
+  .test-disclaimer {
+    margin-top: 18px;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--text-gray);
+    text-align: left;
   }
 
   /* Reset box-sizing for this component */
@@ -120,13 +181,13 @@ sidebar:
   }
 
   .btn-primary:hover {
-    background-color: #1b64da;
+    background-color: var(--accent-strong);
     transform: translateY(-2px);
   }
 
   .btn-option {
     background-color: var(--card-bg);
-    border: 2px solid #e5e8eb;
+    border: 2px solid var(--line);
     color: var(--text-dark);
     padding: 18px 20px;
     margin-bottom: 12px;
@@ -144,14 +205,14 @@ sidebar:
 
   .btn-option:hover {
     border-color: var(--toss-blue);
-    background-color: #f9fbff;
+    background-color: var(--option-hover);
     color: var(--toss-blue);
   }
 
   /* Progress Bar */
   .progress-container {
     width: 100%;
-    background-color: #e5e8eb;
+    background-color: var(--line);
     height: 8px;
     border-radius: 4px;
     margin-bottom: 30px;
@@ -188,7 +249,7 @@ sidebar:
   }
 
   .result-box {
-    background-color: #f9fafb;
+    background-color: var(--surface-soft);
     padding: 20px;
     border-radius: 16px;
     margin-bottom: 20px;
@@ -196,6 +257,8 @@ sidebar:
     text-align: left;
     box-sizing: border-box; /* Explicit safety */
   }
+
+  .result-box--accent { background-color: var(--accent-soft); }
 
   .result-box h3 {
     font-size: 1.1rem;
@@ -265,9 +328,10 @@ sidebar:
   <!-- 1. Start Screen -->
   <div id="start-screen" class="screen active">
     <div style="font-size: 4rem; margin-bottom: 20px;">💰</div>
-    <h2 class="test-title">2025 실전형<br>투자 성향 테스트</h2>
-    <p class="test-desc">나는 어떤 투자 동물일까?<br>행동 경제학 기반으로 분석하는<br>나의 진짜 투자 DNA 찾기</p>
+    <h2 class="test-title">투자 성향 테스트</h2>
+    <p class="test-desc">위험을 얼마나 견디는가, 그리고<br>무엇을 근거로 결정하는가.<br>두 축으로 나누어 보는 10문항</p>
     <button class="btn-primary" onclick="startTest()">테스트 시작하기</button>
+    <p class="test-disclaimer">행동경제학에서 다루는 편향을 소재로 한 자기 점검용 테스트입니다. 투자 자문이나 권유가 아니며, 결과가 특정 상품의 적합성을 판단해 주지 않습니다.</p>
   </div>
 
   <!-- 2. Quiz Screen -->
@@ -284,9 +348,9 @@ sidebar:
   <!-- 3. Loading Screen -->
   <div id="loading-screen" class="screen">
     <div style="font-size: 3rem;">🧠</div>
-    <h2 style="margin-top: 20px;">투자 패턴 분석 중...</h2>
-    <p>FOMO 지수 계산 중...</p>
-    <p>손실 회피 성향 파악 중...</p>
+    <h2 style="margin-top: 20px;">응답 분석 중...</h2>
+    <p>위험 감내도 계산 중...</p>
+    <p>판단 근거 유형 분류 중...</p>
   </div>
 
   <!-- 4. Result Screen -->
@@ -296,135 +360,251 @@ sidebar:
     <h2 id="result-name" class="result-name">결과 이름</h2>
     
     <div class="result-box">
-      <h3>📊 당신의 투자 스타일</h3>
-      <p id="result-desc" style="line-height: 1.6; color: #4e5968;">설명</p>
+      <h3>📊 두 축으로 본 나의 위치</h3>
+      <div class="axis">
+        <div class="axis-head"><span>위험 감내도</span><span id="axis-risk-value">0</span></div>
+        <div class="axis-track"><div id="axis-risk-bar" class="axis-fill"></div></div>
+        <div class="axis-ends"><span>원금 보존 우선</span><span>변동성 수용</span></div>
+      </div>
+      <div class="axis">
+        <div class="axis-head"><span>판단 근거</span><span id="axis-basis-value">0</span></div>
+        <div class="axis-track"><div id="axis-basis-bar" class="axis-fill"></div></div>
+        <div class="axis-ends"><span>원칙·데이터</span><span>직관·분위기</span></div>
+      </div>
+      <p id="result-desc" class="result-desc">설명</p>
     </div>
 
-    <div class="result-box" style="background-color: #e8f3ff;">
-      <h3 style="color: var(--toss-blue);">💡 승리를 위한 솔루션</h3>
-      <ul id="result-advice">
-        <li>조언 1</li>
-      </ul>
-      <br>
-      <a href="/categories/" class="recommend-link">👉 이 성향을 위한 추천 글 읽기</a>
+    <div class="result-box result-box--accent">
+      <h3>🧠 답변에서 자주 보인 편향</h3>
+      <p class="bias-intro">모두가 가진 사고 습관입니다. 있다는 걸 아는 것만으로 영향이 줄어듭니다.</p>
+      <ul id="result-biases" class="bias-list"></ul>
     </div>
+
+    <div class="result-box">
+      <h3>🔍 스스로 점검해 볼 것</h3>
+      <ul id="result-advice"></ul>
+      <a href="/categories/" class="recommend-link">👉 다른 글 둘러보기</a>
+    </div>
+
+    <p class="test-disclaimer">이 결과는 응답 패턴을 요약한 것일 뿐, 투자 실력이나 성과를 예측하지 않습니다. 투자 판단과 그 결과는 본인에게 귀속됩니다.</p>
 
     <div style="display: flex; gap: 10px; width: 100%;">
-      <button class="btn-primary" style="flex: 1; background-color: #333;" onclick="shareTest()">결과 공유</button>
+      <button class="btn-primary" style="flex: 1; background-color: var(--neutral-btn); color: var(--on-neutral);" onclick="shareTest()">결과 공유</button>
       <button class="btn-primary" style="flex: 1;" onclick="location.reload()">다시하기</button>
     </div>
   </div>
 </div>
 
 <script>
-  /* Advanced Quiz Data (Based on Behavioral Finance) */
+  /* Two axes, not one score.
+     The previous version added every answer into a single 7-35 total, which
+     forced two unrelated things onto one line: how much volatility someone can
+     hold, and what they decide on. A cautious person who follows tips and a
+     bold person who follows a written rule are nothing alike, but a single
+     total puts them in the same band.
+
+       risk  — 원금 보존 우선 ...... 변동성 수용
+       basis — 원칙·데이터 ......... 직관·분위기
+
+     Each option also names the bias it leans on, and the biases that came up
+     most are reported back. That is the part worth reading: the archetype is
+     a label, the bias is something to actually notice. */
   const questions = [
     {
-      q: "친구가 '이 코인(주식) 사서 2배 벌었어!'라며 수익 인증을 했다. 나의 솔직한 심정은?",
+      q: "보유 종목이 하루 만에 20% 넘게 빠졌다. 찾아봐도 특별한 악재는 없다.",
+      axis: "risk",
       a: [
-        { text: "😒 '운이 좋았네' 하고 무시한다. 내 갈 길 간다.", score: 1 },
-        { text: "🤔 '오 그래?' 어떤 종목인지 분석해본다.", score: 3 },
-        { text: "🔥 '나만 벼락거지 되는 거 아냐?' 당장 따라 살까 고민한다.", score: 5 }
+        { text: "😱 이유는 나중에. 일단 전량 팔아 현금으로 옮긴다.", score: 0, bias: "loss_aversion" },
+        { text: "😮‍💨 불안하지만 비중을 절반으로 줄여 놓는다.", score: 1 },
+        { text: "🧘 원래 계획대로 둔다. 이 정도 변동은 감안했다.", score: 2 },
+        { text: "😋 계획에 있던 추가 매수 구간이라 더 산다.", score: 3 }
       ]
     },
     {
-      q: "보유 종목이 하루 만에 -20% 폭락했다. 뉴스를 보니 특별한 악재는 없다.",
+      q: "수익 중인 종목과 손실 중인 종목이 있다. 급히 목돈이 필요해 하나를 팔아야 한다.",
+      axis: "basis",
       a: [
-        { text: "😱 너무 무서워서 일단 전량 매도하고 현금화한다.", score: 1 },
-        { text: "🧘‍♀️ 존버는 승리한다. 어플을 지우고 잊어버린다.", score: 3 },
-        { text: "😋 세력의 개미 털기다! 풀매수(추매) 기회로 삼는다.", score: 5 }
+        { text: "📋 어느 쪽이든 지금 기준에 안 맞는 것을 판다.", score: 0 },
+        { text: "🤔 손실 난 쪽을 팔아 세금이라도 아낀다.", score: 1 },
+        { text: "😌 수익 난 쪽을 판다. 확정된 이익이 안전하다.", score: 2, bias: "disposition" }
       ]
     },
     {
-      q: "투자할 종목을 고를 때 가장 중요하게 보는 것은?",
+      q: "친구가 어떤 종목으로 두 배를 벌었다며 인증을 보내왔다.",
+      axis: "basis",
       a: [
-        { text: "🛡️ 잃지 않는 것이 중요하다. 시총 상위 우량주.", score: 1 },
-        { text: "📊 재무제표, 백서, 로드맵 등 펀더멘탈.", score: 2 },
-        { text: "📈 차트의 거래량과 보조지표 (기술적 분석).", score: 4 },
-        { text: "🗣️ 커뮤니티의 화력과 유튜버의 추천.", score: 5 }
+        { text: "🙂 축하하고 넘어간다. 내 기준과는 상관없다.", score: 0 },
+        { text: "🔎 종목명을 적어 두고 나중에 직접 확인해 본다.", score: 1 },
+        { text: "🔥 지금 안 사면 나만 뒤처질 것 같아 조바심이 난다.", score: 2, bias: "herding" }
       ]
     },
     {
-      q: "여윳돈 1,000만 원이 생겼다. 어떻게 배분할까?",
+      q: "종목을 고를 때, 실제로 결정을 좌우하는 것은?",
+      axis: "basis",
       a: [
-        { text: "은행 예적금 70%, 주식/코인 30%.", score: 1 },
-        { text: "주식/코인 60%, 현금 40% 분할 매수.", score: 3 },
-        { text: "가장 핫한 주도 섹터 대장주에 몰빵.", score: 5 }
+        { text: "📑 재무제표·사업 구조 등 직접 확인한 자료.", score: 0 },
+        { text: "📈 차트와 거래량 등 정해 둔 기술적 기준.", score: 1 },
+        { text: "🗣️ 커뮤니티 분위기와 자주 보는 채널의 추천.", score: 2, bias: "herding" }
       ]
     },
     {
-      q: "내가 선호하는 익절(수익 실현) 타이밍은?",
+      q: "최근 1년간 내 판단이 맞은 비율을 스스로 매긴다면?",
+      axis: "basis",
       a: [
-        { text: "소소하게 5~10% 먹으면 만족하고 판다.", score: 1 },
-        { text: "목표가(Target Price)가 올 때까지 기다린다.", score: 3 },
-        { text: "추세가 꺾일 때까지 끝까지 발라 먹는다.", score: 5 }
+        { text: "🤷 기록해 두지 않아 정확히는 모르겠다.", score: 1, bias: "overconfidence" },
+        { text: "📓 기록해 뒀고, 절반쯤 맞았다.", score: 0 },
+        { text: "😎 기록은 없지만 대체로 맞았던 것 같다.", score: 2, bias: "overconfidence" }
       ]
     },
     {
-      q: "잠들기 전, 미국 시장(또는 코인 시장)을 확인하는 빈도는?",
+      q: "여윳돈이 생겼다. 위험자산 비중을 어떻게 잡을까?",
+      axis: "risk",
       a: [
-        { text: "확인 안 한다. 어차피 장기 투자니까.", score: 1 },
-        { text: "중요한 이슈가 있을 때만 챙겨본다.", score: 3 },
-        { text: "새벽에도 자다 깨서 시세를 확인해야 안심이 된다.", score: 5 }
+        { text: "🏦 대부분 예금 등 원금 보존 쪽에 둔다.", score: 0 },
+        { text: "⚖️ 미리 정해 둔 비중대로 나눠 담는다.", score: 1 },
+        { text: "🎯 지금 가장 유망해 보이는 한 곳에 몰아넣는다.", score: 2, bias: "recency" }
       ]
     },
     {
-      q: "레버리지(신용/선물) 거래에 대한 나의 생각은?",
+      q: "산 뒤로 계속 내리는 종목이 있다. 처음 산 이유는 이미 사라졌다.",
+      axis: "basis",
       a: [
-        { text: "패가망신의 지름길. 절대 안 한다.", score: 1 },
-        { text: "확실한 자리에서는 2배 정도 써볼 만하다.", score: 3 },
-        { text: "시드머니 불리려면 고배율 레버리지는 필수다.", score: 5 }
+        { text: "✂️ 이유가 사라졌으면 정리한다. 산 가격과는 무관하다.", score: 0 },
+        { text: "😐 본전까지만 오면 팔려고 기다린다.", score: 2, bias: "sunk_cost" },
+        { text: "💧 평단을 낮추려고 더 산다.", score: 2, bias: "sunk_cost" }
+      ]
+    },
+    {
+      q: "내 판단과 반대되는 분석 글을 읽었을 때, 보통은?",
+      axis: "basis",
+      a: [
+        { text: "🧐 근거가 뭔지 끝까지 읽고 내 판단을 다시 본다.", score: 0 },
+        { text: "😑 훑어보고 넘긴다. 반대 의견은 늘 있으니까.", score: 1, bias: "confirmation" },
+        { text: "🙅 보지 않는다. 흔들리기만 한다.", score: 2, bias: "confirmation" }
+      ]
+    },
+    {
+      q: "자정이 넘었다. 시장을 확인하는 빈도는?",
+      axis: "risk",
+      a: [
+        { text: "😴 확인하지 않는다. 정해 둔 주기에만 본다.", score: 0 },
+        { text: "📱 하루 몇 번 정도는 들여다본다.", score: 1 },
+        { text: "🌙 자다 깨서라도 확인해야 마음이 놓인다.", score: 2, bias: "illusion_of_control" }
+      ]
+    },
+    {
+      q: "레버리지나 신용 거래에 대한 생각은?",
+      axis: "risk",
+      a: [
+        { text: "🚫 쓰지 않는다. 감당할 수 있는 돈으로만 한다.", score: 0 },
+        { text: "📐 규칙을 정해 두고 제한적으로만 쓴다.", score: 1 },
+        { text: "🚀 자산을 불리려면 필요하다고 본다.", score: 2, bias: "overconfidence" }
       ]
     }
   ];
 
-  /* 5 Investment Archetypes */
-  /* Score Range: 7 ~ 35 */
+  /* Each bias gets a plain-language line. Naming it is the point — these are
+     ordinary habits of thought, not character flaws, and they are documented
+     patterns rather than something invented for this quiz. */
+  const biasInfo = {
+    loss_aversion: {
+      label: "손실 회피",
+      desc: "같은 크기라도 잃는 아픔이 버는 기쁨보다 크게 느껴집니다. 그래서 급락에 계획보다 먼저 손이 나갑니다."
+    },
+    disposition: {
+      label: "처분 효과",
+      desc: "오른 것은 빨리 팔고 내린 것은 오래 들고 있게 됩니다. 파는 기준이 가치가 아니라 매수가가 되어 있을 때 나타납니다."
+    },
+    herding: {
+      label: "군집 행동",
+      desc: "많은 사람이 향하는 쪽이 안전해 보입니다. 다만 그때는 이미 가격에 그 기대가 들어가 있는 경우가 많습니다."
+    },
+    overconfidence: {
+      label: "과신",
+      desc: "기억은 맞았던 판단을 더 잘 남깁니다. 기록해 두지 않으면 실제 적중률은 대체로 기억보다 낮습니다."
+    },
+    recency: {
+      label: "최신 편향",
+      desc: "최근에 잘 오른 것이 앞으로도 오를 것처럼 느껴집니다. 최근의 흐름이 미래의 근거로 바뀌는 지점입니다."
+    },
+    sunk_cost: {
+      label: "매몰 비용",
+      desc: "이미 쓴 돈이 아까워 결정을 미루게 됩니다. 산 가격은 시장이 모르는 정보이고, 앞으로의 가치와도 무관합니다."
+    },
+    confirmation: {
+      label: "확증 편향",
+      desc: "내 생각을 뒷받침하는 정보가 더 잘 보이고 더 설득력 있게 읽힙니다. 반대 근거를 일부러 찾아야 균형이 맞습니다."
+    },
+    illusion_of_control: {
+      label: "통제 착각",
+      desc: "자주 들여다보면 상황을 관리하고 있다는 느낌이 듭니다. 확인 빈도와 결과 사이의 관계는 생각보다 약합니다."
+    }
+  };
+
+  /* Five archetypes on the grid the two axes make: low/high risk crossed with
+     principle/intuition, plus a middle for people who sit near the centre of
+     both. */
   const results = {
     turtle: {
-      range: [7, 13],
-      emoji: "🛡️",
-      type: "철벽방어형",
-      name: "돌다리도 두드리는 거북이",
-      desc: "당신에게 투자는 '자산 증식'보다 '자산 방어'의 수단입니다. 원금 손실에 대한 공포가 크기 때문에 변동성을 견디기 힘들어합니다. 대박보다는 마음 편한 투자를 선호합니다.",
-      advice: ["예적금만 고집하면 인플레이션에 뒤쳐집니다.", "S&P500 ETF나 비트코인 적립식 매수부터 시작해보세요.", "개별 종목보다는 '시장 전체'를 사는 것이 좋습니다."]
+      emoji: "🛡️", type: "저위험 · 원칙형", name: "돌다리를 두드리는 거북이",
+      desc: "원금이 줄어드는 상황을 특히 불편해하고, 결정은 미리 정해 둔 기준을 따릅니다. 흔들리지 않는 대신 기회를 늦게 잡는 편입니다.",
+      checks: [
+        "지키는 것과 아무것도 하지 않는 것을 구분하고 있는지.",
+        "위험을 피한 대가로 무엇을 포기했는지 계산해 본 적 있는지.",
+        "기준이 보수적인 것인지, 그냥 결정을 미루는 것인지."
+      ]
+    },
+    squirrel: {
+      emoji: "🐿️", type: "저위험 · 직관형", name: "여기저기 묻어 두는 다람쥐",
+      desc: "크게 걸지는 않지만, 무엇을 살지는 그때그때 분위기를 따라 정합니다. 손실은 작게 막는 대신 판단이 쌓이지 않습니다.",
+      checks: [
+        "지금 가진 것들을 왜 샀는지 각각 설명할 수 있는지.",
+        "조심스러운 성향과 기준 없음이 겹쳐 있지는 않은지.",
+        "소액이라는 이유로 검토를 건너뛰고 있지는 않은지."
+      ]
     },
     owl: {
-      range: [14, 20],
-      emoji: "🦉",
-      type: "전략가형",
-      name: "숲을 꿰뚫어 보는 올빼미",
-      desc: "감정보다는 이성과 논리를 중시합니다. 남들이 좋다고 해서 무작정 사지 않으며, 스스로 납득할 만한 근거(데이터)가 있어야 움직입니다. 밸런스 잡힌 투자자입니다.",
-      advice: ["분석은 완벽한데 실행력이 부족할 수 있습니다.", "때로는 과감하게 비중을 실어야 자산이 점프합니다.", "너무 많은 보조지표는 오히려 판단을 흐립니다."]
+      emoji: "🦉", type: "균형형", name: "양쪽을 저울질하는 올빼미",
+      desc: "위험도 판단 근거도 한쪽으로 치우치지 않았습니다. 상황에 맞춰 조절하는 편이지만, 그 조절의 기준이 그때그때 달라질 수 있습니다.",
+      checks: [
+        "유연한 것인지, 기준이 매번 바뀌는 것인지.",
+        "조절의 근거를 사후가 아니라 사전에 적어 두는지.",
+        "중간을 택하는 것이 판단을 미루는 방식이 되고 있지는 않은지."
+      ]
     },
     lion: {
-      range: [21, 26],
-      emoji: "🦁",
-      type: "진득한 가치투자형",
-      name: "흔들리지 않는 사자",
-      desc: "단기적인 시세 변동에 일희일비하지 않습니다. 우량한 자산을 쌀 때 사서 비쌀 때까지 묵묵히 기다릴 줄 아는 인내심을 가졌습니다. 소위 말하는 '고수'의 기질이 있습니다.",
-      advice: ["'존버'와 '방치'는 다릅니다. 기업 가치가 훼손되면 매도해야 합니다.", "자신의 판단을 너무 맹신하지 마세요.", "현금 흐름(배당, 스테이킹)을 체크하세요."]
-    },
-    fox: {
-      range: [27, 31],
-      emoji: "🦊",
-      type: "스마트한 기회주의자",
-      name: "트렌드 사냥꾼 여우",
-      desc: "시장의 냄새를 기가 막히게 맡습니다. 지금 돈이 어디로 쏠리는지(AI, 밈코인, RWA 등) 파악하고 빠르게 올라탑니다. 유연한 사고방식을 가졌지만, 잦은 매매로 수수료가 많이 나갈 수 있습니다.",
-      advice: ["벌 때는 많이 벌지만, 잃을 때도 빠릅니다. 익절 기준을 지키세요.", "뇌동매매와 빠른 판단을 구분해야 합니다.", "포트폴리오의 30%는 장기 종목에 묻어두세요."]
+      emoji: "🦁", type: "고위험 · 원칙형", name: "확신에 무게를 싣는 사자",
+      desc: "변동성을 감수하되, 그 결정은 스스로 세운 근거에서 나옵니다. 근거가 맞을 때는 크게 가지만, 틀렸을 때도 크게 갑니다.",
+      checks: [
+        "확신의 근거와 확신의 크기가 비례하는지.",
+        "틀렸다고 인정하는 조건을 미리 정해 두었는지.",
+        "한 판단에 얼마까지 걸지 상한을 두고 있는지."
+      ]
     },
     cheetah: {
-      range: [32, 35],
-      emoji: "🐆",
-      type: "야수의 심장",
-      name: "질주하는 치타",
-      desc: "인생은 한 방! 하이 리스크, 하이 리턴을 즐깁니다. 변동성은 곧 기회라고 생각하며, 남들이 공포에 떨 때 매수 버튼을 누릅니다. 대범하지만 깡통 찰 위험도 가장 큽니다.",
-      advice: ["제발 '손절 라인'을 목숨처럼 지키세요.", "대박을 쫓다가 시드가 녹을 수 있습니다.", "수익금은 반드시 안전 자산으로 옮겨두는 습관을 들이세요."]
+      emoji: "🐆", type: "고위험 · 직관형", name: "먼저 뛰고 보는 치타",
+      desc: "빠르게 반응하고 크게 겁니다. 남들보다 먼저 움직이는 것이 강점이지만, 근거가 뒤따라오는 경우가 많아 결과의 폭이 넓습니다.",
+      checks: [
+        "빠른 판단과 반사적 반응을 구분하고 있는지.",
+        "결정을 내린 이유를 사기 전에 적어 두는지.",
+        "회복하기 어려운 크기까지 걸고 있지는 않은지."
+      ]
     }
   };
 
   let currentStep = 0;
-  let totalScore = 0;
+  const totals = { risk: 0, basis: 0 };
+  const maxima = { risk: 0, basis: 0 };
+  const biasTally = {};
+
+  /* Each question contributes 0..1 to its axis. Summing raw scores instead let
+     a four-option question outweigh a three-option one, and left the risk axis
+     centred at 67 — someone picking the middle answer every time came out as
+     high-risk. */
+  questions.forEach(function (q) {
+    q.max = Math.max.apply(null, q.a.map(function (o) { return o.score; }));
+    maxima[q.axis] += 1;
+  });
 
   function startTest() {
     document.getElementById('start-screen').classList.remove('active');
@@ -434,26 +614,28 @@ sidebar:
 
   function showQuestion() {
     const q = questions[currentStep];
-    document.getElementById('question-text').innerText = `Q${currentStep + 1}. ${q.q}`;
-    
-    /* Progress Bar */
-    const percent = ((currentStep) / questions.length) * 100;
-    document.getElementById('progress-bar').style.width = `${percent}%`;
+    document.getElementById('question-text').innerText = 'Q' + (currentStep + 1) + '. ' + q.q;
+
+    const percent = (currentStep / questions.length) * 100;
+    document.getElementById('progress-bar').style.width = percent + '%';
 
     const optsContainer = document.getElementById('options-container');
     optsContainer.innerHTML = '';
 
-    q.a.forEach(opt => {
+    q.a.forEach(function (opt) {
       const btn = document.createElement('button');
       btn.className = 'btn-option';
       btn.innerText = opt.text;
-      btn.onclick = () => selectOption(opt.score);
+      btn.onclick = function () { selectOption(q.axis, opt); };
       optsContainer.appendChild(btn);
     });
   }
 
-  function selectOption(score) {
-    totalScore += score;
+  function selectOption(axis, opt) {
+    totals[axis] += opt.score / questions[currentStep].max;
+    if (opt.bias) {
+      biasTally[opt.bias] = (biasTally[opt.bias] || 0) + 1;
+    }
     currentStep++;
 
     if (currentStep < questions.length) {
@@ -466,39 +648,67 @@ sidebar:
   function showLoading() {
     document.getElementById('quiz-screen').classList.remove('active');
     document.getElementById('loading-screen').classList.add('active');
-    
-    setTimeout(() => {
+
+    setTimeout(function () {
       document.getElementById('loading-screen').classList.remove('active');
       showResult();
-    }, 1800); /* 1.8s delay for suspense */
+    }, 1500);
+  }
+
+  function pickArchetype(risk, basis) {
+    /* Anything close to the middle on both axes is genuinely a middle result,
+       and saying so is more honest than rounding it to a corner. */
+    if (risk > 35 && risk < 65 && basis > 35 && basis < 65) return 'owl';
+    if (risk >= 50) return basis >= 50 ? 'cheetah' : 'lion';
+    return basis >= 50 ? 'squirrel' : 'turtle';
   }
 
   function showResult() {
-    const finalScreen = document.getElementById('result-screen');
-    finalScreen.classList.add('active');
+    document.getElementById('result-screen').classList.add('active');
 
-    let resultKey = 'owl'; /* default */
-    
-    /* Logic based on score range */
-    if (totalScore <= 13) resultKey = 'turtle';
-    else if (totalScore <= 20) resultKey = 'owl';
-    else if (totalScore <= 26) resultKey = 'lion';
-    else if (totalScore <= 31) resultKey = 'fox';
-    else resultKey = 'cheetah';
+    const risk = Math.round((totals.risk / maxima.risk) * 100);
+    const basis = Math.round((totals.basis / maxima.basis) * 100);
+    const res = results[pickArchetype(risk, basis)];
 
-    const res = results[resultKey];
-    
     document.getElementById('result-emoji').innerText = res.emoji;
     document.getElementById('result-type').innerText = res.type;
     document.getElementById('result-name').innerText = res.name;
     document.getElementById('result-desc').innerText = res.desc;
-    
-    const adviceList = document.getElementById('result-advice');
-    adviceList.innerHTML = '';
-    res.advice.forEach(txt => {
+
+    document.getElementById('axis-risk-value').innerText = risk;
+    document.getElementById('axis-basis-value').innerText = basis;
+    /* Next frame, so the bars animate from zero instead of appearing full. */
+    requestAnimationFrame(function () {
+      document.getElementById('axis-risk-bar').style.width = risk + '%';
+      document.getElementById('axis-basis-bar').style.width = basis + '%';
+    });
+
+    const biasList = document.getElementById('result-biases');
+    biasList.innerHTML = '';
+    const ranked = Object.keys(biasTally).sort(function (a, b) { return biasTally[b] - biasTally[a]; }).slice(0, 3);
+
+    if (!ranked.length) {
+      const li = document.createElement('li');
+      li.innerText = '이번 답변에서는 두드러진 편향이 나타나지 않았습니다. 다만 문항이 열 개뿐이라는 점은 감안하세요.';
+      biasList.appendChild(li);
+    } else {
+      ranked.forEach(function (key) {
+        const info = biasInfo[key];
+        const li = document.createElement('li');
+        const name = document.createElement('b');
+        name.innerText = info.label + ' — ';
+        li.appendChild(name);
+        li.appendChild(document.createTextNode(info.desc));
+        biasList.appendChild(li);
+      });
+    }
+
+    const checkList = document.getElementById('result-advice');
+    checkList.innerHTML = '';
+    res.checks.forEach(function (txt) {
       const li = document.createElement('li');
       li.innerText = txt;
-      adviceList.appendChild(li);
+      checkList.appendChild(li);
     });
   }
 
@@ -506,8 +716,8 @@ sidebar:
     const url = window.location.href;
     if (navigator.share) {
       navigator.share({
-        title: '2025 투자 성향 테스트',
-        text: '내 투자 DNA는 거북이일까, 치타일까? 지금 바로 확인해보세요!',
+        title: '투자 성향 테스트',
+        text: '위험 감내도와 판단 근거, 두 축으로 보는 10문항 자기 점검.',
         url: url,
       });
     } else {
