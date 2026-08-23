@@ -31,8 +31,17 @@
      reflowing the whole page once it lands. -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin>
 
-<!-- For all browsers -->
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+{%- comment -%}
+  Above-the-fold CSS inline, full stylesheet after. Without this the browser
+  cannot paint anything until main.css has made a round trip and arrived, which
+  on a slow connection is most of the time to first paint.
+
+  rel="preload" fetches at high priority without blocking; onload promotes it to
+  a real stylesheet. The <noscript> copy covers anyone without JavaScript.
+{%- endcomment -%}
+{% include head/critical-css.html %}
+<link rel="preload" href="{{ '/assets/css/main.css' | relative_url }}" as="style" onload="this.rel='stylesheet';this.onload=null;">
+<noscript><link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}"></noscript>
 
 {%- comment -%}
   Font Awesome only draws decorative icons, so blocking first paint on it is a

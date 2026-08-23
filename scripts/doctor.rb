@@ -9,6 +9,7 @@
 # Exits non-zero when anything at ERROR level is found.
 
 require "yaml"
+require "digest"
 require "date"
 require "set"
 
@@ -167,6 +168,28 @@ permalinks.each do |permalink, paths|
   next if paths.length < 2
   error("permalink", "duplicate permalink `#{permalink}` in: #{paths.join(", ")}",
         "one of these pages will silently overwrite the other")
+end
+
+# --- critical CSS freshness -----------------------------------------------
+# The inlined above-the-fold CSS is generated from the stylesheets. If they
+# change and it is not regenerated, nothing in the finished page looks wrong —
+# only the moment before main.css arrives — so no visual check can catch it.
+# The generator records a hash of its sources; compare it to the sources now.
+critical_path = "_includes/head/critical-css.html"
+if File.exist?(critical_path)
+  recorded = File.read(critical_path, encoding: "utf-8")[/sources-sha256:\s*([0-9a-f]+)/, 1]
+  sources = (Dir.glob("_sass/**/*.scss") + ["assets/css/main.scss"]).sort
+  digest = Digest::SHA256.new
+  sources.each { |f| digest.update(File.binread(f)) }
+  actual = digest.hexdigest[0, 16]
+
+  if recorded.nil?
+    warn_("critical-css", "#{critical_path} has no sources-sha256 fingerprint",
+          "regenerate with `npm run critical`")
+  elsif recorded != actual
+    error("critical-css", "inlined critical CSS is stale — stylesheets changed since it was generated",
+          "run `npm run critical` (needs the site served locally; scripts/debug.sh does that)")
+  end
 end
 
 # --- report ---------------------------------------------------------------

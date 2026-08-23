@@ -44,6 +44,7 @@
     "serve": "scripts/serve.sh",
     "debug:fast": "scripts/debug.sh --skip-build --skip-vitals --skip-a11y",
     "baseline": "scripts/debug.sh --throttle --update-baseline",
-    "known": "node scripts/diagnose.mjs --throttle --skip-visual --known debug-known-issues.json --update-known"
+    "known": "node scripts/diagnose.mjs --throttle --skip-visual --known debug-known-issues.json --update-known",
+    "critical": "node scripts/critical-css.mjs"
   }
 }
