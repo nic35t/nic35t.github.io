@@ -16,10 +16,10 @@ sidebar:
 
   /* Local Styles for Investment Test */
   :root {
-    --toss-blue: #3182f6;
+    --toss-blue: #1b6fe0; /* 4.78:1 with white text; #3182f6 was 3.71:1 */
     --bg-gray: #f2f4f6;
     --text-dark: #191f28;
-    --text-gray: #8b95a1;
+    --text-gray: #69737f; /* 4.82:1 on white; #8b95a1 was 3.03:1 */
   }
 
   /* Reset box-sizing for this component */

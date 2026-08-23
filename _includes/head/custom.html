@@ -1,16 +1,22 @@
 <!-- start custom head snippets -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7683673385648906"
-     crossorigin="anonymous"></script>
 
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_client: "ca-pub-7683673385648906",
-          enable_page_level_ads: true
-     });
-</script>
+{%- comment -%}
+  AdSense.
+
+  This used to load adsbygoogle.js twice — once with the client parameter and
+  once protocol-relative — which fetches the library twice and makes the second
+  push race the first. It also called `enable_page_level_ads`, the old Page
+  Level Ads API that Auto ads replaced; Auto ads is configured in the AdSense
+  dashboard, and leaving the legacy call in alongside it is what produces the
+  "only one AdSense head tag supported" console error.
+
+  One tag, no legacy call. Auto ads placement is a dashboard setting.
+{%- endcomment -%}
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7683673385648906" crossorigin="anonymous"></script>
 
 <!-- Google tag (gtag.js) -->
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q14CHLZSYS"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -19,7 +25,5 @@
 
   gtag('config', 'G-Q14CHLZSYS');
 </script>
-
-<!-- insert favicons. use https://realfavicongenerator.net/ -->
 
 <!-- end custom head snippets -->

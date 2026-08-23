@@ -1,0 +1,60 @@
+{%- comment -%}
+  Site-level structured data, kept separate from the theme's seo.html so a theme
+  update does not clobber it.
+
+  No SearchAction is declared: site search is turned off, and advertising a
+  search endpoint that does not resolve is worse than declaring nothing.
+{%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ site.title | jsonify }},
+  "alternateName": {{ site.subtitle | jsonify }},
+  "url": {{ '/' | absolute_url | jsonify }},
+  "inLanguage": {{ site.locale | default: "ko-KR" | jsonify }},
+  "description": {{ site.description | jsonify }},
+  "publisher": {
+    "@type": "Person",
+    "name": {{ site.social.name | default: site.name | jsonify }}
+    {%- if site.social.links %},
+    "sameAs": {{ site.social.links | jsonify }}
+    {%- endif %}
+  }
+}
+</script>
+
+{%- comment -%}
+  Breadcrumbs tell search engines where a post sits, and are what produces the
+  category path under a result instead of a bare URL. Built from the post's
+  first category, which is how permalinks are structured here.
+{%- endcomment -%}
+{%- if page.layout == "single" and page.categories.size > 0 -%}
+  {%- assign crumb_category = page.categories.first -%}
+  {%- assign category_slug = crumb_category | slugify -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": {{ site.title | jsonify }},
+      "item": {{ '/' | absolute_url | jsonify }}
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ crumb_category | jsonify }},
+      "item": {{ '/categories/#' | append: category_slug | absolute_url | jsonify }}
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ page.title | markdownify | strip_html | strip_newlines | escape_once | jsonify }}
+    }
+  ]
+}
+</script>
+{%- endif -%}

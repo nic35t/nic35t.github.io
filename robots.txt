@@ -1,5 +1,42 @@
+# Everything is crawlable. The stacked User-agent lines this file used to carry
+# were redundant, since `*` already covers every crawler.
+#
+# One group per user-agent, and only one `*` group: a crawler obeys the single
+# most specific group that matches it, so a second `*` block further down would
+# be ambiguous rather than additive.
+
 User-agent: *
+Allow: /
+Disallow: /debug-report/
+Disallow: /debug-baseline/
+
+# AdSense. These two decide whether ads can be served against a page at all, so
+# they are named rather than left to the wildcard.
 User-agent: Mediapartners-Google
+Allow: /
+
 User-agent: Google-Display-Ads-Bot
 Allow: /
+
+# Answer engines. Already permitted by `*`; named here so the choice is on the
+# record and easy to reverse. To keep this content out of one of them, change
+# that engine's line to `Disallow: /`.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
 Sitemap: https://nic35t.github.io/sitemap.xml

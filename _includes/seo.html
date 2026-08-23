@@ -132,9 +132,24 @@
       "name": {{ site.title | jsonify }},
       "logo": {
         "@type": "ImageObject",
-        "url": {{ site.og_image | absolute_url | jsonify }}
+        "url": {{ site.logo | default: site.og_image | absolute_url | jsonify }}
       }
-    }
+    },
+    {%- comment -%}
+      Fields below are not required for a rich result, but they are what a
+      generative engine reads when deciding whether a page answers a question
+      and how to cite it: the language it is written in, how substantial it is,
+      and what it is about.
+    {%- endcomment -%}
+    "inLanguage": {{ site.locale | default: "ko-KR" | jsonify }},
+    "wordCount": {{ page.content | strip_html | number_of_words }},
+    "isAccessibleForFree": true
+    {%- if page.categories.size > 0 %},
+    "articleSection": {{ page.categories | join: ", " | jsonify }}
+    {%- endif %}
+    {%- if page.tags.size > 0 %},
+    "keywords": {{ page.tags | join: ", " | jsonify }}
+    {%- endif %}
     {% if seo_image %}
     ,"image": {
       "@type": "ImageObject",

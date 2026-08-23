@@ -76,13 +76,14 @@ facebook:
   username               :
   app_id                 :
   publisher              :
-og_image                 : # Open Graph/Twitter default site image
+og_image                 : "/assets/images/og-default.jpg" # 1200x630 fallback share card
 # For specifying social profiles
 # - https://developers.google.com/structured-data/customize/social-profiles
 social:
-  type                   : # Person or Organization (defaults to Person)
-  name                   : # If the user or organization name differs from the site's name
+  type                   : "Person"
+  name                   : "Jeremy LEE"
   links: # An array of links to social media profiles
+    - "https://github.com/nic35t"
 
 # Analytics
 analytics:
@@ -181,6 +182,7 @@ exclude:
   - debug-report
   - debug-baseline
   - debug-known-issues.json
+  - make_og.tmp.mjs
   - vendor/bundle
 keep_files:
   - .git

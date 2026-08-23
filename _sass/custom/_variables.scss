@@ -1,0 +1,28 @@
+// Site variable overrides.
+//
+// Imported before the theme so its `!default` values yield to these. Editing
+// the vendored files under _sass/minimal-mistakes/ instead would be lost on any
+// theme update.
+
+// The brand blue was #3182f6, which scores 3.71:1 on white — under the 4.5:1
+// WCAG AA minimum for body text, and the single cause of every colour-contrast
+// violation on the site. This is the same hue darkened until it clears the bar
+// with margin (4.78:1).
+$primary-color: #1b6fe0 !default;
+
+// Link colours follow the primary. Visited deliberately goes darker rather
+// than lighter — the usual "faded" treatment would drop it back under 4.5:1.
+$link-color: $primary-color !default;
+$link-color-hover: mix(#000, $primary-color, 25%) !default;
+$link-color-visited: mix(#000, $primary-color, 15%) !default;
+
+// The muted grey used for post meta, excerpts and taxonomy counts was #8b95a1,
+// which is 3.04:1 on white. It is body text, not decoration, so it has to meet
+// 4.5:1 like anything else. This is the same cool grey, darkened to 4.82:1.
+$gray: #69737f !default;
+
+// Share buttons put white text on the brand colour. Twitter's #55acee gives
+// 2.46:1, so the label is barely there. Darkened to 4.75:1 — still obviously
+// the brand, now actually readable.
+$twitter-color: #1878b8 !default;
+$linkedin-color: #00669b !default;

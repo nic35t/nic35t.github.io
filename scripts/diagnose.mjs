@@ -453,6 +453,12 @@ async function auditPage(context, urlPath, viewport) {
 
   // --- accessibility --------------------------------------------------------
   if (!args["skip-a11y"]) {
+    // Measuring INP scrolls the page, and a sticky masthead then covers the
+    // first row of any list under it — which axe correctly reports as an
+    // obscured tap target. That is an artefact of the probe, not the page, so
+    // the audit runs against the page at rest.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(150);
     try {
       const violations = await runAxe(page);
       result.findings.push(...axeFindings(violations));

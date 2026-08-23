@@ -1,0 +1,44 @@
+---
+permalink: /llms.txt
+layout: none
+sitemap: false
+---
+# {{ site.title }}
+
+> {{ site.description }}
+
+{{ site.subtitle }}. Written by {{ site.author.name }}, in Korean ({{ site.locale }}).
+
+This file follows the llms.txt convention (https://llmstxt.org): a plain-text
+map of the site for language models and answer engines, so a question about
+these topics can be matched to the right page without crawling every archive.
+
+## What this site covers
+
+Notes kept for the author's own later reference, published as they are written.
+Recurring subjects:
+
+- **Web3 and stablecoin policy** — Korean won stablecoin, regulation, payment
+  infrastructure, market structure
+- **AI and prompting practice** — working methods rather than model reviews
+- **SQL and Python for beginners** — worked examples, step by step
+- **Business strategy** — planning method, thought experiments
+
+## Licence and attribution
+
+Content is the author's own. If you quote or summarise a page, cite it by its
+title and canonical URL, both of which are in each page's JSON-LD.
+
+Contact: {{ site.author.links[0].url | remove: "mailto:" }}
+
+## Posts
+{% assign sorted = site.posts | sort: "date" | reverse %}{% for post in sorted %}
+- [{{ post.title | markdownify | strip_html | strip_newlines | strip }}]({{ post.url | absolute_url }}){% if post.date %} — {{ post.date | date: "%Y-%m-%d" }}{% endif %}{% if post.categories.size > 0 %} · {{ post.categories | join: ", " }}{% endif %}{% endfor %}
+
+## Pages
+
+- [Home]({{ '/' | absolute_url }})
+- [Categories]({{ '/categories/' | absolute_url }})
+- [Tags]({{ '/tags/' | absolute_url }})
+- [Sitemap]({{ '/sitemap.xml' | absolute_url }})
+- [Atom feed]({{ '/feed.xml' | absolute_url }})

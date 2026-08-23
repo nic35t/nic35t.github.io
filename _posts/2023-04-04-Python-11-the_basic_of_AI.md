@@ -12,13 +12,13 @@ toc: true
 toc_sticky: true
 ---
 
-# 파이썬을 이용한 데이터 분석
+## 파이썬을 이용한 데이터 분석
 
 파이썬은 데이터 분석에 필요한 라이브러리들이 다양하게 존재하여     
 인기 있는 프로그래밍 언어 중 하나입니다. 이번 글에서는 데이터 분석에 사용되는    
 파이썬 라이브러리인 pandas, NumPy, Matplotlib 등에 대해 소개하고 사용 예제를 제공합니다.    
 
-## pandas
+### pandas
 
 pandas는 데이터 조작과 분석을 위한 라이브러리입니다.   
 pandas는 데이터를 다루기 쉽고 직관적으로 제공하기 때문에 데이터 분석에 적합한 도구입니다.   
@@ -37,7 +37,7 @@ df = pd.DataFrame(data)
 print(df)
 ```
     
-## NumPy
+### NumPy
 NumPy는 Numerical Python의 약자로 수치 계산을 위한 라이브러리입니다.    
 NumPy는 파이썬에서 과학 계산을 위한 핵심 라이브러리 중 하나입니다.    
 
@@ -51,7 +51,7 @@ arr = np.array([1, 2, 3, 4, 5])
 print(arr)
 ```
 
-## Matplotlib
+### Matplotlib
 Matplotlib는 데이터를 시각화하는 데 사용되는 라이브러리입니다.   
 Matplotlib를 이용하면 다양한 종류의 그래프를 그릴 수 있습니다.   
    

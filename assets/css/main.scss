@@ -4,7 +4,12 @@
 
 @charset "utf-8";
 
+// Overrides first: the theme declares its variables with `!default`, so
+// anything set here wins.
+@import "custom/variables";
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
-@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic');
+
+// Rules that need to beat the theme's own, so they come last.
+@import "custom/overrides";

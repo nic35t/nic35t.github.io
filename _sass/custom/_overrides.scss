@@ -1,0 +1,216 @@
+// Rules that must beat the theme's own, so this file is imported last.
+
+/* ==========================================================================
+   Touch targets
+   ========================================================================== */
+
+// WCAG 2.2 AA asks for 24x24 CSS pixels. Table-of-contents rows were 17px
+// tall, so the whole list failed. Padding rather than a fixed height keeps
+// two-line entries intact.
+.toc__menu a {
+  min-height: 24px;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+}
+
+// Tag and category clouds sit close together; give them room to be tapped.
+.taxonomy__index a,
+.entries-list .archive__item-title a {
+  display: inline-block;
+  min-height: 24px;
+}
+
+// The theme paints disabled pagination as `rgba($muted-text-color, .5)`, which
+// composites to 1.98:1 on white. WCAG exempts inactive controls from contrast,
+// and these do carry `pointer-events: none` — but a state nobody can read is
+// not much of a state. Opaque, and still clearly recessed next to body text.
+.pagination a.disabled,
+.pagination li a.disabled {
+  color: #6b7178;
+}
+
+/* ==========================================================================
+   Keyboard focus
+   ========================================================================== */
+
+// The theme leaves focus to the browser default, which several themes then
+// remove. :focus-visible shows a ring for keyboard users without putting one
+// on every mouse click.
+:focus-visible {
+  outline: 3px solid $primary-color;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+// A skip link is useless if it never becomes visible when focused.
+.screen-reader-shortcut:focus {
+  clip: auto;
+  width: auto;
+  height: auto;
+  z-index: 1000;
+  padding: 0.5em 1em;
+  background: #fff;
+  color: $primary-color;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Motion
+   ========================================================================== */
+
+// Vestibular disorders make large motion genuinely unpleasant. Honour the
+// system setting rather than animating regardless.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Dark mode
+   ========================================================================== */
+
+// The theme compiles its palette to literal colours, so a media query cannot
+// re-run the Sass. These custom properties carry the values that need to
+// change at runtime; the rules below consume them.
+:root {
+  --surface: #fff;
+  --surface-raised: #fff;
+  --surface-sunken: #f2f3f3;
+  --text: #3d4144;
+  --text-muted: #7a8288;
+  --border: #f2f3f3;
+  --link: #{$primary-color};
+  --code-bg: #f8f8f8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #14171a;
+    --surface-raised: #1c2024;
+    --surface-sunken: #22272b;
+    --text: #d7dade;
+    --text-muted: #9aa3ab;
+    --border: #2b3137;
+    // Lightened so it clears 4.5:1 against the dark surface, the same bar the
+    // light palette has to meet.
+    --link: #7fb0ff;
+    --code-bg: #1c2024;
+  }
+
+  html,
+  body {
+    background-color: var(--surface);
+    color: var(--text);
+  }
+
+  .masthead,
+  .masthead__inner-wrap,
+  .greedy-nav,
+  .greedy-nav__toggle,
+  .greedy-nav .hidden-links {
+    background-color: var(--surface-raised);
+    color: var(--text);
+  }
+
+  .masthead {
+    border-bottom-color: var(--border);
+  }
+
+  .greedy-nav a,
+  .greedy-nav__toggle,
+  .site-title,
+  .site-subtitle {
+    color: var(--text);
+  }
+
+  a,
+  .page__content a:not(.btn) {
+    color: var(--link);
+  }
+
+  .page__title,
+  .page__content h1,
+  .page__content h2,
+  .page__content h3,
+  .page__content h4,
+  .page__content h5,
+  .page__content h6,
+  .archive__item-title,
+  .archive__item-title a {
+    color: var(--text);
+  }
+
+  .page__meta,
+  .page__date,
+  .archive__item-excerpt,
+  .page__footer,
+  .page__footer a,
+  .breadcrumbs,
+  .pagination a {
+    color: var(--text-muted);
+  }
+
+  .page__footer,
+  .sidebar,
+  .author__avatar,
+  .author__content,
+  .toc,
+  .toc__menu a {
+    background-color: var(--surface);
+    color: var(--text);
+  }
+
+  .toc,
+  .nav__title,
+  .toc .nav__title {
+    background-color: var(--surface-raised);
+    color: var(--text);
+  }
+
+  .toc__menu a {
+    border-bottom-color: var(--border);
+  }
+
+  .toc__menu a:hover,
+  .toc__menu .active a {
+    background-color: var(--surface-sunken);
+    color: var(--link);
+  }
+
+  pre,
+  code,
+  .highlight,
+  .highlight pre {
+    background-color: var(--code-bg);
+    color: var(--text);
+  }
+
+  hr,
+  .page__content blockquote,
+  .archive__item + .archive__item {
+    border-color: var(--border);
+  }
+
+  .btn--inverse {
+    background-color: var(--surface-raised);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .screen-reader-shortcut:focus {
+    background: var(--surface-raised);
+    color: var(--link);
+  }
+
+  // Photographs are fine as-is; flat logo art on a light plate is not, so knock
+  // back the glare without inverting anything.
+  .site-logo img {
+    filter: brightness(0.92);
+  }
+}
