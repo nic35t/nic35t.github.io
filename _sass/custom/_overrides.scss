@@ -471,3 +471,34 @@
 .page__content .toc__menu a {
   text-decoration: none;
 }
+
+/* ==========================================================================
+   Sticky masthead
+   ========================================================================== */
+
+// The theme makes .masthead sticky but never gives it a background — only the
+// .greedy-nav inside it is painted. The inner wrap adds 1em of padding around
+// that nav, so there is a transparent band on all four sides of an element
+// that is pinned over the page, and article text scrolls visibly through it.
+//
+// Both the bar and its wrap are painted, so nothing shows through whichever
+// one the layout happens to stretch.
+.masthead,
+.masthead__inner-wrap {
+  background-color: var(--surface-raised);
+}
+
+// The right sidebar sticks at top: 2em, which puts it under a masthead that is
+// about 79px tall — the contents list tucked itself behind the bar. Clearing
+// the bar's height plus its shadow keeps it fully visible. This became visible
+// when the contents list was made sticky.
+.sidebar__right.sticky {
+  top: calc(#{$nav-height} + 3.5em);
+}
+
+// A sticky header also swallows the top of whatever an in-page link jumps to.
+// scroll-padding-top tells the browser to stop short by the bar's height, so a
+// heading reached from the contents list lands below it rather than beneath it.
+html {
+  scroll-padding-top: calc(#{$nav-height} + 3.5em);
+}

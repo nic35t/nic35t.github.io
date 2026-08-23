@@ -55,7 +55,15 @@ $(document).ready(function() {
 
   // Smooth scrolling
   var scroll = new SmoothScroll('a[href*="#"]', {
-    offset: 20,
+    // Measured rather than fixed. The masthead is sticky, so a target scrolled
+    // to the very top lands underneath it; the old constant 20 was far short of
+    // the bar's real height and every contents-list jump hid its own heading.
+    // A function because the bar is a different height on mobile and desktop.
+    offset: function () {
+      var masthead = document.querySelector('.masthead');
+      var height = masthead ? masthead.getBoundingClientRect().height : 0;
+      return height + 16;
+    },
     speed: 400,
     speedAsDuration: true,
     durationMax: 500
