@@ -12,8 +12,7 @@ toc: true
 toc_sticky: true
 ---
 
-Input
-=====
+## Input
 
 처음 `Tag Writer`를 만들었는데, 그 목적은 처음 기준을 잡을 때 용도여서   
 만들어진 기준으로 양산을 위한 `Tag Checker`를 만들고 싶었습니다.
@@ -24,8 +23,7 @@ Input
 비전공자로서 영역을 넓힌다는 생각으로 탐구하며 만들어 보았습니다.
 
 
-Process
-=====
+## Process
 ```
 목표 : 태그 양산하는 툴 만들기
 ```
@@ -67,7 +65,6 @@ with open(str(save_file)+".txt",'w') as file :
 ```   
 
 
-Output
-=====
+## Output
 이것도 앞선 첫 작처럼 다른 연구 업무를 하게 되어 기획 자체가 의미없어졌지만,   
 그래도 나름 `def`를 처음 활용해서 만들어 봤습니다. :)

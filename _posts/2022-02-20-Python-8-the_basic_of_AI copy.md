@@ -12,8 +12,7 @@ toc: true
 toc_sticky: true
 ---
 
-Input
-=====
+## Input
 
 네이버 커넥트재단 **부스트코스**에서 제공하는 **AI 기초 다지기 과정**에 5주차입니다.    
 직전 포스팅 후 다항 회귀를 배웠고, 이를 간결히 정리한 최최최종판 정리입니다.    
@@ -25,8 +24,7 @@ Input
 미니배치를 통해 원활히 학습시키는 방법입니다.                
 
 
-Process
-=====
+## Process
 ```
 배운 내용 : 다항 선형 회귀 w. nn.Module / DataLoader (minibatch)
 ```
@@ -39,7 +37,7 @@ from torch.utils.data import Dataset #데이터로더 사용을 위한 데이터
 from torch.utils.data import DataLoader # 데이터 로더
 ```
 
-###### 1. Class - Dataset / nn.Module    
+### 1. Class - Dataset / nn.Module    
 ```python
 # 데이터로더에 쓰일 데이터셋 준비
 class CustomDataset(Dataset): 
@@ -66,7 +64,7 @@ class MultivariableLinearRegressionModel(nn.Module): # 입출력 데이터 사�
 dataloader = DataLoader(dataset, batch_size= 2, shuffle = True)
 ```
 
-###### 2. Full Code    
+### 2. Full Code    
 ```python
 # 데이터 - 예시 데이터 : 일반적으로 어디서 가져올 것이고, Pandas 전처리 필요
 x_data = torch.FloatTensor([[60, 70, 80],[70, 80, 90], [80, 90, 100]]) # 입력 데이터 
@@ -99,8 +97,7 @@ for epoch in range(nb_epochs+1):
       
      
      
-Output
-=====
+## Output
 처음부터 바로 이 내용을 봤다면, 이게 뭔소린가 정도의 내용이었습니다.    
 기본 모델을 라이브러리로 단순화시키다보면, 단순하지만 보기에는 이해가 필요한,    
 그래서 차근차근 배운 이번 코스가 참 좋았습니다 :)

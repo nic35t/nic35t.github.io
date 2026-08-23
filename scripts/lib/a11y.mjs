@@ -29,6 +29,23 @@ async function loadAxe() {
 const BLOCKING = new Set(["critical", "serious"]);
 
 export async function runAxe(page) {
+  // `content-visibility: auto` lets the browser skip rendering off-screen
+  // sections, and while a subtree is skipped Chromium reports stale computed
+  // styles for it. axe then reports colour-contrast failures for colours the
+  // reader never sees — on /tags/ that was 3 phantom findings, all of which
+  // resolve correctly the moment the section is scrolled into view.
+  //
+  // Forcing everything to render gives axe the values that actually apply.
+  const marker = await page.evaluate(() => {
+    const style = document.createElement("style");
+    style.id = "axe-force-render";
+    style.textContent = "*{content-visibility:visible !important;contain-intrinsic-size:auto !important}";
+    document.head.appendChild(style);
+    return style.id;
+  });
+  // One frame for the forced layout to settle before anything is measured.
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
   await page.evaluate(await loadAxe());
 
   const results = await page.evaluate(async (tags) => {
@@ -48,6 +65,11 @@ export async function runAxe(page) {
       total: v.nodes.length,
     }));
   }, WCAG_TAGS);
+
+  await page.evaluate((id) => {
+    const style = document.getElementById(id);
+    if (style) style.remove();
+  }, marker);
 
   return results;
 }

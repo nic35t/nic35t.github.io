@@ -46,6 +46,14 @@
   {% endfor %}
 {% endif %}
 
+{%- comment -%}
+  Progressive enhancements: copy buttons and language labels on code blocks, a
+  reading-progress bar, and the theme toggle. Deferred — none of it is needed
+  for the page to be read or navigated.
+{%- endcomment -%}
+<script src="{{ '/assets/js/enhance.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/theme-toggle.js' | relative_url }}" defer></script>
+
 <!-- Lazy Load Images for Performance -->
 <script>
   document.addEventListener("DOMContentLoaded", function() {

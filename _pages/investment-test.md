@@ -18,8 +18,33 @@ sidebar:
   :root {
     --toss-blue: #1b6fe0; /* 4.78:1 with white text; #3182f6 was 3.71:1 */
     --bg-gray: #f2f4f6;
+    --card-bg: #ffffff;
     --text-dark: #191f28;
     --text-gray: #69737f; /* 4.82:1 on white; #8b95a1 was 3.03:1 */
+    --on-accent: #ffffff;
+  }
+
+  /* This widget carries its own palette and used to hardcode white cards. Once
+     the site gained a dark theme, the inherited light body text landed on those
+     white cards — unreadable. Its colours now flip with the rest of the site. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --toss-blue: #7fb0ff;
+      --bg-gray: #14171a;
+      --card-bg: #1c2024;
+      --text-dark: #d7dade;
+      --text-gray: #9aa3ab;
+      /* The accent is light in dark mode, so its label goes dark. */
+      --on-accent: #14171a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --toss-blue: #7fb0ff;
+    --bg-gray: #14171a;
+    --card-bg: #1c2024;
+    --text-dark: #d7dade;
+    --text-gray: #9aa3ab;
+    --on-accent: #14171a;
   }
 
   /* Reset box-sizing for this component */
@@ -34,7 +59,7 @@ sidebar:
     padding: 30px 20px;
     font-family: "Pretendard", -apple-system, sans-serif;
     text-align: center;
-    background-color: #fff;
+    background-color: var(--card-bg);
     border-radius: 24px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     overflow: hidden; /* Prevent overflow */
@@ -61,7 +86,7 @@ sidebar:
   }
 
   /* Typography */
-  h1.test-title {
+  .test-title {
     font-size: 2rem;
     font-weight: 800;
     color: var(--text-dark);
@@ -81,7 +106,7 @@ sidebar:
   /* Buttons */
   .btn-primary {
     background-color: var(--toss-blue);
-    color: white;
+    color: var(--on-accent);
     border: none;
     padding: 16px 32px;
     font-size: 1.1rem;
@@ -100,7 +125,7 @@ sidebar:
   }
 
   .btn-option {
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     border: 2px solid #e5e8eb;
     color: var(--text-dark);
     padding: 18px 20px;
@@ -222,7 +247,7 @@ sidebar:
       box-shadow: 0 4px 15px rgba(0,0,0,0.05);
       min-height: 450px;
     }
-    h1.test-title { 
+    .test-title { 
       font-size: 1.5rem; 
       margin-top: 0;
     }
@@ -240,7 +265,7 @@ sidebar:
   <!-- 1. Start Screen -->
   <div id="start-screen" class="screen active">
     <div style="font-size: 4rem; margin-bottom: 20px;">💰</div>
-    <h1 class="test-title">2025 실전형<br>투자 성향 테스트</h1>
+    <h2 class="test-title">2025 실전형<br>투자 성향 테스트</h2>
     <p class="test-desc">나는 어떤 투자 동물일까?<br>행동 경제학 기반으로 분석하는<br>나의 진짜 투자 DNA 찾기</p>
     <button class="btn-primary" onclick="startTest()">테스트 시작하기</button>
   </div>
@@ -268,7 +293,7 @@ sidebar:
   <div id="result-screen" class="screen">
     <div id="result-emoji" class="result-emoji">🦁</div>
     <div id="result-type" class="result-type">TYPE A</div>
-    <h1 id="result-name" class="result-name">결과 이름</h1>
+    <h2 id="result-name" class="result-name">결과 이름</h2>
     
     <div class="result-box">
       <h3>📊 당신의 투자 스타일</h3>
@@ -292,7 +317,7 @@ sidebar:
 </div>
 
 <script>
-  // Advanced Quiz Data (Based on Behavioral Finance)
+  /* Advanced Quiz Data (Based on Behavioral Finance) */
   const questions = [
     {
       q: "친구가 '이 코인(주식) 사서 2배 벌었어!'라며 수익 인증을 했다. 나의 솔직한 심정은?",
@@ -353,8 +378,8 @@ sidebar:
     }
   ];
 
-  // 5 Investment Archetypes
-  // Score Range: 7 ~ 35
+  /* 5 Investment Archetypes */
+  /* Score Range: 7 ~ 35 */
   const results = {
     turtle: {
       range: [7, 13],
@@ -411,7 +436,7 @@ sidebar:
     const q = questions[currentStep];
     document.getElementById('question-text').innerText = `Q${currentStep + 1}. ${q.q}`;
     
-    // Progress Bar
+    /* Progress Bar */
     const percent = ((currentStep) / questions.length) * 100;
     document.getElementById('progress-bar').style.width = `${percent}%`;
 
@@ -445,16 +470,16 @@ sidebar:
     setTimeout(() => {
       document.getElementById('loading-screen').classList.remove('active');
       showResult();
-    }, 1800); // 1.8s delay for suspense
+    }, 1800); /* 1.8s delay for suspense */
   }
 
   function showResult() {
     const finalScreen = document.getElementById('result-screen');
     finalScreen.classList.add('active');
 
-    let resultKey = 'owl'; // default
+    let resultKey = 'owl'; /* default */
     
-    // Logic based on score range
+    /* Logic based on score range */
     if (totalScore <= 13) resultKey = 'turtle';
     else if (totalScore <= 20) resultKey = 'owl';
     else if (totalScore <= 26) resultKey = 'lion';

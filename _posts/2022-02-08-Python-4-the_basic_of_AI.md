@@ -12,8 +12,7 @@ toc: true
 toc_sticky: true
 ---
 
-Input
-====
+## Input
 
 네이버 커넥트재단 **부스트코스**에서 제공하는 **AI 기초 다지기 과정**에 3주차입니다.      
 역시나 시간이 부족하여, 새벽 공부를 하고 있지만... 그래도 아는 게 늘어 좋습니다.   
@@ -23,8 +22,7 @@ Input
 
 3주차는 Vector 개념을 정리했습니다.
 
-Process
-=====
+## Process
 ```
 배운 내용 : Vector (1d) / Matrix (2d) / Tensor (3d)
 ```
@@ -120,8 +118,7 @@ np.linalg.inv(mat2)
 mat2@np.linalg.inv(mat2) #행렬곱셉 (내적)이 항등행렬
 ```
 
-Output
-=====
+## Output
 행 - 데이터 자체가 여러 차원의 변수로 이루어져 있고,   
 이러한 데이터 마다의 특성을 잘 나타내는 것을 찾는게,   
 회귀라고 배웠습니다. :)   

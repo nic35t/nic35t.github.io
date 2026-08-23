@@ -32,8 +32,23 @@ layout: default
       {% endunless %}
 
       <section class="page__content" itemprop="text">
-        {% if page.toc %}
-          <aside class="sidebar__right {% if page.toc_sticky %}sticky{% endif %}">
+        {%- comment -%}
+          The table of contents used to be per-post opt-in, and the opting was
+          inconsistent: 35 posts with three or more headings had none, while 13
+          posts with one or two headings showed a contents box listing almost
+          nothing. Decide from the article instead. `toc: false` in a post's
+          front matter still wins if one needs to be suppressed by hand.
+        {%- endcomment -%}
+        {%- assign h2_count = content | split: '<h2' | size | minus: 1 -%}
+        {%- assign h3_count = content | split: '<h3' | size | minus: 1 -%}
+        {%- assign heading_count = h2_count | plus: h3_count -%}
+        {%- assign auto_toc = false -%}
+        {%- if heading_count >= 3 -%}{%- assign auto_toc = true -%}{%- endif -%}
+        {%- if page.toc == false -%}{%- assign auto_toc = false -%}{%- endif -%}
+        {%- if page.toc == true -%}{%- assign auto_toc = true -%}{%- endif -%}
+
+        {% if auto_toc %}
+          <aside class="sidebar__right sticky">
             <nav class="toc">
               <header><h4 class="nav__title"><i class="fas fa-{{ page.toc_icon | default: 'file-alt' }}"></i> {{ page.toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
               {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" skip_no_ids=true %}

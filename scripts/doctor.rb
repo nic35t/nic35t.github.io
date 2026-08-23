@@ -170,6 +170,39 @@ permalinks.each do |permalink, paths|
         "one of these pages will silently overwrite the other")
 end
 
+# --- inline scripts vs HTML compression ------------------------------------
+# compress_html collapses every inline <script> onto a single line, at which
+# point a `//` comment comments out the rest of the script and the page dies
+# with "Unexpected end of input". This bit twice: once on the theme toggle,
+# once on the investment test, whose whole quiz app is one inline script.
+#
+# Checked at source level, on lines that clearly open a comment. Trying to find
+# them in the built output means parsing minified JavaScript with a regex, and
+# the strings on this site contain enough quotes and URLs to defeat that; the
+# browser catching the syntax error in scripts/diagnose.mjs is the backstop.
+Dir.glob("{_includes,_layouts,_pages}/**/*.{html,md}").each do |path|
+  in_script = false
+  File.readlines(path, encoding: "utf-8").each_with_index do |line, index|
+    in_script = true if line =~ /<script\b/ && line !~ /\bsrc=/
+    if in_script
+      # A trailing comment is just as fatal as one on its own line, and the
+      # first version of this check only looked at line starts — it passed the
+      # investment test as clean while its quiz app was still dead. Strings and
+      # block comments come out first so a URL is not mistaken for a comment.
+      bare = line.dup
+      bare.gsub!(%r{/\*.*?\*/}, " ")
+      bare.gsub!(/"(?:[^"\\]|\\.)*"/, '""')
+      bare.gsub!(/'(?:[^'\\]|\\.)*'/, "''")
+      bare.gsub!(/`(?:[^`\\]|\\.)*`/, "``")
+      if bare =~ %r{(?<!:)//(?!/)}
+        error("inline-script", "#{path}:#{index + 1} uses a `//` comment inside an inline <script>",
+              "compress_html joins the script onto one line, so it swallows everything after it — use /* */")
+      end
+    end
+    in_script = false if line =~ %r{</script>}
+  end
+end
+
 # --- critical CSS freshness -----------------------------------------------
 # The inlined above-the-fold CSS is generated from the stylesheets. If they
 # change and it is not regenerated, nothing in the finished page looks wrong —

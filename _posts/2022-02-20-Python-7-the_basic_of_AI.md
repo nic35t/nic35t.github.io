@@ -12,8 +12,7 @@ toc: true
 toc_sticky: true
 ---
 
-Input
-======
+## Input
 
 네이버 커넥트재단 **부스트코스**에서 제공하는 **AI 기초 다지기 과정**에 5주차입니다.    
 스스로 자료 찾아 공부했던, 선형 회귀를 더 간단히 PyTorch로 구현하는 방법입니다.
@@ -23,8 +22,7 @@ Input
 최대한 지난번의 깨달음, 그리고 작성 방식을 활용했습니다.     
 
 
-Process
-======
+## Process
 ```
 배운 내용 : 선형 회귀 torch로 세우기
 ```
@@ -39,31 +37,31 @@ torch.manual_seed(1)
 
     <torch._C.Generator at 0x7fa65c03e950>
 
-###### 1. 데이터 설정하기 _ Train / Test
+### 1. 데이터 설정하기 _ Train / Test
 ```python
 x_train = torch.FloatTensor([[1], [2], [3]])
 y_train = torch.FloatTensor([[2], [4], [6]])
 ```
     
-###### 2. 모델 초기화 _ Weight / bias
+### 2. 모델 초기화 _ Weight / bias
 ```python
 W = torch.zeros(1, requires_grad = True)
 b = torch.zeros(1, requires_grad = True)
 ```
     (tensor([0.], requires_grad=True), tensor([0.], requires_grad=True))
     
-###### 3. 예측 모델 
+### 3. 예측 모델 
 ```python
 pred = W * x_train + b
 ```
     
-###### 4. 비용 함수
+### 4. 비용 함수
 ```python
 error = torch.mean((pred - y_train) ** 2) # 제곱의 평균
 ```
     tensor(18.6667, grad_fn=<MeanBackward1>)
 
-###### 5. 경사 하강 - optimizer
+### 5. 경사 하강 - optimizer
 ```python
 # numpy로 구현 시, 편미분을 사용함
 optimizer = optim.SGD([W, b], lr=0.01)
@@ -74,7 +72,7 @@ error.backward() #Grdient 계산
 optimizer.step() #개선
 ```
     
-###### 6. Full Code
+### 6. Full Code
 ```python
 # 1. 데이터
 x_train = torch.FloatTensor([[1], [2], [3]])
@@ -115,7 +113,6 @@ for epoch in range(nb_epochs + 1): # 반복 범위 3000은 2999에서 끝나므�
      
      
      
-Output
-======
+## Output
 지난번 선형회귀와 같은 내용이지만, PyTorch로 다르게 표현하는 부분,    
 전체 흐름을 같으니, 함수를 잘 익혀서 간단히 만들어봐야겠습니다. 

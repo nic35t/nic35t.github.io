@@ -1,0 +1,22 @@
+{%- comment -%}
+  Applies the saved theme before the page paints. This has to be inline and in
+  <head>: any later and the browser paints the system theme first and then
+  swaps, which is the white flash every dark-mode site is judged on.
+
+  No stored choice means no attribute, and the CSS falls back to
+  prefers-color-scheme — the system setting stays the default.
+{%- endcomment -%}
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved === "dark" || saved === "light") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (e) {
+      /* Private mode can throw on localStorage; the system preference stands.
+         Block comment on purpose: compress_html collapses inline scripts onto
+         a single line, so a line comment would swallow the rest of the file. */
+    }
+  })();
+</script>
