@@ -13,6 +13,43 @@
   padding-bottom: 0.4em;
 }
 
+// The site logo is a 32px square, under the 44px a finger needs. Padding round
+// the image rather than scaling it keeps the mark the same size on screen.
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+
+  // The image carries width/height attributes so the browser can reserve its
+  // space before it loads. Those attributes also become the rendered size
+  // unless CSS says otherwise, and the theme only constrained the height —
+  // which stretched a square mark into a 128x34 sliver. Both dimensions are
+  // set here so the aspect ratio survives.
+  img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+  }
+}
+
+// The overflow menu button and the pagination numbers are the two controls a
+// phone user actually aims at, and both sat around 36px. They clear WCAG 2.2's
+// 24px minimum either way; this is the more comfortable 44.
+.greedy-nav__toggle {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.pagination li a {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 // Tag and category clouds sit close together; give them room to be tapped.
 .taxonomy__index a,
 .entries-list .archive__item-title a {

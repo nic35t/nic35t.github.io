@@ -1,5 +1,25 @@
-{% if page.last_modified_at %}
-  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ page.last_modified_at | date: "%Y-%m-%d" }}">{{ page.last_modified_at | date: "%B %-d, %Y" }}</time></p>
-{% elsif page.date %}
-  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time></p>
-{% endif %}
+{%- comment -%}
+  The "Updated" line. Two things were wrong with the theme's version:
+
+  - The format was hardcoded to "%B %-d, %Y", so a Korean site printed
+    "April 13, 2026" here while the meta line above it printed 2026년 4월 13일.
+  - It fell back to page.date when last_modified_at was absent, labelling the
+    publication date as an update. With the publication date now shown in the
+    meta line, that made the same date appear twice, once mislabelled.
+
+  So it renders only when there is a real modification date, and only when that
+  date actually differs from publication.
+{%- endcomment -%}
+{%- if site.locale contains "ko" -%}
+  {%- assign date_format = "%Y년 %-m월 %-d일" -%}
+{%- else -%}
+  {%- assign date_format = "%B %-d, %Y" -%}
+{%- endif -%}
+
+{%- if page.last_modified_at -%}
+  {%- assign modified_day = page.last_modified_at | date: "%Y-%m-%d" -%}
+  {%- assign published_day = page.date | date: "%Y-%m-%d" -%}
+  {%- if modified_day != published_day -%}
+    <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">{{ page.last_modified_at | date: date_format }}</time></p>
+  {%- endif -%}
+{%- endif -%}

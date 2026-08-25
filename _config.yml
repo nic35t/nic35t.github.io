@@ -104,43 +104,23 @@ author:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:nicest@kakao.com"
-    - label: "Website"
-      icon: "fas fa-fw fa-link"
-      # url: "https://your-website.com"
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
-      # url: "https://twitter.com/"
-    - label: "Facebook"
-      icon: "fab fa-fw fa-facebook-square"
-      # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url: "https://github.com/"
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      # url: "https://instagram.com/"
+      url: "https://github.com/nic35t"
 
 # Site Footer
+#
+# Every entry the theme ships was left with its url commented out, so the footer
+# rendered nothing but a copyright line. Only links that actually go somewhere
+# are listed; an icon with no destination is worse than no icon.
 footer:
   links:
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
-      # url: "https://twitter.com/your_username" # Replace with your Twitter profile URL
-    - label: "Facebook"
-      icon: "fab fa-fw fa-facebook-square"
-      # url:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      # url:
-    - label: "GitLab"
-      icon: "fab fa-fw fa-gitlab"
-      # url:
-    - label: "Bitbucket"
-      icon: "fab fa-fw fa-bitbucket"
-      # url:
-    - label: "Instagram"
-      icon: "fab fa-fw fa-instagram"
-      # url:
+      url: "https://github.com/nic35t"
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope-square"
+      url: "mailto:nicest@kakao.com"
 
 
 # Reading Files
@@ -300,6 +280,11 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
+      # No post carried a visible date anywhere on the site — not in listings,
+      # not on the article. On a blog that covers policy and fast-moving tech,
+      # knowing whether something is from 2021 or last month is most of the
+      # context.
+      show_date: true
       comments: # true
       share: true
       related: true
