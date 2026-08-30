@@ -15,6 +15,7 @@ import { PNG } from "pngjs";
 import { AUDIT, MIN_TAP_TARGET } from "./diagnose.mjs";
 import { compare as compareVisual } from "./lib/visual.mjs";
 import { entryOf, partitionKnown } from "./lib/known.mjs";
+import { findRenderBlocking } from "./lib/vitals.mjs";
 
 const BASE_CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -212,6 +213,36 @@ for (const testCase of RATCHET_CASES) {
   }
 }
 
-const total = FIXTURES.length + VISUAL_CASES.length + RATCHET_CASES.length;
+// --- render-blocking detection ---------------------------------------------
+// This check reads the delivered HTML rather than the live DOM, because the
+// very pattern that stops a stylesheet blocking — preload plus an onload that
+// flips rel to "stylesheet" — leaves the DOM looking like it blocked. It also
+// has to ignore the <noscript> fallback that pairs with it, which is a plain
+// stylesheet link that only applies when scripts are off.
+
+const ORIGIN = "https://x.test";
+const BLOCKING_CASES = [
+  { name: "plain third-party stylesheet blocks", html: `<link rel="stylesheet" href="https://cdn.test/a.css">`, expect: 1 },
+  { name: "synchronous third-party script blocks", html: `<script src="https://cdn.test/a.js"></script>`, expect: 1 },
+  { name: "preload with onload swap does not", html: `<link rel="preload" as="style" href="https://cdn.test/a.css" onload="this.rel='stylesheet'">`, expect: 0 },
+  { name: "media=print does not", html: `<link rel="stylesheet" media="print" href="https://cdn.test/a.css">`, expect: 0 },
+  { name: "async script does not", html: `<script async src="https://cdn.test/a.js"></script>`, expect: 0 },
+  { name: "same-origin stylesheet is not third-party", html: `<link rel="stylesheet" href="https://x.test/a.css">`, expect: 0 },
+  { name: "noscript fallback is not counted", html: `<link rel="preload" as="style" href="https://cdn.test/a.css"><noscript><link rel="stylesheet" href="https://cdn.test/a.css"></noscript>`, expect: 0 },
+  { name: "a real blocker outside noscript still counts", html: `<noscript><link rel="stylesheet" href="https://cdn.test/a.css"></noscript><link rel="stylesheet" href="https://cdn.test/b.css">`, expect: 1 },
+];
+
+for (const testCase of BLOCKING_CASES) {
+  const found = findRenderBlocking(testCase.html, ORIGIN).length;
+  if (found === testCase.expect) {
+    console.log(`ok    ${testCase.name}`);
+  } else {
+    failures += 1;
+    console.log(`FAIL  ${testCase.name}`);
+    console.log(`        expected ${testCase.expect}, got ${found}`);
+  }
+}
+
+const total = FIXTURES.length + VISUAL_CASES.length + RATCHET_CASES.length + BLOCKING_CASES.length;
 console.log(failures ? `\n${failures} check(s) failed` : `\nAll ${total} checks passed`);
 process.exit(failures ? 1 : 0);

@@ -29,9 +29,25 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
-<!-- Pretendard: the body font, so it stays render-blocking rather than
-     reflowing the whole page once it lands. -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin>
+{%- comment -%}
+  Pretendard, loaded without blocking the first paint.
+
+  It used to be a plain stylesheet, which meant nothing could be drawn until a
+  third-party CDN had completed a round trip — for every visitor, on every page.
+  Now the page paints in the fallback and Pretendard swaps in when it arrives.
+
+  The trade is one visible font swap, and the fallback is what makes it
+  acceptable: the stack goes -apple-system, Malgun Gothic, Roboto — the Korean
+  UI font of whichever platform the reader is on, not a generic serif. Every
+  screenshot taken while building this site rendered through that fallback,
+  because the CDN is unreachable from the build sandbox, and the typography
+  held up throughout.
+
+  If the swap turns out to be distracting in practice, reverting is one line:
+  make this a plain rel="stylesheet" again.
+{%- endcomment -%}
+<link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" onload="this.rel='stylesheet';this.onload=null;" crossorigin>
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" crossorigin></noscript>
 
 {%- comment -%}
   Above-the-fold CSS inline, full stylesheet after. Without this the browser

@@ -29,6 +29,18 @@ logo                     : "/assets/images/mg.png"
 masthead_title           : # overrides the website title displayed in the masthead, use " " for no title
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
+# Comments are configured but switched off — `comments:` is left unset in the
+# post defaults further down, so nothing renders. That is deliberate, not an
+# oversight waiting to be fixed:
+#
+#   - Disqus injects a large third-party bundle and its own ad and tracking
+#     scripts, which would undo most of the loading work done on this site.
+#   - If comments are wanted, giscus or utterances are the better vehicle now:
+#     they store threads in GitHub, add no trackers, and cost a fraction of the
+#     bytes. Both need a repository-side step (enabling Discussions, installing
+#     the app) that only the owner can do.
+#
+# To turn Disqus on regardless, set `comments: true` in the _posts defaults.
 comments:
   provider               : "disqus" # false (default), "disqus", "discourse", "facebook", "staticman", "staticman_v2", "utterances", "custom"
   disqus:

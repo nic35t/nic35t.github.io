@@ -23,7 +23,7 @@ import { chromium } from "playwright";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { COLLECTOR, READ_VITALS, THRESHOLDS, SLOW_4G, CPU_SLOWDOWN, rate, exerciseInteractions, stubThirdParty, FIND_RENDER_BLOCKING, WEIGHT_BUDGET_KB } from "./lib/vitals.mjs";
+import { COLLECTOR, READ_VITALS, THRESHOLDS, SLOW_4G, CPU_SLOWDOWN, rate, exerciseInteractions, stubThirdParty, findRenderBlocking, WEIGHT_BUDGET_KB } from "./lib/vitals.mjs";
 import { runAxe, toFindings as axeFindings } from "./lib/a11y.mjs";
 import { compare as compareVisual, toFinding as visualFinding } from "./lib/visual.mjs";
 import { loadKnown, signature, partitionKnown, writeKnown } from "./lib/known.mjs";
@@ -326,6 +326,7 @@ async function auditPage(context, urlPath, viewport) {
   });
 
   const url = `${BASE_URL}${urlPath}`;
+  let deliveredHtml = "";
   const result = {
     path: urlPath,
     viewport: viewport.name,
@@ -339,6 +340,8 @@ async function auditPage(context, urlPath, viewport) {
 
   try {
     const response = await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    // The HTML as delivered, before scripts rewrite any of it.
+    if (response) deliveredHtml = await response.text().catch(() => "");
     if (response && response.status() >= 400) {
       result.findings.push({
         level: "error",
@@ -409,7 +412,7 @@ async function auditPage(context, urlPath, viewport) {
     result.vitals = vitals;
     result.throttled = Boolean(args.throttle);
 
-    const blocking = await page.evaluate(FIND_RENDER_BLOCKING);
+    const blocking = findRenderBlocking(deliveredHtml, new URL(BASE_URL).origin);
     if (blocking.length) {
       result.findings.push({
         level: "warning",

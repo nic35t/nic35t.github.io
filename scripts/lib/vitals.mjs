@@ -184,22 +184,43 @@ export async function stubThirdParty(page, origin) {
   });
 }
 
-/** Render-blocking third-party resources in the document, as authored. */
-export const FIND_RENDER_BLOCKING = () => {
+/**
+ * Render-blocking third-party resources, read from the delivered HTML.
+ *
+ * This used to walk the live DOM, which is wrong for exactly the pattern that
+ * fixes the problem: a `rel="preload" ... onload="this.rel='stylesheet'"` link
+ * does not block parsing, but by the time the page is idle its rel *is*
+ * "stylesheet", so the DOM says it blocked when it did not. The bytes the
+ * browser parsed are the only honest source.
+ */
+export function findRenderBlocking(html, origin) {
   const blocking = [];
-  for (const link of document.querySelectorAll("link[rel='stylesheet']")) {
-    const href = link.getAttribute("href") || "";
-    if (!/^https?:\/\//.test(href)) continue;
-    if (new URL(href, location.href).origin === location.origin) continue;
-    if (link.media && link.media !== "all" && link.media !== "screen") continue;
+
+  // A <noscript> copy is the fallback that pairs with a non-blocking load. It
+  // is a plain rel="stylesheet", but it only applies when scripts are off, so
+  // counting it reports the very pattern that removes the blocking as blocking.
+  html = html.replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, "");
+
+  const linkTag = /<link\b[^>]*>/gi;
+  for (const [tag] of html.matchAll(linkTag)) {
+    const rel = (tag.match(/\brel=["']?([^"'\s>]+)/i) || [])[1];
+    if (!rel || rel.toLowerCase() !== "stylesheet") continue;      // preload does not block
+    const href = (tag.match(/\bhref=["']([^"']+)/i) || [])[1];
+    if (!href || !/^https?:\/\//.test(href)) continue;
+    if (href.startsWith(origin)) continue;
+    const media = (tag.match(/\bmedia=["']([^"']+)/i) || [])[1];
+    if (media && !/^(all|screen)$/i.test(media.trim())) continue;  // media="print" does not block
     blocking.push({ type: "stylesheet", href: href.slice(0, 90) });
   }
-  for (const script of document.querySelectorAll("script[src]")) {
-    if (script.defer || script.async || script.type === "module") continue;
-    const src = script.getAttribute("src") || "";
-    if (!/^https?:\/\//.test(src)) continue;
-    if (new URL(src, location.href).origin === location.origin) continue;
+
+  const scriptTag = /<script\b[^>]*>/gi;
+  for (const [tag] of html.matchAll(scriptTag)) {
+    if (/\b(defer|async|type=["']module["'])/i.test(tag)) continue;
+    const src = (tag.match(/\bsrc=["']([^"']+)/i) || [])[1];
+    if (!src || !/^https?:\/\//.test(src)) continue;
+    if (src.startsWith(origin)) continue;
     blocking.push({ type: "script", href: src.slice(0, 90) });
   }
+
   return blocking;
-};
+}
