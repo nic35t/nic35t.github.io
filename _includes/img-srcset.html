@@ -1,0 +1,32 @@
+{%- comment -%}
+  Builds a srcset for an image that has narrower variants sitting next to it,
+  named `<stem>-<width>.<ext>`.
+
+  Emits nothing unless the variants are actually on disk. Teasers and avatars
+  are author-supplied paths, so a srcset assembled by naming convention alone
+  would point at 404s the moment someone sets a different image — and a 404 in
+  a srcset is worse than no srcset, because the browser picks it and shows a
+  broken image. The narrowest variant is checked as a proxy for the set; they
+  are generated together.
+
+  Parameters:
+    src    — path to the full-size image, e.g. /assets/images/noteaser.jpg
+    widths — comma-separated variant widths, narrowest first
+    full   — intrinsic width of `src` itself
+
+  The stem/extension split assumes the only dot in the path is the one before
+  the extension, which holds for everything under /assets/images.
+{%- endcomment -%}
+{%- assign _parts = include.src | strip | split: "." -%}
+{%- assign _stem = _parts | first -%}
+{%- assign _ext = _parts | last -%}
+{%- assign _widths = include.widths | split: "," -%}
+{%- assign _first = _widths | first -%}
+{%- assign _probe = _stem | append: "-" | append: _first | append: "." | append: _ext -%}
+{%- assign _available = site.static_files | map: "path" | join: "," -%}
+{%- if _available contains _probe -%}
+  {%- for w in _widths -%}
+    {{- _stem | append: "-" | append: w | append: "." | append: _ext | relative_url }} {{ w }}w,
+  {%- endfor -%}
+  {{- include.src | strip | relative_url }} {{ include.full }}w
+{%- endif -%}

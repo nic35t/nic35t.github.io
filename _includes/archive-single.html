@@ -13,8 +13,24 @@
 <div class="{{ include.type | default: 'list' }}__item">
   <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
     {% if include.type == "grid" and teaser %}
+      {%- comment -%}
+        The teaser slot is one column wide — 343px on a phone, 175px in the
+        four-up grid on a tablet, 224px on a desktop — while the stored file is
+        1248px so it can still serve as the Open Graph card. The variants keep
+        the card and stop the grid downloading it at full size.
+
+        width/height give the browser the aspect ratio up front, which is what
+        keeps the related-posts grid from reflowing as the teasers land. They
+        only work because the override sheet pairs the theme's `width: 100%`
+        with `height: auto`; without that the height attribute would win and
+        the teaser would render 832px tall.
+      {%- endcomment -%}
+      {%- capture teaser_srcset -%}{% include img-srcset.html src=teaser widths="224,448,700" full="1248" %}{%- endcapture -%}
+      {%- if teaser_srcset != "" -%}
+        {%- capture teaser_responsive -%}srcset="{{ teaser_srcset }}" sizes="(min-width: 1024px) 224px, (min-width: 768px) 175px, calc(100vw - 2rem)"{%- endcapture -%}
+      {%- endif -%}
       <div class="archive__item-teaser">
-        <img src="{{ teaser | relative_url }}" alt="">
+        <img src="{{ teaser | relative_url }}" {{ teaser_responsive }} alt="" width="1248" height="832" loading="lazy" decoding="async">
       </div>
     {% endif %}
     <h3 class="archive__item-title no_toc" itemprop="headline">

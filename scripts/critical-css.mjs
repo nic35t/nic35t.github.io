@@ -112,8 +112,13 @@ const EXTRACT = () => {
   };
 
   for (const sheet of document.styleSheets) {
-    // Only this site's own stylesheet; third-party sheets stay where they are.
-    if (sheet.href && !sheet.href.includes("/assets/css/main.css")) continue;
+    // Only this site's own stylesheet. The earlier form of this test skipped a
+    // sheet when its href pointed elsewhere, which let every inline <style>
+    // through, since those have no href at all. Two things rode in that way:
+    // the previous critical block, re-collected from the page it was inlined
+    // into, and the investment-test quiz's page-local styles, which then
+    // shipped inside the critical CSS of every other page on the site.
+    if (!sheet.href || !sheet.href.includes("/assets/css/main.css")) continue;
     try {
       visit(sheet.cssRules, null);
     } catch {

@@ -34,12 +34,64 @@
   }
 }
 
+// The theme sets `width: 100%` on a teaser and leaves the height alone. That
+// was fine while the img had no dimension attributes; now that it carries them
+// so the grid can reserve space, the height attribute would win and render a
+// 3:2 teaser 832px tall. `height: auto` hands the ratio back to the width.
+.archive__item-teaser img {
+  height: auto;
+}
+
 // The overflow menu button and the pagination numbers are the two controls a
 // phone user actually aims at, and both sat around 36px. They clear WCAG 2.2's
 // 24px minimum either way; this is the more comfortable 44.
 .greedy-nav__toggle {
   min-width: 44px;
   min-height: 44px;
+}
+
+// The author card's "Follow" toggle and the back-to-top link were 32px and
+// 18px tall. Both are ordinary controls with room to spare around them, so
+// they get the comfortable 44px rather than the 24px WCAG floor.
+.author__urls-wrapper button.btn {
+  min-height: 44px;
+}
+
+.back-to-top {
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+
+// Below 600px the share buttons hide their labels and rely on an icon from the
+// deferred Font Awesome sheet. Until that sheet lands — or if it never does —
+// the button has no rendered content at all and collapses to its own padding:
+// a 29x14 tap target on the widest-reaching breakpoint. A flex box with a
+// floor is the same size whether the glyph arrives or not.
+.page__share .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+// The site title sat at 41px next to a 44px logo link. It is already a flex
+// container, so a floor raises it without touching how the title and subtitle
+// stack, and the masthead does not grow: the logo link was the taller of the
+// two all along.
+.site-title {
+  min-height: 44px;
+}
+
+// Table-of-contents rows are 34px: fine under a mouse, tight under a thumb.
+// Only coarse pointers get the extra height — a desktop sidebar keeps the
+// compact list instead of growing 10px for every heading in the post.
+@media (pointer: coarse) {
+  .toc__menu a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
 }
 
 .pagination li a {

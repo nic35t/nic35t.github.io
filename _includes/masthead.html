@@ -11,7 +11,7 @@
             axe flags as a serious link-name violation. The label goes on the
             link rather than the image.
           {%- endcomment -%}
-          <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="{{ site.title | markdownify | strip_html | strip_newlines | escape_once }} 홈"><img src="{{ logo_path | relative_url }}" alt="" width="128" height="128"></a>
+          <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="{{ site.title | markdownify | strip_html | strip_newlines | escape_once }} 홈"><img src="{{ logo_path | relative_url }}" srcset="{{ '/assets/images/mg-64.png' | relative_url }} 64w, {{ logo_path | relative_url }} 128w" sizes="2rem" alt="" width="32" height="32"></a>
         {% endunless %}
         <a class="site-title" href="{{ '/' | relative_url }}">
           {{ site.masthead_title | default: site.title }}
