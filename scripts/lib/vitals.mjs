@@ -42,7 +42,7 @@ export function rate(metric, value) {
  * starts painting — registering them after load would miss every entry.
  */
 export const COLLECTOR = () => {
-  window.__vitals = { lcp: null, cls: 0, inp: null, fcp: null, shifts: [], longTasks: 0 };
+  window.__vitals = { lcp: null, cls: 0, fcp: null, shifts: [], longTasks: 0, interactions: {} };
 
   try {
     new PerformanceObserver((list) => {
@@ -69,11 +69,24 @@ export const COLLECTOR = () => {
     }).observe({ type: "paint", buffered: true });
   } catch {}
 
+  // INP is defined over *interactions* — a click, a tap, a key press — not over
+  // every timed event. An entry only belongs to an interaction when the browser
+  // gives it an interactionId; hovering does not get one.
+  //
+  // Taking the widest entry regardless of that was measuring the wrong thing
+  // entirely. The first time a mouse enters the page the browser does a hover
+  // hit-test and style recalc, and under a 4x CPU throttle that pointerover ran
+  // 368ms. That number was being reported as INP on a page where nothing had
+  // been clicked at all.
+  //
+  // Latency for one interaction is the longest of the events sharing its id
+  // (pointerdown, pointerup and click are one interaction, not three).
   try {
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        const current = window.__vitals.inp ?? 0;
-        if (entry.duration > current) window.__vitals.inp = entry.duration;
+        if (!entry.interactionId) continue;
+        const seen = window.__vitals.interactions[entry.interactionId] ?? 0;
+        window.__vitals.interactions[entry.interactionId] = Math.max(seen, entry.duration);
       }
     }).observe({ type: "event", buffered: true, durationThreshold: 16 });
   } catch {}
@@ -111,10 +124,19 @@ export const READ_VITALS = () => {
 
   const nav = performance.getEntriesByType("navigation")[0];
 
+  // With fewer than 50 interactions the metric is the worst one; the 98th
+  // percentile rule only starts discarding outliers above that. Nothing here
+  // drives a page anywhere near 50, but the rule is cheap to state correctly.
+  const latencies = Object.values(v.interactions ?? {}).sort((a, b) => b - a);
+  const inp = latencies.length
+    ? latencies[Math.min(latencies.length - 1, Math.floor(latencies.length / 50))]
+    : null;
+
   return {
     LCP: v.lcp == null ? null : Math.round(v.lcp),
     CLS: Math.round(cls * 1000) / 1000,
-    INP: v.inp == null ? null : Math.round(v.inp),
+    INP: inp == null ? null : Math.round(inp),
+    interactionCount: latencies.length,
     FCP: v.fcp == null ? null : Math.round(v.fcp),
     TTFB: nav ? Math.round(nav.responseStart) : null,
     longTasks: v.longTasks,
@@ -144,18 +166,46 @@ export const WEIGHT_BUDGET_KB = 1500;
  * the page's own controls and let the event observer time them.
  */
 export async function exerciseInteractions(page) {
-  const targets = await page.$$("button:visible, [role='button']:visible, nav a:visible");
-  for (const target of targets.slice(0, 3)) {
+  // Real clicks, not trial ones. The previous version used Playwright's
+  // `trial: true`, which runs the actionability checks and then does not
+  // dispatch anything — so no interaction ever happened and INP had nothing to
+  // measure. That was invisible because the observer was reading hover events.
+  //
+  // Real clicks change the page, which is why this now runs after the
+  // accessibility audit and the screenshots rather than before them.
+  //
+  // Buttons only, and never an anchor: activating a link navigates, and the
+  // audit would then be measuring a different page.
+  let driven = 0;
+  const buttons = await page.$$("button:visible, [role='button']:visible");
+  for (const button of buttons.slice(0, 3)) {
     try {
-      await target.hover({ timeout: 1000 });
-      await target.click({ timeout: 1000, trial: true });
+      await button.click({ timeout: 1000 });
+      driven += 1;
+      await page.waitForTimeout(120);
     } catch {
       // A control that cannot be driven is the click-blocked check's problem.
     }
   }
-  await page.mouse.move(10, 10);
+
+  // Keyboard interactions count too, and Tab is the one key that is guaranteed
+  // to do nothing but move focus — no page here binds it.
+  for (let i = 0; i < 3; i += 1) {
+    await page.keyboard.press("Tab");
+    driven += 1;
+    await page.waitForTimeout(80);
+  }
+
   await page.mouse.wheel(0, 400);
   await page.waitForTimeout(300);
+
+  // How many interactions were actually dispatched. The observer cannot stand
+  // in for this: `durationThreshold` is clamped to a 16ms floor by the event
+  // timing spec, so an interaction faster than that produces no entry at all.
+  // Without this count a null INP is ambiguous — it could mean every
+  // interaction was quick, or that nothing was ever clicked, and those are
+  // opposite conclusions.
+  return driven;
 }
 
 /**

@@ -291,6 +291,27 @@ export const AUDIT = ({ minTapTarget }) => {
   return { findings, stacking: stacking.slice(0, 15) };
 };
 
+/**
+ * One vitals metric against its threshold, or null when there is nothing to
+ * report. Shared so INP — measured at the end of the pass — is judged by
+ * exactly the same rule as the load metrics.
+ */
+function rateVitals(metric, value) {
+  if (value == null) return null;
+  const verdict = rate(metric, value);
+  if (verdict === "good") return null;
+  // Unthrottled timings measured against a local server are not evidence of
+  // anything, so only CLS — which is layout, not speed — can fail a run.
+  const timing = metric !== "CLS";
+  const meaningful = args.throttle || !timing;
+  return {
+    level: verdict === "poor" && meaningful ? "error" : "warning",
+    check: "web-vitals",
+    message: `${metric} ${value}${THRESHOLDS[metric].unit} is ${verdict} (good \u2264 ${THRESHOLDS[metric].good})`,
+    details: [THRESHOLDS[metric].label + (meaningful ? "" : " \u2014 unthrottled local timing, indicative only")],
+  };
+}
+
 async function auditPage(context, urlPath, viewport) {
   const page = await context.newPage();
   const consoleErrors = [];
@@ -402,13 +423,7 @@ async function auditPage(context, urlPath, viewport) {
     // the browser had not emitted yet, and the timestamp then reflects when the
     // page was poked rather than when it painted — on this runner that turned a
     // page measuring 1.6s at mobile width into a fictional 5.1s at desktop.
-    const loadVitals = await page.evaluate(READ_VITALS);
-
-    // Now interact, and take only INP from the second read.
-    await exerciseInteractions(page);
-    const afterInteraction = await page.evaluate(READ_VITALS);
-
-    const vitals = { ...loadVitals, INP: afterInteraction.INP ?? loadVitals.INP };
+    const vitals = await page.evaluate(READ_VITALS);
     result.vitals = vitals;
     result.throttled = Boolean(args.throttle);
 
@@ -446,30 +461,23 @@ async function auditPage(context, urlPath, viewport) {
       });
     }
 
-    for (const metric of ["LCP", "CLS", "INP", "FCP", "TTFB"]) {
-      const value = vitals[metric];
-      if (value == null) continue;
-      const verdict = rate(metric, value);
-      if (verdict === "good") continue;
-      // Unthrottled timings measured against a local server are not evidence
-      // of anything, so only CLS — which is layout, not speed — can fail a run.
-      const timing = metric !== "CLS";
-      const meaningful = args.throttle || !timing;
-      result.findings.push({
-        level: verdict === "poor" && meaningful ? "error" : "warning",
-        check: "web-vitals",
-        message: `${metric} ${value}${THRESHOLDS[metric].unit} is ${verdict} (good \u2264 ${THRESHOLDS[metric].good})`,
-        details: [THRESHOLDS[metric].label + (meaningful ? "" : " \u2014 unthrottled local timing, indicative only")],
-      });
+    // INP is deliberately absent here: it is measured after the audit, once
+    // driving the page can no longer affect what the audit and the screenshots
+    // see. It is judged in rateVitals below.
+    for (const metric of ["LCP", "CLS", "FCP", "TTFB"]) {
+      const finding = rateVitals(metric, vitals[metric]);
+      if (finding) result.findings.push(finding);
     }
   }
 
   // --- accessibility --------------------------------------------------------
   if (!args["skip-a11y"]) {
-    // Measuring INP scrolls the page, and a sticky masthead then covers the
-    // first row of any list under it — which axe correctly reports as an
-    // obscured tap target. That is an artefact of the probe, not the page, so
-    // the audit runs against the page at rest.
+    // The audit runs against the page at rest. This used to matter because the
+    // INP probe ran first and scrolled the page, and a sticky masthead then
+    // covered the first row of any list under it — which axe correctly reported
+    // as an obscured tap target, an artefact of the probe rather than the page.
+    // The probe has moved to the end of the pass, so nothing has touched the
+    // page by now; the reset stays as a guard for whatever runs here next.
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(150);
     try {
@@ -516,6 +524,36 @@ async function auditPage(context, urlPath, viewport) {
     }
   }
 
+  // --- INP ------------------------------------------------------------------
+  // Last, on purpose. Measuring it means clicking things, and a clicked page is
+  // not the page the accessibility audit and the visual baseline are supposed
+  // to see — an opened overflow menu or a flipped theme would be recorded as if
+  // it were the resting state. Nothing below observes the page, so the probe
+  // can finally use real clicks.
+  if (!args["skip-vitals"] && result.vitals) {
+    try {
+      const driven = await exerciseInteractions(page);
+      const probed = await page.evaluate(READ_VITALS);
+      result.vitals.INP = probed.INP;
+      result.vitals.interactionCount = probed.interactionCount;
+      result.vitals.interactionsDriven = driven;
+      const finding = rateVitals("INP", probed.INP);
+      if (finding) result.findings.push(finding);
+
+      // Pages share one browser context per viewport, and one of the controls
+      // the probe clicks is the theme toggle, which persists the choice. Left
+      // behind, it renders every later page in this viewport dark and the
+      // baselines record that as the site's resting appearance — nine false
+      // visual regressions, the first time this ran. Storage goes back to the
+      // state a first visit sees.
+      await page.evaluate(() => {
+        try { localStorage.clear(); sessionStorage.clear(); } catch {}
+      });
+    } catch (err) {
+      result.findings.push({ level: "warning", check: "web-vitals", message: `INP probe failed: ${err.message}` });
+    }
+  }
+
   await page.close();
   return result;
 }
@@ -542,9 +580,19 @@ function renderMarkdown(results) {
     if (result.vitals) {
       const cells = ["LCP", "CLS", "INP", "FCP", "TTFB"].map((m) => {
         const value = result.vitals[m];
-        if (value == null) return `${m}: n/a`;
+        if (value == null) {
+          // A null INP is not missing data when the page was actually driven:
+          // the event timing spec floors durationThreshold at 16ms, so an
+          // interaction quicker than that is never reported. Say which case
+          // this is rather than printing "n/a" for both.
+          if (m !== "INP") return `${m}: n/a`;
+          return result.vitals.interactionsDriven
+            ? `\u{1F7E2} INP <16ms (${result.vitals.interactionsDriven} interactions, none slow enough to time)`
+            : `INP: no interaction driven`;
+        }
         const icon = { good: "\u{1F7E2}", "needs-improvement": "\u{1F7E1}", poor: "\u{1F534}" }[rate(m, value)] ?? "";
-        return `${icon} ${m} ${value}${THRESHOLDS[m].unit}`;
+        const suffix = m === "INP" ? ` (worst of ${result.vitals.interactionCount} timed)` : "";
+        return `${icon} ${m} ${value}${THRESHOLDS[m].unit}${suffix}`;
       });
       lines.push(``, `Vitals${result.throttled ? " (Slow 4G, 4x CPU)" : " (unthrottled)"}: ` + cells.join(" \u00B7 "), ``);
     }

@@ -15,7 +15,7 @@ import { PNG } from "pngjs";
 import { AUDIT, MIN_TAP_TARGET } from "./diagnose.mjs";
 import { compare as compareVisual } from "./lib/visual.mjs";
 import { entryOf, partitionKnown } from "./lib/known.mjs";
-import { findRenderBlocking } from "./lib/vitals.mjs";
+import { findRenderBlocking, COLLECTOR, READ_VITALS, exerciseInteractions } from "./lib/vitals.mjs";
 
 const BASE_CSS = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,6 +100,65 @@ for (const fixture of FIXTURES) {
     console.log(`        actual: ${[...fired].join(", ") || "(nothing)"}`);
   } else {
     console.log(`ok    ${fixture.name}`);
+  }
+}
+
+// --- INP -------------------------------------------------------------------
+// The metric is defined over interactions — clicks, taps, key presses — and
+// nothing else. Reading the widest `event` entry instead measured a hover: on
+// this runner the first pointerover into a page takes hundreds of milliseconds
+// under CPU throttling, and that was being reported as INP on pages where
+// nothing had been clicked. Both directions are pinned here, plus the case
+// that made the bug invisible.
+const INP_CASES = [
+  {
+    // The floor is the point: durationThreshold is clamped to 16ms, so an
+    // interaction faster than that is invisible. Reading null here as "no
+    // interaction" would invert the conclusion — this page is the fast one.
+    name: "an interaction under the 16ms floor reports as fast, not as missing",
+    html: `<button id="b" style="min-width:44px;min-height:44px">Press</button>`,
+    expect: (v, driven) => driven > 0 && v.INP == null,
+    describe: (v, driven) => `INP ${v.INP === null ? "null" : v.INP}, ${driven} driven`,
+  },
+  {
+    name: "a blocking click handler is caught",
+    html: `<button id="b" style="min-width:44px;min-height:44px">Press</button>
+           <script>document.addEventListener("click", () => {
+             const end = performance.now() + 400; while (performance.now() < end);
+           }, true);<\/script>`,
+    expect: (v) => v.INP != null && v.INP > 300,
+    describe: (v) => `INP ${v.INP} from ${v.interactionCount} timed interaction(s)`,
+  },
+  {
+    name: "hovering alone is not an interaction",
+    html: `<div id="hoverable" style="width:200px;height:200px">Hover me</div>`,
+    hoverOnly: true,
+    expect: (v, driven) => v.INP == null && v.interactionCount === 0 && driven === 0,
+    describe: (v, driven) => `INP ${v.INP === null ? "null" : v.INP}, ${v.interactionCount} timed, ${driven} driven`,
+  },
+];
+
+for (const c of INP_CASES) {
+  const inpPage = await context.newPage();
+  await inpPage.addInitScript(COLLECTOR);
+  await inpPage.goto("about:blank");
+  await inpPage.setContent(`<style>${BASE_CSS}</style>${c.html}`);
+  let driven = 0;
+  if (c.hoverOnly) {
+    await inpPage.hover("#hoverable");
+    await inpPage.mouse.move(20, 20);
+    await inpPage.waitForTimeout(200);
+  } else {
+    driven = await exerciseInteractions(inpPage);
+  }
+  const vitals = await inpPage.evaluate(READ_VITALS);
+  await inpPage.close();
+  if (c.expect(vitals, driven)) {
+    console.log(`ok    ${c.name}`);
+  } else {
+    failures += 1;
+    console.log(`FAIL  ${c.name}`);
+    console.log(`        got ${c.describe(vitals, driven)}`);
   }
 }
 
@@ -243,6 +302,6 @@ for (const testCase of BLOCKING_CASES) {
   }
 }
 
-const total = FIXTURES.length + VISUAL_CASES.length + RATCHET_CASES.length + BLOCKING_CASES.length;
+const total = FIXTURES.length + INP_CASES.length + VISUAL_CASES.length + RATCHET_CASES.length + BLOCKING_CASES.length;
 console.log(failures ? `\n${failures} check(s) failed` : `\nAll ${total} checks passed`);
 process.exit(failures ? 1 : 0);
