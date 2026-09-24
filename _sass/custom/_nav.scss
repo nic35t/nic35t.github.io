@@ -472,11 +472,16 @@ a.site-title {
   // Sheet links: large and semibold like Apple's phone menu, each a 48px row.
   // Press dims the row (.55) rather than scaling it: a full-width row that
   // shrinks looks like it is falling away. (0,3,1) beats the inline link rule.
+  // The 12px padding, cancelled by the margin, keeps the label on the content
+  // edge but gives the keyboard focus ring room around it instead of drawing
+  // it 2px from the first letter; the 12px radius is the nested-surface step.
   .site-nav[data-open] .site-nav__list a {
     display: flex;
     align-items: center;
     min-height: 48px;
-    padding: 0;
+    margin: 0 -12px;
+    padding: 0 12px;
+    border-radius: var(--r-sm);
     font-size: 1.5rem;
     font-weight: var(--fw-heading);
     letter-spacing: -0.015em;
