@@ -1,0 +1,194 @@
+/* ==========================================================================
+   Global base (owner: u1, spec 4.1)
+
+   Element defaults every page shares: root size, body surface and Korean line
+   breaking, emphasis, selection, the keyboard focus ring, the skip link,
+   text-wrap, and the few theme components nobody else restyles.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad) and
+   what became of them:
+     121-144  `:focus-visible` ring and the visible skip link: replaced below
+              (tokenized ring colour, no border-radius, pill skip link)
+     201-205  dark `html, body` surface and text: deleted in the token commit
+     226-227  dark link colour: deleted in the token commit
+     229-239  dark heading colours: deleted in the token commit
+     241-274  dark muted list, this part: `.breadcrumbs, .help-block,
+              .help-inline, .nav__list label, .comment__date`: replaced by
+              one unconditional var(--text-secondary) rule
+     331-334  dark skip link: deleted (the skip link reads --card and --link,
+              which the dark swap already recolours)
+     466-486  `text-wrap` balance on titles, pretty on paragraphs: kept, plus
+              the tile and home-hero selectors
+   `#main` is deliberately not styled here: each layout owner neutralizes it
+   for its own `.layout--*` (spec 4.1).
+   ========================================================================== */
+
+/* ==========================================================================
+   Root and body
+   ========================================================================== */
+
+// A percentage, not the theme's fixed 16px/17px, so the reader's own browser
+// text size still scales every rem on the site. 100% and 106.25% are the same
+// 16px and 17px at default settings, so nothing moves for most readers; the
+// 17px step at 1024 keeps the desktop reading size the theme already had.
+// Grayscale antialiasing matches how macOS and iOS draw Pretendard in Apple's
+// own pages; subpixel rendering makes light-on-black text look bolder than the
+// same weight on white, which would make dark mode feel heavier.
+html {
+  font-size: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include desktop-up {
+    font-size: 106.25%;
+  }
+}
+
+// The page surface and text colour come from tokens, so the dark swap reaches
+// the body itself (the theme only paints `html`, which left body transparent
+// and a flash of the wrong colour possible behind late content).
+// --text on --bg: 16.83 light, 19.29 dark.
+// keep-all: Korean breaks between words (at spaces), never inside one, which
+// is how Korean is typeset in print. break-word is the safety valve for a long
+// URL or an English identifier that cannot fit the column.
+// font-synthesis-style: Pretendard has no italic, and a browser-slanted Hangul
+// glyph is a distortion, not a style. Anything still marked italic renders
+// upright instead of skewed.
+// The font family is not restated: it already arrives through the tokenized
+// $global-font-family (var(--font-sans)).
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-synthesis-style: none;
+}
+
+/* ==========================================================================
+   Emphasis
+   ========================================================================== */
+
+// The browser's `bolder` lands on 700, which the scale reserves for display
+// and title1; running-text emphasis is semibold like every smaller heading.
+strong,
+b {
+  font-weight: var(--fw-strong);
+}
+
+// Hangul has no italic form, so slanting is not available as emphasis. The
+// emphasis moves to weight (the same 600 as strong), which reads in both
+// scripts. Classed <i> is left alone: those are icon fonts.
+em,
+cite,
+i:not([class]) {
+  font-style: normal;
+  font-weight: var(--fw-strong);
+}
+
+/* ==========================================================================
+   Selection
+   ========================================================================== */
+
+// The theme selects in white on black, a hard inversion that fights both
+// themes. A pale blue wash (dark: deep navy) keeps selected text legible and
+// on-brand. --text on --selection: 12.39 light, 11.53 dark. The text colour is
+// set explicitly so prose (--text-body), secondary grey and syntax colours all
+// read the same once selected.
+::selection {
+  background-color: var(--selection);
+  color: var(--text);
+}
+
+/* ==========================================================================
+   Keyboard focus
+   ========================================================================== */
+
+// One ring everywhere: 3px of the focus blue, 2px clear of the control, so it
+// never sits on top of a pill's fill or a chip's label. No border-radius here:
+// the outline follows each element's own radius (round on pills and chips,
+// square on text links), and setting one would reshape the element itself.
+// Ring contrast: 4.70 on white, 4.31 on #f5f5f7; dark 6.96 on black, 5.58 on
+// #1d1d1f (all >= 3:1, WCAG 1.4.11).
+// `a` and `button` are named because the theme's `a:focus, button:focus`
+// (a 5px `auto` ring pulled 2px inside the box, in the light blue only) sits
+// at (0,1,1) and would otherwise beat a bare :focus-visible on every link.
+:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+// The theme's `a:focus, button:focus` ring also fires on a mouse click, which
+// is why so many sites remove focus rings altogether. :focus-visible already
+// covers keyboard users, so the click-only ring goes.
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// The skip link is the first tab stop on every page and was an unstyled white
+// box. Now it floats as a pill over the masthead: the raised card surface and
+// the float shadow (none in dark, where --card #1d1d1f on #000 is the lift),
+// kept 12px off the corner, above every layer including the nav.
+// --link on --card: 5.57 light, 5.58 dark. The underline says "this is a link"
+// without relying on the blue. Semibold rather than the theme's bold: 700 is
+// reserved for display and title1.
+.screen-reader-shortcut:focus {
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: var(--z-skip);
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  color: var(--link);
+  box-shadow: var(--shadow-float);
+  font-weight: var(--fw-strong);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+// Headings break where the line is balanced rather than wherever the last word
+// happens to fall: noticeably better on the long Korean titles here, which
+// otherwise leave one or two words stranded on the last line. With keep-all a
+// balanced title can end up narrower than its column (the Havruta H1 at 375);
+// that is intended (spec 3.3), do not "fix" it with `wrap`.
+.page__title,
+.archive__item-title,
+.tile__title,
+.home-hero__title,
+.page__content h1,
+.page__content h2,
+.page__content h3,
+.page__content h4 {
+  text-wrap: balance;
+}
+
+// Avoids a single short word alone on the last line of a paragraph or a
+// clamped excerpt.
+.page__content p,
+.archive__item-excerpt,
+.tile__excerpt,
+.home-hero__excerpt {
+  text-wrap: pretty;
+}
+
+/* ==========================================================================
+   Unused theme components
+   ========================================================================== */
+
+// Components the theme paints in its $muted-text-color literal, which is tuned
+// to white and drops to 3.7:1 on the dark surface. Nothing on this site shows
+// them today, but if one returns it should follow the tokens in both themes.
+// --text-secondary on --bg: 5.07 light, 8.16 dark.
+.breadcrumbs,
+.help-block,
+.help-inline,
+.nav__list label,
+.comment__date {
+  color: var(--text-secondary);
+}

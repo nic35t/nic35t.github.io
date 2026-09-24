@@ -1,3 +1,10 @@
+{%- comment -%}
+  The theme's left sidebar. single.html no longer includes it: posts carry a
+  byline and an author card instead of the rail (spec C12), and the archive
+  layouts drop it with author_profile: false (spec 4.6). It is kept unchanged
+  for the layouts that still call it (search, archive-taxonomy), where it
+  renders nothing unless a page opts in.
+{%- endcomment -%}
 {% if page.author_profile or layout.author_profile or page.sidebar %}
   <div class="sidebar sticky">
   {% if page.author_profile or layout.author_profile %}{% include author-profile.html %}{% endif %}

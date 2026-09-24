@@ -1,43 +1,147 @@
 ---
 layout: archive
 ---
+{%- comment -%}
+  /tags/ (spec 4.6, C15). Before this change: 92 tag names, 217 post rows, one
+  headed section per tag, 36,764px tall at 375. What makes it scannable:
 
+  1. Case variants are merged. Front matter spells some tags two ways
+     (Blockchain/blockchain, Stablecoin/stablecoin, RWA/rwa ... 8 pairs), which
+     printed two sections with the same slugified id, so half of those anchors
+     could never be reached. Posts are grouped by the lowercased name, the
+     variants' lists concatenated, de-duplicated and re-sorted newest first.
+     The heading shows the spelling with the most posts (on a tie, the first
+     in ASCII order, which prefers the capitalised form). The id stays
+     `name | slugify`, which lowercases, so every existing link still lands.
+  2. Only the 20 biggest tags are chips; the rest sit behind one
+     "태그 모두 보기" disclosure.
+  3. A tag with two or more posts gets its own section showing 5 rows; the
+     rest are in a closed <details>. They stay in the DOM, so crawlers see
+     every link, and enhance.js (u7) opens the section a URL hash points to
+     (the home series tile links to /tags/#원화-스테이블코인-심층분석).
+  4. The long tail is folded. 57 of the 84 tags label exactly one post, and
+     as sections they were 57 headings over one row each: two thirds of the
+     page, and headed sections alone could not bring it under the 40% target
+     at 375. They become one "한 번 쓰인 태그" list with one row per post (31),
+     each row naming its tags above the title. Every tag name there carries
+     the tag's id, so /tags/#opportunity still lands, on the row that holds
+     the only post with that tag.
+
+  Order: "<10000 - count>|<key>|<display name>|<url of the only post>" sorted
+  as strings puts the biggest tag first and breaks ties alphabetically by the
+  lowercase key; the url part is filled for single-post tags only.
+
+  --rows on each section feeds content-visibility's first size guess
+  (_archive.scss), so the page is about as long before a section renders as
+  after.
+{%- endcomment -%}
+{%- assign ui = site.data.ui-text[site.locale] -%}
+{%- assign tag_names = "" | split: "" -%}
+{%- for tag in site.tags -%}
+  {%- assign tag_names = tag_names | push: tag[0] -%}
+{%- endfor -%}
+{%- assign tag_names = tag_names | sort -%}
+{%- assign tag_keys = "" | split: "" -%}
+{%- for name in tag_names -%}
+  {%- assign key = name | downcase -%}
+  {%- unless tag_keys contains key -%}{%- assign tag_keys = tag_keys | push: key -%}{%- endunless -%}
+{%- endfor -%}
+{%- capture tag_order -%}
+  {%- for key in tag_keys -%}
+    {%- assign merged = "" | split: "" -%}
+    {%- assign best_name = key -%}
+    {%- assign best_n = 0 -%}
+    {%- for name in tag_names -%}
+      {%- assign name_key = name | downcase -%}
+      {%- if name_key == key -%}
+        {%- assign merged = merged | concat: site.tags[name] -%}
+        {%- if site.tags[name].size > best_n -%}{%- assign best_n = site.tags[name].size -%}{%- assign best_name = name -%}{%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- assign merged = merged | uniq -%}
+    {{ 10000 | minus: merged.size }}|{{ key }}|{{ best_name }}|{% if merged.size == 1 %}{{ merged.first.url }}{% endif %}{% unless forloop.last %}^{% endunless %}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign tag_order = tag_order | split: "^" | sort -%}
+{%- assign chip_limit = 20 -%}
+{%- assign more_count = tag_order.size | minus: chip_limit -%}
+<p class="archive-header__summary">글 {{ site.posts.size }}편 · 태그 {{ tag_order.size }}개</p>
 {{ content }}
-
-{% assign tags_max = 0 %}
-{% for tag in site.tags %}
-  {% if tag[1].size > tags_max %}
-    {% assign tags_max = tag[1].size %}
-  {% endif %}
-{% endfor %}
-
-<ul class="taxonomy__index">
-  {% for i in (1..tags_max) reversed %}
-    {% for tag in site.tags %}
-      {% if tag[1].size == i %}
-        <li>
-          <a href="#{{ tag[0] | slugify }}">
-            <strong>{{ tag[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
-          </a>
-        </li>
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-</ul>
-
-{% assign entries_layout = page.entries_layout | default: 'list' %}
-{% for i in (1..tags_max) reversed %}
-  {% for tag in site.tags %}
-    {% if tag[1].size == i %}
-      <section id="{{ tag[0] | slugify | downcase }}" class="taxonomy__section">
-        <h3 class="archive__subtitle">{{ tag[0] }}</h3>
-        <ul class="taxonomy__posts">
-          {% for post in tag.last %}
-            {%- include archive-single-compact.html -%}
-          {% endfor %}
-        </ul>
-        <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
-      </section>
-    {% endif %}
-  {% endfor %}
-{% endfor %}
+<nav class="taxonomy__nav" aria-label="태그 바로가기">
+  <ul class="taxonomy__index chip-row">
+    {%- for entry in tag_order limit: chip_limit -%}
+      {%- assign parts = entry | split: "|" -%}
+      <li><a class="chip" href="#{{ parts[1] | slugify }}">{{ parts[2] }} <span class="chip__count">{{ 10000 | minus: parts[0] }}</span></a></li>
+    {%- endfor -%}
+  </ul>
+  {%- if more_count > 0 %}
+  <details class="taxonomy__more">
+    <summary class="pill pill--secondary pill--sm">태그 모두 보기 ({{ more_count }})</summary>
+    <ul class="taxonomy__index chip-row">
+      {%- for entry in tag_order offset: chip_limit -%}
+        {%- assign parts = entry | split: "|" -%}
+        <li><a class="chip" href="#{{ parts[1] | slugify }}">{{ parts[2] }} <span class="chip__count">{{ 10000 | minus: parts[0] }}</span></a></li>
+      {%- endfor -%}
+    </ul>
+  </details>
+  {%- endif %}
+</nav>
+{%- assign once_tags = 0 -%}
+{%- for entry in tag_order -%}
+  {%- assign parts = entry | split: "|" -%}
+  {%- if parts[0] == "9999" -%}{%- assign once_tags = once_tags | plus: 1 -%}{%- continue -%}{%- endif -%}
+  {%- assign key = parts[1] -%}
+  {%- assign merged = "" | split: "" -%}
+  {%- for name in tag_names -%}
+    {%- assign name_key = name | downcase -%}
+    {%- if name_key == key -%}{%- assign merged = merged | concat: site.tags[name] -%}{%- endif -%}
+  {%- endfor -%}
+  {%- assign merged = merged | uniq | sort: "date" | reverse -%}
+  {%- assign rest = merged.size | minus: 5 -%}
+  {%- if rest > 0 -%}{%- assign est_rows = 6 -%}{%- else -%}{%- assign est_rows = merged.size -%}{%- endif %}
+<section id="{{ key | slugify }}" class="taxonomy__section" style="--rows: {{ est_rows }}">
+  <h2 class="taxonomy__title">{{ parts[2] }} <span class="taxonomy__title-count">{{ merged.size }}</span></h2>
+  <ul class="taxonomy__posts">
+    {%- for post in merged limit: 5 -%}
+      {%- include archive-single-compact.html -%}
+    {%- endfor -%}
+  </ul>
+  {%- if rest > 0 %}
+  <details class="taxonomy__overflow">
+    <summary class="pill pill--secondary pill--sm">{{ rest }}개 더 보기</summary>
+    <ul class="taxonomy__posts">
+      {%- for post in merged offset: 5 -%}
+        {%- include archive-single-compact.html -%}
+      {%- endfor -%}
+    </ul>
+  </details>
+  {%- endif %}
+</section>
+{%- endfor -%}
+{%- if once_tags > 0 -%}
+  {%- assign once_posts = 0 -%}
+  {%- capture once_rows -%}
+    {%- for post in site.posts -%}
+      {%- capture once_names -%}
+        {%- for entry in tag_order -%}
+          {%- assign parts = entry | split: "|" -%}
+          {%- if parts[0] == "9999" and parts[3] == post.url -%}
+            {{ ", " }}<span id="{{ parts[1] | slugify }}" class="taxonomy__post-tag">{{ parts[2] }}</span>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if once_names != "" -%}
+        {%- assign once_posts = once_posts | plus: 1 -%}
+        {%- assign compact_title = post.title | markdownify | strip_html | strip_newlines | strip -%}
+        <li class="taxonomy__post taxonomy__post--once"><p class="taxonomy__post-tags">{{ once_names | remove_first: ", " }}</p><a href="{{ post.url | relative_url }}">{{ compact_title }}</a><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time></li>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+  {%- comment -%} A row here also carries a line of tag names: about 4/3 of a plain row. {%- endcomment -%}
+  {%- assign once_est = once_posts | times: 4 | divided_by: 3 %}
+<section class="taxonomy__section taxonomy__section--once" style="--rows: {{ once_est }}">
+  <h2 class="taxonomy__title">한 번 쓰인 태그 <span class="taxonomy__title-count">{{ once_tags }}</span></h2>
+  <ul class="taxonomy__posts">{{ once_rows }}</ul>
+</section>
+{%- endif %}
+<p class="archive__top"><a class="link-arrow link-arrow--up" href="#page-title">{{ ui.back_to_top | default: "맨 위로" }}</a></p>

@@ -3,26 +3,72 @@
 // Imported before the theme so its `!default` values yield to these. Editing
 // the vendored files under _sass/minimal-mistakes/ instead would be lost on any
 // theme update.
+//
+// Two kinds of value live here:
+//
+// 1. Theme variables the theme only ever prints as a plain value. These hold
+//    `var(--token)` strings, so the theme's own compiled rules follow the
+//    light/dark tokens in _tokens.scss with no per-selector dark override.
+//    Verified on Ruby Sass 3.7.4 (GitHub Pages): each is used only as a value,
+//    with one known exception: _forms.scss `rgba($text-color, .06)` compiles
+//    SILENTLY to the invalid `rgba(var(--text), 0.06)` (an input focus shadow;
+//    the site has no forms, so the browser just drops it). Ruby Sass does not
+//    fail on this, so the guard is a grep, not the build: after any theme
+//    update, `grep -c 'rgba(var(' <compiled css>` must stay at 1.
+//
+// 2. Theme variables that go through Sass colour functions ($primary-color,
+//    $gray, $border-color, $light-gray, $active-color). These must stay literal
+//    hex; each is the light-mode twin of a token and must match it exactly.
 
-// The brand blue was #3182f6, which scores 3.71:1 on white — under the 4.5:1
-// WCAG AA minimum for body text, and the single cause of every colour-contrast
-// violation on the site. This is the same hue darkened until it clears the bar
-// with margin (4.78:1).
-$primary-color: #1b6fe0 !default;
+/* ---- 1. tokenized (plain values only) ---- */
 
-// Link colours follow the primary. Visited deliberately goes darker rather
-// than lighter — the usual "faded" treatment would drop it back under 4.5:1.
-$link-color: $primary-color !default;
-$link-color-hover: mix(#000, $primary-color, 25%) !default;
-$link-color-visited: mix(#000, $primary-color, 15%) !default;
+$text-color: unquote("var(--text)") !default;
+$background-color: unquote("var(--bg)") !default;
+$code-background-color: unquote("var(--code-bg)") !default;
+$footer-background-color: unquote("var(--bg-alt)") !default;
+$form-background-color: unquote("var(--bg-alt)") !default;
+// Apple's split: blue text links (#0066cc light, #2997ff dark) and a separate
+// fill blue for buttons. Hover changes the underline, not the hue; Apple does
+// not mark visited links.
+$link-color: unquote("var(--link)") !default;
+$link-color-hover: unquote("var(--link)") !default;
+$link-color-visited: unquote("var(--link)") !default;
+$masthead-link-color: unquote("var(--nav-text)") !default;
+$masthead-link-color-hover: unquote("var(--nav-text-hover)") !default;
 
-// The muted grey used for post meta, excerpts and taxonomy counts was #8b95a1,
-// which is 3.04:1 on white. It is body text, not decoration, so it has to meet
-// 4.5:1 like anything else. This is the same cool grey, darkened to 4.82:1.
-$gray: #69737f !default;
+/* ---- 2. literal (fed to Sass colour functions) ---- */
 
-// Share buttons put white text on the brand colour. Twitter's #55acee gives
-// 2.46:1, so the label is barely there. Darkened to 4.75:1 — still obviously
-// the brand, now actually readable.
-$twitter-color: #1878b8 !default;
-$linkedin-color: #00669b !default;
+// Fill blue: white label 4.70:1. Link text uses --link, never this.
+$primary-color: #0071e3 !default;
+// = --text-secondary: 5.07:1 on white, 4.66:1 on #f5f5f7.
+$gray: #6e6e73 !default;
+$light-gray: #f5f5f7 !default;   // = --bg-alt
+$lighter-gray: #e8e8ed !default; // = --fill
+$border-color: #d2d2d7 !default; // = --separator (decorative only)
+
+// Font stacks are tokens too (--font-sans / --font-mono in _tokens.scss), for
+// one reason: head/font-swap.html swaps them on <html class="wf-wait"> so the
+// page renders in the system face until every Pretendard subset it needs has
+// arrived, then changes face ONCE (spec 4.9; staged unicode-range swaps measured
+// CLS 0.165 on a post, one swap 0.061). The theme only prints these as plain
+// font-family values (checked: no string functions), so var() is safe.
+$sans-serif: unquote("var(--font-sans)") !default;
+$monospace: unquote("var(--font-mono)") !default;
+// Captions were Georgia, which pulled Korean into a system Myungjo.
+$caption-font-family: $sans-serif !default;
+
+// Nested surfaces (notices, inputs) follow the 12px step of the radius scale.
+$border-radius: 12px !default;
+
+// The theme transitions `all` on text, which also animates font-size and
+// line-height on resize and fades each node unevenly on a theme switch.
+$global-transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !default;
+
+// The theme hid #main, the masthead and the footer for 150ms and faded them in
+// on every page load. Critical CSS carried the animation but not its keyframes,
+// so content appeared, vanished and came back when main.css landed.
+$intro-transition: none !default;
+
+
+// Our own layout constant (not a theme variable): the global nav height.
+$nav-h: 48px !default;

@@ -1,0 +1,489 @@
+/* ==========================================================================
+   Archive and taxonomy pages (owner: u6, spec 4.6)
+
+   /categories/ and /tags/ are Apple Settings-style grouped inset lists in the
+   692px reading column; category and tag landings are tile grids on the grey
+   band; the 404 gets a pill row. Chips, pills, tiles and link arrows come from
+   _components.scss (u1); this file only places them and styles the rows.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad) and
+   what became of them:
+     37-43    `.archive__item-teaser img { height: auto }`: kept (below). The
+              theme's grid view of archive-single.html still exists for any
+              layout that asks for `entries_layout: grid`.
+     60-63    `.back-to-top` padding: deleted with the per-section links.
+     105-110  `.taxonomy__index a`, `.entries-list .archive__item-title a`:
+              deleted. The index is now chips (44px below 768, u1), and the
+              list-style entries are no longer rendered by any archive.
+     241-274  dark muted list (`.archive__item-excerpt, .taxonomy__title,
+              .taxonomy__count, .back-to-top, .archive__subtitle,
+              .taxonomy__post time`): deleted. Secondary text is
+              var(--text-secondary), which the tokens swap for dark.
+     278-281  dark borders `.archive__subtitle`, `.taxonomy__section + ...`:
+              deleted; the section rule itself is reset below.
+     318-323  dark borders `.taxonomy__post, .archive__item + .archive__item`:
+              deleted; rows are separated by a token hairline.
+     488-538  `.taxonomy__section` content-visibility: kept.
+              `.taxonomy__posts`, `.taxonomy__post`: replaced by the grouped
+              inset list.
+     540-562  `.archive__item-excerpt a` underline: deleted (no archive page
+              prints excerpts any more).
+   ========================================================================== */
+
+/* ==========================================================================
+   Shell
+   ========================================================================== */
+
+// The theme's #main is a 1em-padded box with a max-width, sized for the old
+// sidebar layout. Archive pages lay themselves out with .l-container, which
+// carries the gutter inside its own width, so #main steps aside here (spec
+// 4.6). (1,1,0) beats the theme's #main (1,0,0).
+.layout--archive #main,
+.layout--archive-taxonomy #main,
+.layout--categories #main,
+.layout--tags #main,
+.layout--category #main,
+.layout--tag #main {
+  max-width: none;
+  padding: 0;
+}
+
+// Landings are a grid of cards, and cards are drawn for the grey band (spec
+// 1.4 "tiles on a grey band for any list of posts"; 3.3: shadows only on
+// --card inside a --band). So the whole landing sits on the band, as on the
+// Apple Store: white cards on #f5f5f7 in light; in dark --band is #000 and
+// the #1d1d1f cards lift off it. The body, not #main, so a short landing
+// (Diary has one post) has no white strip above the footer. Text on it:
+// --text 15.46, --text-secondary 4.66 (light) / 19.29, 8.16 (dark).
+// (0,1,1) beats the base `body { background-color: var(--bg) }`.
+body.layout--category,
+body.layout--tag,
+body.layout--archive-taxonomy {
+  background-color: var(--band);
+}
+
+// No `width: auto` and no `padding` shorthand, on purpose (spec 4.6). This
+// file loads after _components.scss, so `width: auto` here would beat
+// .l-container (same specificity, later) and run the landing grids edge to
+// edge. The vertical rhythm is the section step (48 / 64 / 80px), so each
+// page ends with var(--section-y) of space above the footer (spec 7.3).
+//
+// The theme floats .archive right at 1024px and up, 200/300px narrower than
+// its parent with the same again as padding-right, inside min-width queries
+// earlier in main.css, where .l-container's width and a plain `.archive`
+// reset both win by source order. The critical CSS does not keep that order:
+// it collects the 375px page first and appends rules that only match at
+// 1440, so those theme rules land AFTER the resets, and until main.css
+// arrived /categories/ painted in a 680px column shoved left, then jumped
+// (CLS 0.27 at 1440, throttled). Two classes, (0,2,0), win in either order;
+// the width restates the container formulas (.l-container, and the reading
+// column for the index pages) rather than inventing a new one.
+.archive-main > .archive {
+  float: none;
+  width: #{"min(100% - 2 * var(--gutter), var(--w-content))"};
+  padding-right: 0;
+  padding-block: var(--section-y);
+  margin-block: 0;
+}
+
+// The two index pages are lists of titles, read like a table of contents,
+// so they take the reading column instead of the 980px content width.
+// Mixed units, so the min() is interpolated for Ruby Sass.
+.archive-main > .archive--index {
+  width: #{"min(100% - 2 * var(--gutter), var(--w-text))"};
+}
+
+// Archive H1: title1 at 700, the same role as a post title (28 / 37.6 /
+// 46.75px). (0,2,0) beats the theme's .page__title and its phone size.
+.archive-header .page__title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-title1);
+  line-height: var(--lh-title1);
+  font-weight: var(--fw-title1);
+  letter-spacing: var(--track-title1);
+  color: var(--text);
+}
+
+// "글 57편 · 주제 8개" and a landing's one-line description: callout in
+// secondary, the quiet line under a title. --text-secondary on --bg 5.07 /
+// 8.16, on --band 4.66 / 8.16.
+.archive-header__summary,
+.archive-header__lede {
+  margin: 0 0 var(--space-6);
+  font-size: var(--fs-callout);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+// A lede is followed by a grid of large tiles, not a chip row: one step
+// more space so the header reads as its own block.
+.archive-header__lede {
+  margin-bottom: var(--space-7);
+}
+
+// Category landings: every tile's eyebrow would print the page's own
+// category (15 of the 16 AI posts say "AI" under an H1 that already does),
+// the repetition the related shelf drops eyebrows for (spec 4.2). Tag
+// landings keep them: their posts span several categories.
+.layout--category .tile__eyebrow {
+  display: none;
+}
+
+/* ==========================================================================
+   Topic and tag index (chips from u1)
+   ========================================================================== */
+
+// The theme lays .taxonomy__index out as a 2-3 column grid with a 1.414em
+// margin; u1's .chip-row (same specificity, later) turns it into a wrapping
+// chip row. Wrapping, not sticky (C14): a sticky bar would sit on top of the
+// very headings it jumps to.
+.taxonomy__nav {
+  margin: 0;
+}
+
+// The /tags/ long tail: 64 more chips behind one pill. 12px above the pill
+// and above the revealed chips, the same step as the chip row's own gap
+// family, so the open state reads as one block.
+.taxonomy__more {
+  margin-top: var(--space-3);
+
+  > .chip-row {
+    margin-top: var(--space-3);
+  }
+}
+
+// Disclosure pills (태그 모두 보기, N개 더 보기) show which way they go with
+// the site's one chevron glyph, the link arrow's "›", turned to point down
+// when closed and up when open. It is a flex item in the pill, so the pill's
+// own 8px gap spaces it. Rotation only, 200ms on the standard curve like the
+// TOC disclosure (spec 5, M11); the reduced-motion blanket stops it.
+.taxonomy__more > summary::after,
+.taxonomy__overflow > summary::after {
+  content: "\203A";
+  display: inline-block;
+  font-size: 1.25em;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform var(--dur-hover) var(--ease-standard);
+}
+
+.taxonomy__more[open] > summary::after,
+.taxonomy__overflow[open] > summary::after {
+  transform: rotate(-90deg);
+}
+
+// Closed means closed. Current Chrome hides a closed <details> body with
+// content-visibility: hidden on its ::details-content slot, which still
+// answers geometry queries with laid-out boxes: 64 chips and 60 rows
+// reported as sitting on top of the sections below them (diagnose's
+// click-blocked and tap-target checks, and any hit-testing script). The
+// content stays in the DOM for crawlers and opens as before, and enhance.js
+// (u7) still opens the list of the section a URL hash points to.
+.taxonomy__more:not([open]) > :not(summary),
+.taxonomy__overflow:not([open]) > :not(summary) {
+  display: none;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+// Theme resets (spec 4.6). The theme draws a #d2d2d7 rule under every
+// section but the last, bright on black in dark; (0,2,0) ties it and wins by
+// source order. Its 2em/1em spacing goes too.
+.taxonomy__section:not(:last-child) {
+  border-bottom: 0;
+  padding-bottom: var(--space-2);
+}
+
+// /tags/ renders every tag and every post beneath it on one page, because
+// GitHub Pages cannot run jekyll-archives, so per-tag pages are not an option
+// and the anchors all live here.
+//
+// content-visibility lets the browser skip layout and paint for sections that
+// are off screen, and do the work when they scroll into view. Every anchor
+// still resolves and crawlers still see the whole page. `auto` on
+// contain-intrinsic-size makes the browser remember each section's real
+// height once measured.
+//
+// The first guess is per section, not the spec's single 360px: sections run
+// from one row (most tags) to 17 (Tech), so one number was wrong for nearly
+// all of them. /tags/ would open 28 sections x 360px long and shrink as they
+// rendered, and a chip that jumps to a section far down would land short
+// while the sections above it resized. The layouts print --rows (the rows a
+// section shows); a row is about 64px on a phone, where titles wrap to two
+// lines, and 50px from 768, where they mostly fit on one. 60 / 72px covers
+// the title and the bottom padding. 360px stays as the fallback.
+//
+// Spacing: the 48px between sections is the section's own top margin rather
+// than the title's (the spec's var(--space-9)). content-visibility implies
+// layout containment, so a title margin would sit INSIDE the section and a
+// jump to /tags/#til would land the heading 48px further down than the
+// scroll padding intends.
+//
+// Paint containment also clips at the section's edge, and the "N개 더 보기"
+// pill sits flush with it: its 3px + 2px focus ring would lose its left and
+// bottom edges. 8px of padding, taken back with a negative inline margin so
+// nothing moves, keeps the ring inside.
+.taxonomy__section {
+  --row-guess: 64px;
+  --head-guess: 60px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
+  margin: var(--space-9) calc(-1 * var(--space-2)) 0;
+  padding: 0 var(--space-2) var(--space-2);
+
+  @include tablet-up {
+    --row-guess: 50px;
+    --head-guess: 72px;
+  }
+}
+
+.taxonomy__section[style] {
+  contain-intrinsic-size: auto calc(var(--rows, 5) * var(--row-guess) + var(--head-guess));
+}
+
+// Ties the theme's `+ .taxonomy__section { margin-top: 2em }` (0,2,0).
+.taxonomy__section + .taxonomy__section {
+  margin-top: var(--space-9);
+}
+
+// Section title: title2 at 600, the count beside it in secondary at 400, so
+// the number reads as a label, not part of the name. --text on --bg 16.83 /
+// 19.29; --text-secondary 5.07 / 8.16. (0,1,0) after the theme's muted
+// .taxonomy__title colour.
+.taxonomy__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-title2);
+  line-height: var(--lh-title2);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--track-title2);
+  color: var(--text);
+}
+
+.taxonomy__title-count {
+  margin-left: var(--space-2);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+// The first five rows, then the rest behind a pill. 12px above the pill and
+// above the revealed rows keeps the three pieces one group.
+.taxonomy__overflow {
+  margin-top: var(--space-3);
+
+  > .taxonomy__posts {
+    margin-top: var(--space-3);
+  }
+}
+
+// One "맨 위로" after the last section (C14), replacing a back-to-top under
+// every section. Its arrow comes from .link-arrow--up (u1); the label has no
+// glyph of its own, so it renders one ↑ and no ›.
+.archive__top {
+  margin: var(--space-8) 0 0;
+}
+
+/* ==========================================================================
+   Grouped inset list (Apple Settings pattern)
+   ========================================================================== */
+
+// A rounded --bg-alt panel with rows inside it (spec 4.6, mock
+// categories.*). overflow: hidden clips the rows to the 18px corners.
+.taxonomy__posts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--r-md);
+  background-color: var(--bg-alt);
+  overflow: hidden;
+}
+
+// A row: the title, with the date pinned to the top right of its first line
+// (the Mail list layout). A title that wraps runs under the date at full
+// width instead of keeping a 110px date column down every line: at 375 that
+// column left titles 199px wide and most wrapped to three lines. margin 0
+// beats the theme's `ul li { margin-bottom: .5em }`, which would open grey
+// gaps between rows. position: relative anchors the date and the row-wide
+// link area.
+.taxonomy__post {
+  position: relative;
+  display: block;
+  margin: 0;
+  border: 0;
+}
+
+// The inset hairline: a 1px gradient on every row but the first, starting
+// 20px in (under the text, not the panel edge) and running to the right
+// edge, as in iOS grouped tables. A background, not a border, so it never
+// adds to the row height. --separator is decorative (1.51 / 2.10).
+.taxonomy__post + .taxonomy__post {
+  background-image: linear-gradient(var(--separator), var(--separator));
+  background-position: right top;
+  background-size: calc(100% - 20px) 1px;
+  background-repeat: no-repeat;
+}
+
+// The row's link. 12px + one 23px line + 12px = 47px, so a one-line title is
+// still a full tap target; min-height keeps it there if the type shrinks.
+// --text on --bg-alt 15.46 / 16.61. (0,1,1) after the theme's a:visited.
+.taxonomy__post a {
+  display: block;
+  min-height: 44px;
+  padding: 12px 20px;
+  color: var(--text);
+  font-size: var(--fs-callout);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition:
+    color var(--dur-hover) var(--ease-standard),
+    opacity var(--dur-hover) var(--ease-out);
+}
+
+// Room for the date on the first line only: a float 1px tall shortens the
+// first line box and no other. Six footnote ems hold "2025.09.22" in
+// tabular figures with room to spare, plus the 16px gap.
+.taxonomy__post a::before {
+  content: "";
+  float: right;
+  width: calc(var(--fs-footnote) * 6 + var(--space-4));
+  height: 1px;
+}
+
+// The whole row is the target, date included, as a Settings row is: the
+// link's box is stretched over the row. The same stretched-link pattern the
+// tiles use (spec 4.2).
+.taxonomy__post a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md);
+}
+
+// Focus ring on the stretched area, drawn 3px inside it (spec 4.6: the
+// list's overflow: hidden would clip an outside ring on a full-width row).
+// The 18px radius makes the ring concentric with the panel's corners on the
+// first and last rows, so no corner of it is clipped either. --focus on
+// --bg-alt 4.31 / 6.00 (>= 3, WCAG 1.4.11).
+.taxonomy__post a:focus-visible {
+  outline: none;
+}
+
+.taxonomy__post a:focus-visible::after {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
+
+// Hover changes the title colour, never the row background: --text-secondary
+// (the date) on --fill fails at 4.15 (spec 3.3). --link on --bg-alt 5.11 /
+// 6.00. Fine pointers only, so a tap never leaves a row blue.
+.taxonomy__post a {
+  @include hover {
+    color: var(--link);
+  }
+}
+
+// Press: the row's text dims to 60% in 100ms and recovers over 200ms (spec 5,
+// M8). Opacity only; no fill, for the same contrast reason.
+.taxonomy__post a:active,
+.taxonomy__post a:active ~ time,
+.taxonomy__post a:active ~ .taxonomy__post-tags {
+  opacity: 0.6;
+  transition-duration: var(--dur-press);
+}
+
+// The date: footnote, secondary, tabular so the dates line up down the list.
+// Its line box is the title's (callout x 1.45), so it sits centred on the
+// title's first line. It paints above the stretched link (positioned, later
+// in the DOM), so it lets clicks through to it. --text-secondary on
+// --bg-alt 4.66 / 7.03.
+.taxonomy__post time {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  color: var(--text-secondary);
+  font-size: var(--fs-footnote);
+  line-height: calc(var(--fs-callout) * 1.45);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity var(--dur-hover) var(--ease-out);
+}
+
+// /tags/ "한 번 쓰인 태그": each row names the post's one-off tags above its
+// title, and the date moves up to that line. The title then runs the full
+// width. Footnote in secondary, like the date (4.66 / 7.03 on --bg-alt).
+.taxonomy__post-tags {
+  margin: 0;
+  padding: 12px 20px 0;
+  color: var(--text-secondary);
+  font-size: var(--fs-footnote);
+  line-height: 1.45;
+  transition: opacity var(--dur-hover) var(--ease-out);
+}
+
+.taxonomy__post-tags::before {
+  content: "";
+  float: right;
+  width: calc(var(--fs-footnote) * 6 + var(--space-4));
+  height: 1px;
+}
+
+.taxonomy__post--once a {
+  padding-top: var(--space-1);
+}
+
+.taxonomy__post--once a::before {
+  content: none;
+}
+
+.taxonomy__post--once time {
+  line-height: 1.45;
+}
+
+// Arriving from a post's tag pill (/tags/#opportunity), the tag that brought
+// the reader here is picked out in --text at 600 among its secondary
+// neighbours (15.46 / 16.61). Not blue: blue means "you can act here".
+.taxonomy__post-tag:target {
+  color: var(--text);
+  font-weight: var(--fw-strong);
+}
+
+/* ==========================================================================
+   Widgets inside article content (the 404)
+   ========================================================================== */
+
+// The 404's three ways back (spec 4.6): a wrapping row of secondary pills,
+// with the recovery options set apart from the recent list below them.
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 var(--space-9);
+}
+
+// Inside .page__content the theme underlines every non-.btn link on hover at
+// (1,3,1): `.page__content a:not(.btn):not(#goog-wm-sb):hover`. Pills and
+// list rows are controls, not running text. Repeating :not(#goog-wm-sb)
+// makes these (1,3,1) too, and they win by source order.
+.page__content .pill-row a:not(#goog-wm-sb):hover,
+.page__content .taxonomy__posts a:not(#goog-wm-sb):hover {
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Theme archive grid
+   ========================================================================== */
+
+// The theme sets `width: 100%` on a teaser and leaves the height alone. The
+// img carries width/height attributes so the grid can reserve space, and the
+// height attribute would otherwise win and render a 3:2 teaser 832px tall.
+// `height: auto` hands the ratio back to the width. Only reached by a layout
+// that asks archive-single.html for `type="grid"`.
+.archive__item-teaser img {
+  height: auto;
+}

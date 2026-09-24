@@ -1,0 +1,225 @@
+/* ==========================================================================
+   Footer (owner: u6, spec 4.7)
+
+   A breadcrumb on posts (footer/custom.html), a three-group site directory
+   (주제 / 둘러보기 / 연결) and the legal row (footer.html), on --bg-alt in
+   caption type, like the directory at the bottom of apple.com.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad) and
+   what became of them:
+     241-274  dark muted list, this part: `.page__footer, .page__footer a,
+              .page__footer .fas/.fab/.far/.fal`: deleted. The footer's text
+              is var(--text-secondary) and its links var(--footer-link),
+              both swapped by the tokens; the icons are gone.
+     283-289  dark `.page__footer` surface: deleted in the token commit (the
+              theme prints $footer-background-color as var(--bg-alt)).
+     540-562  `.page__footer a` underline: narrowed to the copyright line
+              (`.page__footer-copyright a`); directory links underline on
+              hover only. `.page__footer a.btn`: deleted (no buttons here).
+   The theme's uppercase follow-row styles (.page__footer-follow) no longer
+   match anything: the markup is gone.
+   ========================================================================== */
+
+/* ==========================================================================
+   Frame
+   ========================================================================== */
+
+// The theme floats the footer, gives it a 3em top margin, fades it in with
+// the intro animation and makes the inner <footer> sticky with its own max
+// width and padding. Here it is a plain block: the page above ends with its
+// own band or var(--section-y) of space (spec 7.3), the inner footer is
+// neutral, and each row is an .l-container, so the footer's edges line up
+// with the nav and the content. --text-secondary on --bg-alt 4.66 / 7.03.
+.page__footer {
+  float: none;
+  margin-top: 0;
+  background-color: var(--bg-alt);
+  color: var(--text-secondary);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  animation: none;
+}
+
+.page__footer footer {
+  position: static;
+  margin: 0;
+  max-width: none;
+  padding: 0;
+}
+
+// Footer lists are bare: no bullets, and no theme `ul li` half-line gaps.
+.footer-dir__nav ul,
+.footer-breadcrumb ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-dir__nav li,
+.footer-breadcrumb li {
+  margin: 0;
+}
+
+// Links: #424245 / #d2d2d7, a step darker (lighter in dark) than the
+// secondary text, so a link is visibly a link without being blue: 9.20 /
+// 12.00 on --bg-alt. (0,1,1) after the theme's a:visited and
+// `.page__footer a`. Underline on hover, fine pointers only. Scoped to the
+// nav, not all of .footer-dir: the legal row inside it holds links in a
+// sentence, which keep their own treatment below.
+.footer-dir__nav a,
+.footer-breadcrumb a {
+  color: var(--footer-link);
+  text-decoration: none;
+
+  @include hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+// Phones: diagnose checks width AND height on every `nav a`, and labels such
+// as AI, SQL and 홈 are 13-40px wide, so every footer and breadcrumb link is
+// a 44x44 box (spec 4.7). flex-start keeps the text on the gutter, under its
+// group title; the extra width runs to the right (centred labels looked
+// ragged in the mock).
+.footer-dir__nav a,
+.footer-breadcrumb a {
+  @include below-tablet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ==========================================================================
+   Breadcrumb (posts only)
+   ========================================================================== */
+
+// 12px above the trail: the footer's top edge is where a post's band or the
+// black page ends, and a 44px row flush against it read as cramped.
+.footer-breadcrumb {
+  padding-top: var(--space-3);
+}
+
+// One line at every width (mock decision 6: the 40-character title wrapped to
+// a second row at 375). The home and category links keep their size; the
+// current title takes what is left and ellipsizes. The hairline under it
+// separates the trail from the directory, which then drops its own top rule.
+.footer-breadcrumb ol {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow: hidden;
+  min-height: 44px;
+  border-bottom: 1px solid var(--separator);
+}
+
+// A 44px row even above 768, so the trail sits at the same height as on a
+// phone and the hairline does not hug the text.
+.footer-breadcrumb li {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.footer-breadcrumb li[aria-current] {
+  flex: 1 1 auto;
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// The separator is decoration drawn by CSS, so screen readers hear the three
+// items of the list, not the chevrons. --text-tertiary is for glyphs only
+// (3.62 on white; never text).
+.footer-breadcrumb li + li::before {
+  content: "\203A";
+  padding: 0 var(--space-2);
+  color: var(--text-tertiary);
+}
+
+/* ==========================================================================
+   Directory
+   ========================================================================== */
+
+// 32px above, 24px below. The top hairline separates the footer from a page
+// that ends on the same grey (a band, or a landing on --band; mock decision
+// 6). After the breadcrumb, whose own hairline already does that, it goes.
+.footer-dir {
+  padding: var(--space-7) 0 var(--space-6);
+  border-top: 1px solid var(--separator);
+}
+
+.footer-breadcrumb + .footer-dir {
+  border-top: 0;
+}
+
+// Three groups stacked on phones, three equal columns from 768 (C16).
+.footer-dir__nav {
+  display: grid;
+  gap: var(--space-5);
+
+  @include tablet-up {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// Group titles: caption at 600 in --text (15.46 / 16.61 on --bg-alt), the
+// only emphasis in the footer. (0,1,0) beats the theme's h2 size and 2em top
+// margin.
+.footer-dir__title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--track-small);
+  color: var(--text);
+}
+
+// Phones: each group's links wrap as a row of 44px boxes, 12px apart, so the
+// six topics take one or two lines instead of six.
+.footer-dir__nav ul {
+  @include below-tablet {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--space-3);
+  }
+}
+
+// Tablet and up: a column of text links with 3px of air, apple.com's
+// directory density.
+.footer-dir__nav a {
+  @include tablet-up {
+    display: block;
+    padding: 3px 0;
+  }
+}
+
+/* ==========================================================================
+   Legal row
+   ========================================================================== */
+
+// The copyright sentence, unchanged, under its own hairline.
+.footer-legal {
+  margin-top: var(--space-6);
+  padding: var(--space-4) 0 var(--space-7);
+  border-top: 1px solid var(--separator);
+}
+
+// The theme sets this line in $type-size-7 (.75em), which inside a 12px
+// footer is 9px; 12px caption is the floor for any Hangul (spec 3.3).
+.page__footer-copyright {
+  margin: 0;
+  font-size: var(--fs-caption);
+}
+
+// Links inside a sentence are marked by more than colour (WCAG 1.4.1): they
+// inherit the line's secondary grey and keep an underline at rest.
+.page__footer-copyright a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}

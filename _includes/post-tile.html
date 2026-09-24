@@ -1,0 +1,15 @@
+{%- comment -%} Params: post (required), variant = feature | default | compact, heading = h2 | h3 (default h3).
+Compact tiles (the related shelf) carry no eyebrow: their posts share a category, so it would repeat. {%- endcomment -%}
+{%- assign tile_post = include.post -%}
+{%- assign variant = include.variant | default: "default" -%}
+{%- assign heading = include.heading | default: "h3" -%}
+<article class="tile tile--{{ variant }}" itemscope itemtype="https://schema.org/CreativeWork">
+  {%- unless variant == "compact" -%}{%- if tile_post.categories.first %}<p class="tile__eyebrow">{{ tile_post.categories.first }}</p>{% endif -%}{%- endunless -%}
+  <{{ heading }} class="tile__title no_toc" itemprop="headline"><a href="{{ tile_post.url | relative_url }}" rel="permalink">{{ tile_post.title | markdownify | strip_html | strip_newlines | strip }}</a></{{ heading }}>
+  {%- unless variant == "compact" -%}
+    {%- capture tile_excerpt -%}{% include excerpt.html post=tile_post %}{%- endcapture -%}
+    {%- assign tile_excerpt = tile_excerpt | strip -%}
+    {%- if tile_excerpt != "" %}<p class="tile__excerpt" itemprop="description">{{ tile_excerpt }}</p>{% endif -%}
+  {%- endunless -%}
+  <p class="tile__meta"><time datetime="{{ tile_post.date | date_to_xmlschema }}" itemprop="datePublished">{{ tile_post.date | date: "%Y년 %-m월 %-d일" }}</time></p>
+</article>

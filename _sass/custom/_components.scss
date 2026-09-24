@@ -1,0 +1,613 @@
+/* ==========================================================================
+   Shared components (owner: u1, spec 4.2)
+
+   The small system every page is built from: layout primitives, pills for
+   actions (the theme's .btn maps onto them), chips for topic and tag filters,
+   tiles for any list of posts, and Apple's "more ›" link arrow. Markup for
+   tiles comes from _includes/post-tile.html; its parameters and these class
+   names are a contract with the page units (spec 7.3), so keep them stable.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad) and
+   what became of them:
+     325-329  dark `.btn--inverse`: deleted. The theme's inverse button is now
+              the secondary pill, whose --fill and --text swap with the theme.
+
+   The `.l-*` layout primitives were written by u0, verbatim from spec 4.2, so
+   the page units could build against them from the start.
+
+   Sizes and press/hover motion follow spec 5 (M8, M9, M10): only transform,
+   background-color, color and box-shadow animate, never `all`, and every
+   hover is behind @include hover so a tap never leaves a sticky hover state.
+   ========================================================================== */
+
+/* ==========================================================================
+   Layout primitives (spec 4.2)
+   ========================================================================== */
+
+// One container width rule for the whole site, so the nav, every section and
+// the footer share their left and right edges. min() rather than max-width plus
+// padding: the gutter is part of the width, so a full-bleed parent never needs
+// its own padding. Mixed units, so the min() is interpolated for Ruby Sass.
+// Full-bleed sections are full-width elements with an .l-container child; never
+// 100vw (it includes the scrollbar and overflows).
+.l-container        { width: #{"min(100% - 2 * var(--gutter), var(--w-content))"}; margin-inline: auto; }
+.l-container--text  { width: #{"min(100% - 2 * var(--gutter), var(--w-text))"}; margin-inline: auto; }
+.l-container--shell { width: #{"min(100% - 2 * var(--gutter), var(--w-shell))"}; margin-inline: auto; }
+// A band is the grey field that tiles sit on; its vertical rhythm is the
+// section step (48 / 64 / 80px) so every band on every page breathes the same.
+.l-band             { background-color: var(--band); padding-block: var(--section-y); }
+// Section titles are title2 at semibold: the size step, not weight, carries the
+// hierarchy. --text on --band: 15.46 light, 19.29 dark.
+.l-section__title   { margin: 0 0 var(--space-6); font-size: var(--fs-title2); line-height: var(--lh-title2);
+                      font-weight: var(--fw-heading); letter-spacing: var(--track-title2); color: var(--text); }
+
+/* ==========================================================================
+   Pills (buttons)
+   ========================================================================== */
+
+// Every action on the site is one shape: a full-round pill at callout size,
+// regular weight, 44px tall (Apple's minimum hit target). The theme's .btn is
+// folded in so any theme template that still prints .btn gets the same pill.
+// `font: inherit` drops the theme's bold and the UA's button font; the colour
+// lives on the variants below, so a pill never inherits link blue by accident.
+// `border: 0` also removes the theme's 1px grey rim on .btn--inverse.
+// Transitions name their properties (never `all`): colour changes on the
+// standard curve, the press scale on the ease-out curve (spec 5, M8/M10).
+a.pill,
+button.pill,
+summary.pill,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--r-pill);
+  font: inherit;
+  font-size: var(--fs-callout);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-hover) var(--ease-standard),
+    color var(--dur-hover) var(--ease-standard),
+    transform var(--dur-hover) var(--ease-out);
+
+  // The tap-target audit checks width as well as height, and a one-glyph pill
+  // (the share row's "X") is only about 40px wide at 20px of padding.
+  @include below-tablet {
+    min-width: 44px;
+  }
+}
+
+// The theme gives .btn a 0.25em bottom margin, which lifts it off the centre
+// line of a row of pills. Reset on .btn alone (0,1,0), so a page unit's own
+// margin on a pill still wins.
+.btn {
+  margin-bottom: 0;
+}
+
+// A <details> toggle styled as a pill keeps its disclosure role but loses the
+// triangle, which would sit outside the pill's rounded label.
+summary.pill {
+  list-style: none;
+}
+
+summary.pill::-webkit-details-marker {
+  display: none;
+}
+
+// Primary: the one filled blue action. White on --accent #0071e3 is 4.70; the
+// hover and pressed steps darken (5.38, 5.93) rather than lighten, because
+// Apple's lighter #0077ed hover fails at 4.32. The theme's own :visited and
+// :hover rules for .btn--primary (0,2,0) are reset to the same pair, so a
+// visited link or a sticky touch hover never shows the theme's darker literal.
+a.pill--primary,
+.pill--primary,
+.btn--primary,
+.btn--primary:visited,
+.btn--primary:hover {
+  background-color: var(--accent);
+  color: var(--on-accent);
+}
+
+a.pill--primary,
+.pill--primary,
+.btn--primary {
+  @include hover {
+    background-color: var(--accent-hover);
+    color: var(--on-accent);
+  }
+}
+
+a.pill--primary:active,
+.pill--primary:active,
+.btn--primary:active {
+  background-color: var(--accent-active);
+}
+
+// Secondary: a grey fill with --text on it (13.78 light, 12.80 dark), one
+// step darker on hover (12.32 / 10.42). The text colour is repeated in every
+// state because --text-secondary (3.71 on --fill-hover) and --link (4.07 /
+// 3.76) both fail there, and the theme's a:hover would otherwise turn the
+// label blue. The theme's .btn--inverse (white fill, grey rim, and its own
+// :visited / :hover at (0,2,0)) maps here.
+a.pill--secondary,
+.pill--secondary,
+.btn--inverse,
+.btn--inverse:visited,
+.btn--inverse:hover {
+  background-color: var(--fill);
+  color: var(--text);
+}
+
+a.pill--secondary,
+.pill--secondary,
+.btn--inverse {
+  @include hover {
+    background-color: var(--fill-hover);
+    color: var(--text);
+  }
+}
+
+// Small pills for dense rows (share, the /tags/ disclosures). 32px is a
+// comfortable mouse target; below 768, where fingers are the pointer, they
+// grow back to 44px. (0,2,0) so the size beats the base pill's a.pill (0,1,1).
+.pill.pill--sm {
+  min-height: 32px;
+  padding: 0 var(--space-4);
+  font-size: var(--fs-footnote);
+
+  @include below-tablet {
+    min-height: 44px;
+  }
+}
+
+// Press feedback on pointer-down: a quick 3% shrink, released on the slower
+// hover duration (spec 5, M8). After the variant hover rules so a pressed
+// hovered pill still shrinks.
+a.pill:active,
+button.pill:active,
+summary.pill:active,
+.btn:active {
+  transform: scale(0.97);
+  transition-duration: var(--dur-press);
+}
+
+/* ==========================================================================
+   Chips (topic and tag filters)
+   ========================================================================== */
+
+// A row of chips wraps by default; the list markup loses its bullets and the
+// theme's `ul li` bottom margin, which would stagger wrapped rows.
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip-row > li {
+  display: flex;
+  margin: 0;
+}
+
+// On phones a long chip row becomes one swipeable line instead of four
+// wrapped rows pushing the content down. It bleeds to the screen edges (the
+// negative gutter) so chips scroll under the edge rather than stopping short
+// of it, and the right edge fades over its last 24px to say "there is more".
+// The 6px block padding matters: once overflow-x is set the scroller clips on
+// both axes, and a focused chip's ring reaches 5px (3px ring + 2px offset)
+// outside the chip. scroll-padding keeps snapped chips aligned with the page
+// gutter instead of the screen edge. The mask gradient is interpolated for
+// Ruby Sass (mixed units inside calc()).
+.chip-row--scroll {
+  @include below-tablet {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 6px var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    -webkit-mask-image: #{"linear-gradient(90deg, #000 calc(100% - 24px), transparent)"};
+    mask-image: #{"linear-gradient(90deg, #000 calc(100% - 24px), transparent)"};
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    // Keyboard focus inside the row. Chrome does not scroll a focused element
+    // that is already partly visible, so tabbing onto a chip cut by either
+    // edge left it (and its ring) clipped by up to 48px at 375. A 47% inline
+    // scroll-padding narrows the "visible" band to the middle ~6% of the row:
+    // any chip not already crossing the middle counts as off screen and is
+    // scrolled to the centre, so the focused chip always sits clear of both
+    // edges (>= 14px of clearance for the widest chip at 320 and 375, forward
+    // and backward). Not 50%: a zero-width band reads as "fully visible" and
+    // never scrolls. Snapping pauses meanwhile (it would pull the row back to
+    // a chip start) and the fade goes, so the ring is never half-transparent.
+    // Swiping does not focus anything, so touch scrolling keeps the
+    // gutter-aligned snap points above.
+    &:focus-within {
+      scroll-snap-type: none;
+      scroll-padding-inline: 47%;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
+}
+
+// A chip is a small grey capsule: --text on --fill (13.78 light, 12.80 dark),
+// medium weight so a two-letter "AI" still reads as a label. 36px tall on a
+// mouse, 44px square-or-wider below 768 (width and height both, for the
+// tap-target audit). The theme's .page__taxonomy-item border and margins are
+// cleared here too, so a chip is the same object on a post as on the home
+// page. a.chip (0,1,1) beats the theme's a:visited.
+a.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--r-pill);
+  background-color: var(--fill);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  transition:
+    background-color var(--dur-hover) var(--ease-standard),
+    color var(--dur-hover) var(--ease-standard),
+    transform var(--dur-hover) var(--ease-out);
+
+  @include below-tablet {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+// The theme turns .page__taxonomy-item link blue on :hover at (0,2,0), and on
+// touch that hover sticks after a tap. --link on --fill-hover is 4.07 / 3.76
+// (fails), so the label stays --text in every hover, fine pointer or not.
+a.chip:hover {
+  color: var(--text);
+}
+
+// Hover darkens the fill one step: --text on --fill-hover 12.32 / 10.42.
+a.chip {
+  @include hover {
+    background-color: var(--fill-hover);
+    color: var(--text);
+  }
+}
+
+a.chip:active {
+  transform: scale(0.97);
+  transition-duration: var(--dur-press);
+}
+
+// The count is quieter by weight only. It inherits the chip's colour: the
+// secondary grey is 4.15 on --fill in light (fails) and would fail harder on
+// hover.
+.chip__count {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+}
+
+// The current topic inverts: --bg on --text (16.83 light, 19.29 dark). After
+// the hover rules so a hovered selected chip stays inverted.
+a.chip[aria-current],
+a.chip.is-selected {
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+/* ==========================================================================
+   Tiles (post cards)
+   ========================================================================== */
+
+// One column on phones, two from 768. The 16/20px gaps are the Apple Store
+// tile spacing: close enough that the grid reads as one group.
+.tile-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+
+  @include tablet-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+
+// AdSense injects its units as grid children; a half-width ad would squeeze
+// the ad and push a tile out of its pair.
+.tile-grid > ins.adsbygoogle,
+.tile-grid > .google-auto-placed {
+  grid-column: 1 / -1;
+}
+
+// Cell-count safety net (the page units also avoid odd counts in Liquid). A
+// feature tile spans the row; a lone last tile spans the row rather than
+// leaving a hole beside it. A tile that spans caps its title and excerpt at
+// 40em so a 900px line never runs 55 syllables.
+.tile-grid--with-feature > .tile--feature {
+  grid-column: 1 / -1;
+}
+
+@include tablet-up {
+  .tile-grid--with-feature > .tile:not(.tile--feature):last-child:nth-child(even),
+  .tile-grid:not(.tile-grid--with-feature) > .tile:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+
+    .tile__title,
+    .tile__excerpt {
+      max-width: 40em;
+    }
+  }
+}
+
+// The tile: a white card on the grey band with Apple Store's soft shadow; in
+// dark, a #1d1d1f card on black with no shadow (the lighter surface is the
+// elevation). --tile-radius carries the corner to the stretched link below, so
+// the hit area and its focus ring follow the tile's own radius (18px, 28px on
+// the feature tile). Only transform, box-shadow and background-color
+// transition: the lift on the ease-out curve, the colour on the standard one.
+.tile {
+  --tile-radius: var(--r-md);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  border-radius: var(--tile-radius);
+  background-color: var(--card);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform var(--dur-lift) var(--ease-out),
+    box-shadow var(--dur-lift) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-standard);
+
+  @include tablet-up {
+    padding: 28px 28px 24px;
+  }
+
+  // Apple Store hover: 1% growth, a deeper shadow in light and a lighter card
+  // in dark (--card-hover #242426). Fine pointer only (spec 5, M9).
+  @include hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-card-hover);
+    background-color: var(--card-hover);
+  }
+
+  // Pressing anywhere on the tile presses its link (the stretched ::after), and
+  // :active reaches the tile through the ancestor chain.
+  &:active {
+    transform: scale(0.99);
+    transition-duration: var(--dur-press);
+  }
+}
+
+// Category eyebrow in sentence case (never uppercase-tracked Latin), quiet
+// secondary grey: 5.07 on --card light, 6.54 dark (6.02 on --card-hover).
+.tile__eyebrow {
+  margin: 0;
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--track-small);
+  color: var(--text-secondary);
+}
+
+// Title3 at semibold, three lines at most; 1.38 leading gives two- and
+// three-line Hangul titles room to breathe without the gap of body leading.
+.tile__title {
+  margin: 0;
+  font-size: var(--fs-title3);
+  font-weight: var(--fw-heading);
+  line-height: 1.38;
+  letter-spacing: var(--track-title3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+// The title link is the tile's only link. --text on --card: 16.83 light,
+// 15.46 dark. (0,1,1) beats the theme's a:visited and a:hover.
+.tile__title a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+// The stretched link: its ::after covers the whole tile, so the entire card is
+// one target and one tab stop. Its containing block is the positioned .tile,
+// outside the title's overflow clip, so the clamp does not clip it.
+.tile__title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--tile-radius);
+}
+
+// Keyboard focus rings the whole tile, not the title text: the ring moves from
+// the link to its stretched ::after. The page units give the tile row enough
+// room around it for the 5px ring.
+.tile__title a:focus-visible {
+  outline: none;
+}
+
+.tile__title a:focus-visible::after {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+// Two-line excerpt in secondary grey: 5.07 on --card light, 6.54 dark.
+.tile__excerpt {
+  margin: 0;
+  font-size: var(--fs-subhead);
+  line-height: 1.6;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+// The date sits on the tile's bottom edge (auto top margin), so every tile in
+// a row ends on the same line whatever its title length. Tabular numerals keep
+// dates in a column aligned. 5.07 / 6.54 on --card.
+.tile__meta {
+  margin: auto 0 0;
+  padding-top: var(--space-2);
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-ui);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+// Feature tile: the one large surface on a page (page >= 2 of the home list).
+// Full row, the 28px feature radius, a feature-size title capped at 24em and
+// a three-line body-size excerpt capped at 40em so lines stay readable at
+// 1440. Padding steps 28/24 -> 40 -> 48/56 with the width.
+.tile--feature {
+  --tile-radius: var(--r-lg);
+  grid-column: 1 / -1;
+  padding: 28px 24px;
+
+  @include tablet-up {
+    padding: 40px;
+  }
+
+  @include desktop-up {
+    padding: 48px 56px;
+  }
+
+  .tile__title {
+    max-width: 24em;
+    font-size: var(--fs-feature);
+    line-height: 1.25;
+    letter-spacing: var(--track-title1);
+  }
+
+  .tile__excerpt {
+    max-width: 40em;
+    font-size: var(--fs-body);
+    line-height: 1.65;
+    -webkit-line-clamp: 3;
+  }
+}
+
+// Compact tile: the related-posts shelf. Title and date only (post-tile.html
+// renders no eyebrow or excerpt for it), headline size, tighter padding.
+.tile--compact {
+  padding: var(--space-5);
+
+  .tile__title {
+    font-size: var(--fs-headline);
+    line-height: 1.45;
+  }
+}
+
+/* ==========================================================================
+   Link arrow (Apple's "Learn more ›")
+   ========================================================================== */
+
+// A quiet text action: link blue, no underline at rest, a chevron drawn by CSS
+// so labels never carry a typed arrow. 44px tall for touch. The class-only
+// selector lets a <span class="link-arrow"> inside a larger link (the home
+// hero's "읽어 보기") look the same; a.link-arrow (0,1,1) beats a:visited.
+// --link on --bg 5.57 / 6.96, on --bg-alt 5.11 / 6.00, on --card 5.57 / 5.58.
+.link-arrow,
+a.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--link);
+  text-decoration: none;
+}
+
+// The space before the chevron is a no-break space inside the pseudo-element,
+// not a margin: in an inline-flex box the chevron is its own flex item and
+// gets the hover underline too, and a margin left a visible break in that
+// underline ("text_ _›"). A glyph space is underlined, so the hover line runs
+// unbroken under label and chevron, and the chevron can never wrap alone.
+.link-arrow::after {
+  content: "\00a0\203A";
+}
+
+// Back: the chevron moves to the front and points the other way.
+.link-arrow--back::after {
+  content: none;
+}
+
+.link-arrow--back::before {
+  content: "\2039\00a0";
+}
+
+// Up ("맨 위로"): an arrow replaces the chevron, so the label shows exactly
+// one glyph.
+.link-arrow--up::after {
+  content: "\00a0\2191";
+}
+
+// Hover underlines in a hairline 0.2em below the baseline, like apple.com.
+.link-arrow,
+a.link-arrow {
+  @include hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* ==========================================================================
+   Controls inside article content
+   ========================================================================== */
+
+// .page__content wraps authored widgets too (the 404 pill row, the quiz CTA).
+// There the theme underlines every non-.btn link on hover at (1,3,1)
+// (`.page__content a:not(.btn):not(#goog-wm-sb):hover`) and the prose rules
+// underline running-text links at rest. A pill, chip or link arrow is a
+// control, not running text: repeating :not(#goog-wm-sb) ties the theme's id
+// weight, and source order wins.
+.page__content a.pill:not(#goog-wm-sb),
+.page__content a.chip:not(#goog-wm-sb),
+.page__content a.link-arrow:not(#goog-wm-sb) {
+  &,
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+// ...and a link arrow keeps its own hairline hover there.
+.page__content a.link-arrow:not(#goog-wm-sb) {
+  @include hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+}
+
+// The same for a tile placed inside content (an authored list of posts): the
+// whole card is the link, so its title never underlines.
+.page__content .tile__title a:not(#goog-wm-sb) {
+  &,
+  &:hover {
+    text-decoration: none;
+  }
+}

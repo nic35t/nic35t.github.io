@@ -5,6 +5,12 @@
 
   No stored choice means no attribute, and the CSS falls back to
   prefers-color-scheme — the system setting stays the default.
+
+  A stored choice also repaints the browser chrome. The two theme-color metas
+  above this include each carry a media query, so on their own they follow the
+  system; a reader who chose dark on a light system would get a light status
+  bar over a dark page. Both are set to the chosen bar colour (--nav-bg-solid:
+  #161617 dark, #fbfbfd light) so whichever one the browser picks agrees.
 {%- endcomment -%}
 <script>
   (function () {
@@ -12,6 +18,11 @@
       var saved = localStorage.getItem("theme");
       if (saved === "dark" || saved === "light") {
         document.documentElement.setAttribute("data-theme", saved);
+        var chrome = saved === "dark" ? "#161617" : "#fbfbfd";
+        var metas = document.querySelectorAll('meta[name="theme-color"]');
+        for (var i = 0; i < metas.length; i++) {
+          metas[i].setAttribute("content", chrome);
+        }
       }
     } catch (e) {
       /* Private mode can throw on localStorage; the system preference stands.

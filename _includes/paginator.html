@@ -1,69 +1,38 @@
-{% if paginator.total_pages > 1 %}
-<nav class="pagination">
-  {% assign first_page_path = paginator.first_page_path | default: site.paginate_path | replace: 'page:num', '' | replace: '//', '/' | relative_url %}
-  <ul>
-    {% comment %} Link for previous page {% endcomment %}
-    {% if paginator.previous_page %}
-      {% if paginator.previous_page == 1 %}
-        <li><a href="{{ first_page_path }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
-      {% else %}
-        <li><a href="{{ site.paginate_path | replace: ':num', paginator.previous_page | replace: '//', '/' | relative_url }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a></li>
-      {% endif %}
-    {% else %}
-    <li><a href="#" class="disabled" aria-disabled="true" aria-label="{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</span></a></li>
-    {% endif %}
+{%- comment -%}
+  Home paging (spec 4.4). The root keeps the theme's `pagination` class: the
+  debug audit measures `.pagination a` as tap targets.
 
-    {% comment %} First page {% endcomment %}
-    {% if paginator.page == 1 %}
-      <li><a href="#" class="disabled current">1</a></li>
-    {% else %}
-      <li><a href="{{ first_page_path }}">1</a></li>
-    {% endif %}
-
-    {% assign page_start = 2 %}
-    {% if paginator.page > 4 %}
-      {% assign page_start = paginator.page | minus: 2 %}
-      {% comment %} Ellipsis for truncated links {% endcomment %}
-      <li><a href="#" class="disabled">&hellip;</a></li>
-    {% endif %}
-
-    {% assign page_end = paginator.total_pages | minus: 1 %}
-    {% assign pages_to_end = paginator.total_pages | minus: paginator.page %}
-    {% if pages_to_end > 4 %}
-      {% assign page_end = paginator.page | plus: 2 %}
-    {% endif %}
-
-    {% for index in (page_start..page_end) %}
-      {% if index == paginator.page %}
-        <li><a href="{{ site.paginate_path | replace: ':num', index | replace: '//', '/' | relative_url }}" class="disabled current">{{ index }}</a></li>
-      {% else %}
-        {% comment %} Distance from current page and this link {% endcomment %}
-        {% assign dist = paginator.page | minus: index %}
-        {% if dist < 0 %}
-          {% comment %} Distance must be a positive value {% endcomment %}
-          {% assign dist = 0 | minus: dist %}
-        {% endif %}
-        <li><a href="{{ site.paginate_path | replace: ':num', index | relative_url }}">{{ index }}</a></li>
-      {% endif %}
-    {% endfor %}
-
-    {% comment %} Ellipsis for truncated links {% endcomment %}
-    {% if pages_to_end > 3 %}
-      <li><a href="#" class="disabled">&hellip;</a></li>
-    {% endif %}
-
-    {% if paginator.page == paginator.total_pages %}
-      <li><a href="#" class="disabled current">{{ paginator.page }}</a></li>
-    {% else %}
-      <li><a href="{{ site.paginate_path | replace: ':num', paginator.total_pages | replace: '//', '/' | relative_url }}">{{ paginator.total_pages }}</a></li>
-    {% endif %}
-
-    {% comment %} Link next page {% endcomment %}
-    {% if paginator.next_page %}
-      <li><a href="{{ site.paginate_path | replace: ':num', paginator.next_page | replace: '//', '/' | relative_url }}">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a></li>
-    {% else %}
-      <li><a href="#" class="disabled" aria-disabled="true" aria-label="{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}"><span aria-hidden="true">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</span></a></li>
-    {% endif %}
-  </ul>
-</nav>
-{% endif %}
+  Page 1 has no page numbers: after four posts, "more" is the whole question,
+  so it gets one pill to page 2 and a quiet link to the full archive. Pages 2
+  and on get one line, previous | n / N | next, instead of the theme's row of
+  numbered boxes that wrapped to two lines at 375. A missing side renders an
+  empty span that holds its grid column, never a disabled href="#" link that
+  a keyboard or screen reader would still stop on.
+{%- endcomment -%}
+{%- if paginator.total_pages > 1 -%}
+  {%- assign ui = site.data.ui-text[site.locale] -%}
+  {%- if paginator.page == 1 -%}
+    <nav class="pagination pagination--more" aria-label="더 보기">
+      <a class="pill pill--secondary" href="{{ site.paginate_path | replace: ':num', 2 | replace: '//', '/' | relative_url }}">{{ ui.more_posts | default: "More posts" }}</a>
+      <a class="link-arrow" href="{{ '/categories/' | relative_url }}">전체 아카이브</a>
+    </nav>
+  {%- else -%}
+    {%- comment -%} jekyll-paginate has no first_page_path: page 1 is the site root, not /page1/. {%- endcomment -%}
+    {%- assign first_page_path = paginator.first_page_path | default: site.paginate_path | replace: 'page:num', '' | replace: '//', '/' | relative_url -%}
+    <nav class="pagination pagination--pager" aria-label="페이지">
+      {%- if paginator.previous_page == 1 -%}
+        <a class="link-arrow link-arrow--back" href="{{ first_page_path }}" rel="prev">{{ ui.page_previous | default: "Previous" }}</a>
+      {%- elsif paginator.previous_page -%}
+        <a class="link-arrow link-arrow--back" href="{{ site.paginate_path | replace: ':num', paginator.previous_page | replace: '//', '/' | relative_url }}" rel="prev">{{ ui.page_previous | default: "Previous" }}</a>
+      {%- else -%}
+        <span></span>
+      {%- endif -%}
+      <span class="pagination__status">{{ paginator.page }} / {{ paginator.total_pages }}</span>
+      {%- if paginator.next_page -%}
+        <a class="link-arrow pagination__next" href="{{ site.paginate_path | replace: ':num', paginator.next_page | replace: '//', '/' | relative_url }}" rel="next">{{ ui.page_next | default: "Next" }}</a>
+      {%- else -%}
+        <span></span>
+      {%- endif -%}
+    </nav>
+  {%- endif -%}
+{%- endif -%}

@@ -1,0 +1,8 @@
+{%- comment -%} Param: post. A tile's one-line summary. Jekyll's auto-excerpt is the post's first block, and 29 posts open with a "## 시작하며:" heading, so their excerpt would be a heading, not a sentence. When the excerpt holds a heading, take the first paragraph after the first h2 instead (empty if there is none, and the tile then shows no excerpt). Only used on pages (home, category landings), which Jekyll renders after posts, so post.content is already HTML here. {%- endcomment -%}
+{%- assign ex_post = include.post -%}
+{%- assign ex_html = ex_post.excerpt | default: "" | markdownify -%}
+{%- if ex_html contains "</h" -%}
+  {%- assign ex_parts = ex_post.content | split: "</h2>" -%}
+  {%- if ex_parts.size > 1 -%}{%- assign ex_html = ex_parts[1] | split: "</p>" | first -%}{%- else -%}{%- assign ex_html = "" -%}{%- endif -%}
+{%- endif -%}
+{{- ex_html | strip_html | strip_newlines | strip | truncate: 120 -}}

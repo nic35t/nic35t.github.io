@@ -81,7 +81,13 @@ $(document).ready(function() {
       nestedClass: "active", // applied to the parent items
 
       // Offset & reflow
-      offset: 20, // how far from the top of the page to activate a content area
+      // Measured, like SmoothScroll's offset above. A TOC jump lands the heading
+      // at the bar's height plus 16-24px, so a fixed 20 left it above the line
+      // and the rail highlighted the previous section.
+      offset: function () {
+        var m = document.querySelector(".masthead");
+        return (m ? m.getBoundingClientRect().height : 0) + 28;
+      },
       reflow: true, // if true, listen for reflows
 
       // Event support

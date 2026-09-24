@@ -1,0 +1,493 @@
+/* ==========================================================================
+   Article body typography (owner: u5, spec 4.5.2)
+
+   .page__content wraps more than prose. It also holds authored widgets: the
+   investment test (.investment-test-container) and, on the 404, a pill row
+   and a grouped list (ul.taxonomy__posts). A plain `.page__content x` rule sits
+   at (0,1,1) and beats those widgets' own (0,1,0) classes, so every rule here
+   is one of two kinds:
+
+   A. RESETS. Descendant selectors are allowed, but a reset only takes a theme
+      decoration away (a border, a fill); it never sets a size or a space. The
+      widgets lose nothing they relied on.
+   B. STRUCTURE (size, spacing, colour). Written on direct children of
+      .page__content (`>`) or on unclassed elements (`:not([class])`), so a
+      widget's own classed markup is never matched. The few descendant rules
+      that remain (links in p and unclassed li, li > p, nested lists, inline
+      code, images, figcaption, table parts, footnotes, notices, heading
+      anchors) target markup no widget contains.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad), all
+   replaced here by token-based rules:
+     241-274  dark `figcaption, a.reversefootnote` muted colour: deleted, both
+              now take --text-secondary unconditionally
+     318-323  dark `hr, .page__content blockquote` border colour: deleted, the
+              hr is a --separator fill and blockquotes have no border
+     540-562  running-text link underline and `.page__content a.btn`: replaced
+   ========================================================================== */
+
+/* ==========================================================================
+   A. Resets (remove theme decoration only)
+   ========================================================================== */
+
+// The theme underlines every content h2 with a #d2d2d7 rule and 0.5em of
+// padding. Apple's editorial pages separate sections with space, not rules
+// (spec 1.3), and the rule also showed under the quiz's own title. Removing
+// both costs the quiz nothing it wanted.
+.page__content h2 {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+// The theme fills thead with $border-color (#d2d2d7) as a literal. With dark
+// tokens the header text is #f5f5f7 on that grey: 1.38:1 on the four pandas
+// tables (axe color-contrast on /ai/Pandas_2/). Header rows are marked by
+// weight and a stronger rule instead (below).
+.page__content thead {
+  background: none;
+  border-bottom: 0;
+}
+
+// Pandas writes <table border="1" class="dataframe">; the UA turns that
+// attribute into a 1px outset border on the table and every cell, a grey grid
+// that ignores the theme. Rows are separated by one hairline instead.
+.page__content table {
+  border: 0;
+}
+
+// Cells: drop the UA grid and the theme's mixed-grey rule, keep one
+// decorative --separator hairline under each row (1.51 / 2.10; decorative,
+// the row text carries the meaning).
+.page__content th,
+.page__content td {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--separator);
+}
+
+// The theme draws a 0.25em $primary-color rail on every blockquote. Quotes are
+// tiles or a standfirst here (spec C9); neither has a rail.
+.page__content blockquote {
+  border-left: 0;
+}
+
+// An hr nested below the top level (none today; the one top-level hr is a
+// fill, below) would keep the theme's #d2d2d7 top border: a bright 13:1 line
+// on the black dark page. Only its colour follows the token.
+.page__content hr:not([class]) {
+  border-top-color: var(--separator);
+}
+
+/* ==========================================================================
+   B. Structure: the reading column
+   ========================================================================== */
+
+// Body role: 17px (18px at >=1024) with 1.75 leading, which gives Hangul,
+// whose glyphs fill the em box, the air Latin text gets at 1.5. The colour is
+// --text-body: equal to --text in light (16.83), and a step softer in dark
+// (#e0e0e5, 15.96 on #000) so a whole article of near-white on black does not
+// halate on OLED. Headings set --text (#f5f5f7) back.
+.page__content {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--text-body);
+}
+
+// Widget boundary. The quiz, the 404's pill row and its grouped list are UI
+// inside the article, not prose, and were drawn against what body gives them:
+// 1rem / 1.5 / --text. The prose values above would otherwise reach their
+// unsized text through inheritance (1px larger, 17% taller leading, softer in
+// dark: the 404's list rows grew 10px each). Hand body's values back at each
+// root. (0,2,0) beats their own (0,1,0) root rules, which set none of these.
+.page__content > .investment-test-container,
+.page__content > .pill-row,
+.page__content > .taxonomy__posts {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+// One paragraph rhythm: 1.25em (21px) between paragraphs, for prose paragraphs
+// only (the theme's `.page__content p` still spaces the quiz's).
+.page__content > p {
+  margin: 0 0 1.25em;
+}
+
+// The first block of an article sits right under the header; a heading's
+// 2.2em top margin there would open a hole the header already provides.
+.page__content > :first-child {
+  margin-top: 0;
+}
+
+/* ---------- headings ---------- */
+
+// Title 2 at 600: size and space carry the hierarchy (spec 1.3), not weight.
+// 2.2em above and 0.6em below binds each heading to the text it introduces.
+.page__content > h2 {
+  margin: 2.2em 0 0.6em;
+  font-size: var(--fs-title2);
+  line-height: var(--lh-title2);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--track-title2);
+  color: var(--text);
+}
+
+// Title 3, one step down, the same 600.
+.page__content > h3 {
+  margin: 1.9em 0 0.5em;
+  font-size: var(--fs-title3);
+  line-height: var(--lh-title3);
+  font-weight: var(--fw-heading);
+  letter-spacing: var(--track-title3);
+  color: var(--text);
+}
+
+// Headline: body size at 600, so an h4 reads as a run-in label, not a title.
+.page__content > h4 {
+  margin: 1.6em 0 0.4em;
+  font-size: var(--fs-headline);
+  line-height: 1.45;
+  font-weight: var(--fw-heading);
+  color: var(--text);
+}
+
+// h5 and h6 are rare; callout size keeps them from outranking an h4.
+.page__content > h5,
+.page__content > h6 {
+  margin: 1.4em 0 0.4em;
+  font-size: var(--fs-callout);
+  line-height: 1.5;
+  font-weight: var(--fw-heading);
+  color: var(--text);
+}
+
+// A section rule: a 1px --separator fill (decorative, 1.51 / 2.10) with 3em
+// either side. The heading after it drops its own top margin, which would
+// otherwise double the gap the rule already makes.
+.page__content > hr {
+  height: 1px;
+  margin: 3em 0;
+  border: 0;
+  background: var(--separator);
+}
+
+.page__content > hr + h2,
+.page__content > hr + h3 {
+  margin-top: 0;
+}
+
+/* ---------- lists ---------- */
+
+// Lists take the paragraph rhythm (the UA gives them 1em above and below) and
+// a 1.4em indent: room for a two-digit marker, less than the UA's 40px, which
+// costs an eighth of a 335px phone column.
+.page__content > ul:not([class]),
+.page__content > ol:not([class]) {
+  margin: 0 0 1.25em;
+}
+
+.page__content > ul:not([class]),
+.page__content > ol:not([class]),
+.page__content li > ul,
+.page__content li > ol {
+  padding-left: 1.4em;
+}
+
+// Items of prose lists sit closer than paragraphs (0.4em against 1.25em) so a
+// list reads as one block. The 404's ul.taxonomy__posts and the quiz's lists
+// are not unclassed direct children, so they keep their own spacing.
+.page__content > ul:not([class]) li,
+.page__content > ol:not([class]) li {
+  margin-bottom: 0.4em;
+}
+
+// Loose lists (`<li><p>`, e.g. the numbered arguments in the web3 posts) get
+// the item gap, not a full paragraph gap inside every item.
+.page__content li > p {
+  margin-bottom: 0.4em;
+}
+
+// Markers are furniture: secondary (5.07 / 8.16) with tabular digits so the
+// text of a numbered list stays in one column past 9. Only under an unclassed
+// top-level block, so the quiz's result lists keep their own markers.
+.page__content > :not([class]) li::marker {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- links in running text ---------- */
+
+// Colour alone does not mark a link (WCAG 1.4.1): link against body is 3.02
+// light and 2.77 dark. A 1px underline in the link's own tint marks it without
+// the weight of a full-strength rule; hover takes it to full colour. Long URLs
+// may break anywhere rather than push the column wider than a phone.
+.page__content p a,
+.page__content li:not([class]) a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: var(--link-underline);
+  overflow-wrap: anywhere;
+
+  @include hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+// Pills and buttons are controls, not running text.
+.page__content a.btn,
+.page__content a.pill {
+  text-decoration: none;
+}
+
+/* ---------- quotes ---------- */
+
+// A blockquote in the body is a quiet tile: --bg-alt, 12px nested radius, no
+// rail, upright (Hangul has no italic, and the theme's synthesized slant is
+// ugly). Text 15.46 light / 13.75 dark on the tile. Written before the
+// standfirst so that rule wins the tie on order.
+.page__content > blockquote {
+  margin: 1.75em 0;
+  padding: 20px 24px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--bg-alt);
+  color: var(--text-body);
+  font-style: normal;
+  font-size: 0.95em;
+  line-height: 1.7;
+}
+
+// The tile's padding is the inset; a last paragraph's margin would add to it.
+.page__content > blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+// Standfirst: 12 posts open with a `>` summary. At the top of an article it is
+// the lede, not a quotation: no box, title3 at 500, secondary (5.07 / 8.16).
+.page__content > blockquote:first-child {
+  margin: 0 0 2.25em;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: var(--fs-title3);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+}
+
+// The standfirst's own 2.25em is the gap to the first section; its last
+// paragraph's margin would stack on top of it.
+.page__content > blockquote:first-child > p:last-child {
+  margin: 0;
+}
+
+/* ---------- inline code ---------- */
+
+// Inline code on a --fill chip: --text on it is 13.78 / 12.80 (secondary
+// would fail at 4.15, so it is never used here). 0.875em keeps the monospace
+// x-height near the body's. The theme's 12px radius turns a short token into a
+// lozenge; 6px reads as a chip. Long identifiers break rather than overflow.
+.page__content :not(pre) > code {
+  padding: 0.12em 0.35em;
+  border-radius: var(--r-xs);
+  background: var(--fill);
+  color: var(--text);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+
+// The theme pads inline code with a non-breaking space on each side (a
+// ::before/::after hack from before padding was used). With real padding the
+// hack doubles the gap and glues the chip to the next word, so a line cannot
+// break beside it. The theme applies it to p, li, a, td and figcaption code;
+// all of them are inline code.
+.page__content :not(pre) > code::before,
+.page__content :not(pre) > code::after {
+  content: none;
+}
+
+/* ---------- images and figures ---------- */
+
+// Images are nested surfaces: 12px, like code and quotes. Emoji images stay
+// square: rounding a 20px glyph box clips it.
+.page__content img {
+  border-radius: var(--r-sm);
+}
+
+.page__content img.emoji {
+  border-radius: 0;
+}
+
+// A figure is a pause in the text: 2em either side, more than a paragraph's
+// 1.25em, so it does not read as part of the paragraph above it.
+.page__content > figure {
+  margin: 2em 0;
+}
+
+// Captions are secondary (5.07 / 8.16), centred under the figure, at 14px so
+// Hangul stays above the 12px floor.
+.page__content figcaption {
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* ---------- tables ---------- */
+
+// Tables scroll inside themselves: the pandas frames are 20 to 34 columns
+// wide. 14px tabular figures keep columns of numbers aligned.
+.page__content table {
+  display: block;
+  width: 100%;
+  margin: 1.5em 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  // Where the platform draws a scrollbar, a thin one in the palette (thumb
+  // --separator-strong: 3.62 on white, 4.14 on black), as on code blocks.
+  scrollbar-width: thin;
+  scrollbar-color: var(--separator-strong) transparent;
+}
+
+// Cells never get overflow-wrap:anywhere (it lets min-content collapse to one
+// character and squashes a column, spec C24); keep-all Hangul headers wrap at
+// spaces instead.
+.page__content th,
+.page__content td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+// Header cells are headings: --text at 600 (the theme's 700 is for titles).
+.page__content th {
+  font-weight: var(--fw-strong);
+  color: var(--text);
+}
+
+// The header row is marked by a stronger rule instead of the removed grey fill
+// (--separator-strong: 3.62 on white, 4.14 on black). Headers that wrap to two
+// or three lines sit on that rule, next to the column they name.
+.page__content thead th {
+  vertical-align: bottom;
+  border-bottom-color: var(--separator-strong);
+}
+
+// Pandas frames are columns of numbers. Their scoped <style> right-aligns only
+// the header cells (Jupyter right-aligns the rest in its own stylesheet), so
+// the left default above put every header over the wrong edge of its column.
+// Right-aligned tabular figures line up by place value, as in a spreadsheet.
+// (0,2,3) beats the scoped `.dataframe thead th` (0,1,2), which comes later.
+.page__content table.dataframe tr > th,
+.page__content table.dataframe tr > td {
+  text-align: right;
+}
+
+// u7 makes overflowing tables focusable (axe scrollable-region-focusable).
+// The table is its own scroller, so an outside ring would be cut where it
+// meets the column edge; draw it inside.
+.page__content table:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- notices and footnotes ---------- */
+
+// Notices become the same quiet tile as a blockquote. The theme tints each
+// variant from its brand colour and forces 0.9em with !important; the tile is
+// --bg-alt with --text (15.46 / 16.61), and matching the quote tile's size
+// needs the same !important.
+.page__content .notice,
+.page__content [class*="notice--"] {
+  padding: 20px 24px;
+  border-radius: var(--r-sm);
+  background: var(--bg-alt);
+  color: var(--text);
+  box-shadow: none;
+  font-size: 0.95em !important;
+}
+
+// The theme colours notice links with the notice's own tint (for the default
+// notice that is #f5f5f7 on #f5f5f7: invisible). Links are --link (5.11 /
+// 6.00 on --bg-alt), hover included.
+.page__content .notice a,
+.page__content .notice a:hover,
+.page__content [class*="notice--"] a,
+.page__content [class*="notice--"] a:hover {
+  color: var(--link);
+}
+
+// Footnotes are apparatus: subhead size, secondary (5.07 / 8.16).
+.page__content .footnotes {
+  font-size: var(--fs-subhead);
+  color: var(--text-secondary);
+}
+
+// (0,2,1) beats the theme's a:visited (0,1,1); the back arrow is secondary too.
+.page__content a.reversefootnote {
+  color: var(--text-secondary);
+}
+
+/* ---------- heading anchors ---------- */
+
+// main.min.js appends `<a class="header-link"><span class="sr-only">Permalink
+// </span><i class="fas fa-link"></i></a>` to every content heading with an id.
+// The Font Awesome glyph goes (integration removes Font Awesome); a plain "#"
+// in --text-tertiary replaces it (3.62 on white, 5.94 on black: a glyph, not
+// text). (0,2,1) ties the theme's `.page__content h2 .header-link` and wins on
+// order; the link itself stays opaque so its focus ring can show.
+.page__content a.header-link {
+  position: static;
+  opacity: 1;
+  font-size: 1em;
+  text-decoration: none;
+
+  i {
+    display: none;
+  }
+
+  &::before {
+    content: "#";
+    margin-left: 0.3em;
+    font-weight: 400;
+    color: var(--text-tertiary);
+    opacity: 0;
+    transition: opacity var(--dur-hover) var(--ease-standard);
+  }
+
+  // A keyboard user must never land on an invisible link.
+  &:focus-visible::before {
+    opacity: 1;
+  }
+}
+
+// .sr-only exists only in Font Awesome's stylesheet. Once integration drops
+// it, "Permalink" would print after every heading; hide it here.
+.page__content .header-link .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+// Reveal on hovering the heading, fine pointers only (on touch :hover sticks
+// after a tap). Prose headings only: the quiz's headings carry ids too.
+.page__content > h2,
+.page__content > h3,
+.page__content > h4,
+.page__content > h5,
+.page__content > h6 {
+  @include hover {
+    .header-link::before {
+      opacity: 1;
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{%- comment -%} Param: name (a category). The four _pages with layout: category (AI, Web3, Projects, Diary) are landings; everything else is an anchor on /categories/. {%- endcomment -%}
+{%- assign ch_landing = site.pages | where: "layout", "category" | where: "taxonomy", include.name | first -%}
+{%- if ch_landing -%}{{ ch_landing.url | relative_url }}{%- else -%}{{ '/categories/' | relative_url }}#{{ include.name | slugify }}{%- endif -%}

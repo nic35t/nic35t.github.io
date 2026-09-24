@@ -1,0 +1,168 @@
+/* ==========================================================================
+   Motion (owner: u7, spec 5). Imported last, so reduced-motion and the
+   theme-switch suppression win over every component's transitions.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad):
+     146-161  reduced-motion blanket (kept verbatim)
+     444-464  `.reading-progress` (replaced: spec 5, M13)
+
+   Motion that lives elsewhere, so it is not hunted for here:
+     - the page crossfade (M2) is inline in _includes/head/view-transitions.html,
+       because main.css has not loaded when the new page is revealed;
+     - the quiz (M14) keeps its motion in its own page <style>, and its WAAPI
+       question swap checks reduced motion itself (the blanket below cannot
+       reach el.animate() or the ::view-transition-* pseudo-elements).
+   ========================================================================== */
+
+/* ==========================================================================
+   Motion
+   ========================================================================== */
+
+// Vestibular disorders make large motion genuinely unpleasant. Honour the
+// system setting rather than animating regardless.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Theme switch
+   ========================================================================== */
+
+// theme-toggle.js (u2) puts .theme-switching on <html> for the one frame in
+// which the colour tokens change. Without this, every element with a colour
+// transition (links, pills, chips, tiles, the nav) fades to the new theme on
+// its own 200ms schedule while the rest of the page has already swapped, so
+// the page passes through a half-light, half-dark state. With it the swap
+// lands in one frame, and the 200ms root crossfade (M3), where the browser
+// has one, is the only motion the reader sees.
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
+/* ==========================================================================
+   Transitions nobody can trigger
+   ========================================================================== */
+
+// The theme's _base.scss gives $global-transition (colour, background, border,
+// shadow and opacity at 0.2s) to text and structure: b, i, strong, em,
+// blockquote, p, q, span, figure, img, h1, h2, header, tr, td. None of them is
+// interactive, so the only thing those transitions ever animated was a theme
+// change: every paragraph and heading faded on its own while the page behind
+// had already swapped. Controls (a, button, input, .btn) keep theirs. Type
+// selectors only (0,0,1), after the theme, so any component that animates one
+// of these on purpose through a class (0,1,0) still wins.
+b,
+i,
+strong,
+em,
+blockquote,
+p,
+q,
+span,
+figure,
+img,
+h1,
+h2,
+header,
+tr,
+td {
+  transition: none;
+}
+
+/* ==========================================================================
+   Touch
+   ========================================================================== */
+
+// Mobile browsers paint a grey or blue slab over whatever was tapped. Every
+// control here has its own press state (scale or opacity, spec M8), so the
+// slab only doubles up on it and bleeds past rounded corners.
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+// manipulation turns off double-tap-to-zoom on controls, so a tap is a click
+// at once instead of after the double-tap wait. Pinch zoom is untouched: it
+// is only the double tap on a control that goes.
+a,
+button,
+summary,
+label,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* ==========================================================================
+   Reading progress (spec 5, M13)
+   ========================================================================== */
+
+// A 2px line in the accent, sitting on the nav's bottom edge, that fills from
+// the left as the article is read. enhance.js creates it (articles at least
+// two screens long only) and marks it aria-hidden: it repeats what the
+// scrollbar already says. Fixed rather than inside the sticky bar, so it can
+// never change the bar's 48px height; top: nav height - 2px lays it over the
+// bar's own bottom edge instead of 2px below the bar. --z-progress (120) sits
+// above the nav (100). It carries no text, so it takes the accent fill, the
+// one colour that already means "this is live". transform only, so a scroll
+// tick never costs layout or paint.
+.reading-progress {
+  position: fixed;
+  top: calc(var(--nav-h) - 2px);
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: var(--z-progress);
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+// Only `to` is written: the start is the bar's own scaleX(0) above.
+@keyframes reading-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+// Where the browser can drive the bar from the scroll position itself, it
+// does so off the main thread, and enhance.js skips its scroll and resize
+// listeners (it checks the same two features). The bar is a child of <body>,
+// outside .page__content, so the article's named view timeline has to be
+// hoisted to <html> with timeline-scope before the bar can see it; a browser
+// with view() but without timeline-scope would leave the bar at 0, hence both
+// conditions, here and in the script.
+//   view-timeline-inset: 0 measures against the whole viewport, as the script
+//   does; the default (auto) would subtract html's scroll-padding-top.
+//   contain 0% .. contain 100% runs from the article's top reaching the top of
+//   the viewport to its bottom reaching the bottom of the viewport: the
+//   script's -top / (height - innerHeight), exactly.
+// Reduced motion leaves it alone: the bar only follows the reader's own
+// scrolling, and on a scroll timeline the blanket's 0.01ms duration is
+// stretched over the whole range like any other duration.
+@supports (animation-timeline: view()) and (timeline-scope: --a) {
+  html {
+    timeline-scope: --article;
+  }
+
+  .page__content[itemprop="text"] {
+    view-timeline: --article block;
+    view-timeline-inset: 0;
+  }
+
+  .reading-progress {
+    animation: reading-progress linear both;
+    animation-timeline: --article;
+    animation-range: contain 0% contain 100%;
+  }
+}

@@ -2,28 +2,21 @@
 layout: default
 author_profile: false
 ---
-
-{% if page.header.overlay_color or page.header.overlay_image or page.header.image %}
-  {% include page__hero.html %}
-{% elsif page.header.video.id and page.header.video.provider %}
-  {% include page__hero_video.html %}
-{% endif %}
-
-{% if page.url != "/" and site.breadcrumbs %}
-  {% unless paginator %}
-    {% include breadcrumbs.html %}
-  {% endunless %}
-{% endif %}
-
-<div id="main" role="main">
-  {% include sidebar.html %}
-
-  <div class="archive">
-    {% unless page.header.overlay_color or page.header.overlay_image %}
+{%- comment -%}
+  The theme's layout for jekyll-archives pages. GitHub Pages cannot run that
+  plugin, so nothing uses it today; it is kept on the same shell as the other
+  archive layouts (spec 4.6: no sidebar, one header, tiles) so that turning
+  the plugin on later does not bring back the retired author rail.
+{%- endcomment -%}
+<div id="main" role="main" class="archive-main">
+  <div class="archive l-container">
+    <header class="archive-header">
       <h1 id="page-title" class="page__title">{{ page.title }}</h1>
-    {% endunless %}
-    {% for post in page.posts %}
-      {% include archive-single.html %}
-    {% endfor %}
+    </header>
+    <div class="tile-grid">
+      {%- for post in page.posts %}
+      {% include post-tile.html post=post heading="h2" %}
+      {%- endfor %}
+    </div>
   </div>
 </div>

@@ -1,0 +1,348 @@
+/* ==========================================================================
+   Code blocks (owner: u5, spec 4.5.3)
+
+   Xcode's default palettes on --code-bg: light on #f5f5f7, dark on #161617.
+   Every colour comes from a --syn-* token in _tokens.scss, each >= 4.5:1 on
+   its background (the numbers sit next to the tokens).
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad), all
+   replaced here by token-based rules:
+     310-316  dark `pre, code, .highlight`: deleted (the block surface and
+              every syntax colour are tokens now, so dark needs no rule)
+     336-340  dark `.code-copy`: deleted
+     342      dark language label: deleted
+     384-442  language label in the corner, `.code-copy` button: replaced,
+              and the `$muted-text-color` / `$success-color` literals with them
+   ========================================================================== */
+
+// Geometry shared by the language label and the copy button. The chrome sits
+// in one 28px row, 8px from the top and right edges, so the label's text and
+// the button's text share a centre line.
+$code-chrome-inset: 8px;
+$code-chrome-row: 28px;
+$code-chrome-gap: 8px;
+$code-label-right: 16px;
+
+/* ==========================================================================
+   Surface
+   ========================================================================== */
+
+// A nested surface (12px) on --code-bg, replacing the theme's Material-dark
+// slab (#263238), which was the one dark block on a light page. The theme's
+// container font settings no longer matter: the pre below sets its own.
+.page__content div.highlighter-rouge,
+.page__content figure.highlight {
+  position: relative;
+  margin: 1.5em 0;
+  border-radius: var(--r-sm);
+  background: var(--code-bg);
+  color: var(--syn-plain);
+}
+
+// 14px / 1.6 (spec C23): denser than prose, still easy to track across a
+// long line. Tabs as 4 spaces (the Python samples), no ligatures (a reader
+// copying `!=` must see two characters), and no keep-all: code breaks only
+// where it was written. The radius follows the container, so the scrollbar
+// stays inside the rounded corners and the keyboard ring (enhance.js makes an
+// overflowing pre focusable) follows them. The spec's `.highlight pre, pre.highlight` sit
+// at (0,1,1) and lost the padding to the theme's `div.highlighter-rouge
+// pre.highlight { padding: 1em }` (0,2,2), which left 14px; the prefixed
+// selectors reach (0,3,2) and (0,2,2), the latter winning on order.
+.page__content div.highlighter-rouge pre.highlight,
+.page__content figure.highlight pre,
+.highlight pre,
+pre.highlight {
+  margin: 0;
+  padding: 16px 20px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--syn-plain);
+  font-family: $monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 4;
+  font-variant-ligatures: none;
+  word-break: normal;
+  overflow-wrap: normal;
+  // A long line scrolls sideways; where the platform draws a bar, it is a
+  // thin one in the palette instead of the default grey slab across the block
+  // (thumb --separator-strong: 3.33 on #f5f5f7, 3.57 on #161617).
+  scrollbar-width: thin;
+  scrollbar-color: var(--separator-strong) transparent;
+}
+
+// On a phone the copy button is always visible (there is no hover to reveal
+// it) and a code line is rarely shorter than the 295px the block leaves, so
+// the button and the label would sit on top of the first line and hide its
+// end at every scroll position. A 44px top band holds that chrome instead.
+// Static, not keyed to the classes enhance.js adds, so nothing moves on load.
+@include below-tablet {
+  .page__content div.highlighter-rouge pre.highlight,
+  .page__content figure.highlight pre {
+    padding-top: $code-chrome-inset * 2 + $code-chrome-row;
+  }
+}
+
+/* ==========================================================================
+   Syntax: Rouge classes onto the --syn-* tokens
+   ========================================================================== */
+
+// Keywords, tags and diff headings: the one weight step in a block (600), so
+// structure reads before colour does (and for readers who cannot tell the
+// pink from the red).
+.highlight {
+  .k, .kd, .kn, .kp, .kr, .kv, .kc, .ow, .nt, .gh, .gu {
+    color: var(--syn-keyword);
+    font-weight: var(--fw-strong);
+  }
+
+  // Strings, including affixes (the f of an f-string), escapes, interpolation
+  // delimiters, and deleted diff lines.
+  .s, .s1, .s2, .sa, .sb, .sc, .sd, .se, .sh, .si, .sx, .sr, .ss, .dl, .gd {
+    color: var(--syn-string);
+  }
+
+  // Numbers and other literals (the theme colours .l and .ld too; left alone
+  // they would keep its #f78c6c, 2.16:1 on #f5f5f7).
+  .m, .mi, .mf, .mh, .mo, .il, .mb, .mx, .l, .ld {
+    color: var(--syn-number);
+  }
+
+  // Comments stay upright: Hangul has no italic (32% of these code lines hold
+  // some), and a synthesized slant makes it hard to read.
+  .c, .c1, .cm, .cs, .ch, .cpf {
+    color: var(--syn-comment);
+    font-style: normal;
+  }
+
+  // Types, classes, namespaces, constants and exceptions: Xcode's type colour.
+  .kt, .nc, .nn, .no, .ne {
+    color: var(--syn-type);
+  }
+
+  // Functions, builtins, and inserted diff lines.
+  .nf, .fm, .nb, .bp, .gi {
+    color: var(--syn-function);
+  }
+
+  .cp {
+    color: var(--syn-preproc);
+  }
+
+  // Attributes, decorators, labels and entities.
+  .na, .nd, .nl, .ni {
+    color: var(--syn-attr);
+  }
+
+  // Everything else reads as plain code. .err marks what the lexer could not
+  // parse (a `!` in printed output); it is not an error for the reader, so it
+  // gets no red and no background.
+  .n, .nx, .nv, .vi, .vc, .vg, .py, .o, .p, .w, .err {
+    color: var(--syn-plain);
+    background: none;
+  }
+
+  // Console prompts are furniture, like comments, at body weight (the theme
+  // sets them bold).
+  .gp {
+    color: var(--syn-comment);
+    font-weight: 400;
+  }
+
+  // Generic strong and emphasis: weight, never slant (no italic Hangul).
+  .gs, .ge {
+    font-style: normal;
+    font-weight: var(--fw-strong);
+  }
+
+  // Highlighted lines (hl_lines; none today): --fill instead of the theme's
+  // #eeffff, which would be a white bar on the dark block.
+  .hll {
+    background-color: var(--fill);
+  }
+}
+
+// Line numbers (linenos; none today): the theme's #b2ccd6 is 1.6:1 on
+// #f5f5f7. Comment colour (4.96 / 5.26) and a decorative separator.
+.highlight table td.gutter,
+.highlight table td.rouge-gutter {
+  color: var(--syn-comment);
+  border-right-color: var(--separator);
+}
+
+/* ==========================================================================
+   Chrome: language label and copy button
+   ========================================================================== */
+
+// The language sits in the block's corner rather than above it, so it costs
+// no height on a wide screen. 11px Latin caps at 600 with +0.06em tracking
+// (small caps need air), secondary: 4.66 on #f5f5f7, 7.03 on #161617.
+// A first line longer than the column runs, and scrolls, under the corner
+// (a pandas read_csv path, a long SQL comment): the label would print on top
+// of the code. Its box therefore runs to the block's edge on a --code-bg
+// backing that fades in over 20px, so the code slides under the label
+// instead of colliding with it.
+.page__content .highlighter-rouge[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: $code-chrome-inset;
+  right: 0;
+  padding: 0 $code-label-right 0 28px;
+  border-top-right-radius: var(--r-sm);
+  background: linear-gradient(90deg, transparent, var(--code-bg) 20px);
+  font-family: $sans-serif;
+  font-size: 0.6875rem;
+  font-weight: var(--fw-strong);
+  line-height: $code-chrome-row;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+// The copy button (added by enhance.js): a small pill, --text on --card with a
+// 1px --separator ring (16.83 / 15.46), so it reads as a control floating on
+// the block. The pill is drawn by ::before, which lets the button's own box
+// grow to a 44px target on phones while the pill stays 28px everywhere.
+// Hidden at rest where a pointer can reveal it, so it does not sit on the
+// code while reading.
+.code-copy {
+  position: absolute;
+  top: $code-chrome-inset;
+  right: $code-chrome-inset;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: $code-chrome-row;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--text);
+  font-family: $sans-serif;
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms var(--ease-standard), transform var(--dur-hover) var(--ease-out);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-color: var(--card);
+    box-shadow: 0 0 0 1px var(--separator);
+    transition: background-color var(--dur-hover) var(--ease-standard);
+  }
+
+  // Hover darkens the pill to --fill; the label stays --text (13.78 / 12.80).
+  @include hover {
+    &::before {
+      background-color: var(--fill);
+    }
+  }
+
+  // Press feedback, instant on the way in (spec M8: code-copy .95).
+  &:active {
+    transform: scale(0.95);
+    transition-duration: var(--dur-press);
+  }
+
+  // The ring follows the pill, not the (larger on phones) hit box.
+  &:focus-visible {
+    outline: none;
+    opacity: 1;
+  }
+
+  &:focus-visible::before {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  // "복사됨" is confirmed by the label change itself; the colour stays --text
+  // (the theme's green $success-color fails on the white pill).
+  &.is-done {
+    color: var(--text);
+  }
+}
+
+// Reveal on hovering the block or keyboard focus inside it (enhance.js makes
+// an overflowing pre focusable, and the button comes right after it).
+.has-copy {
+  @include hover {
+    .code-copy {
+      opacity: 1;
+    }
+  }
+}
+
+.has-copy:focus-within .code-copy {
+  opacity: 1;
+}
+
+// Touch has no hover to reveal it, so it is always there.
+@media (hover: none), (pointer: coarse) {
+  .code-copy {
+    opacity: 1;
+  }
+}
+
+// Phones: a 44x44 minimum hit box anchored in the corner; the 28px pill sits
+// 8px inside it, exactly where it sits on a wide screen.
+@include below-tablet {
+  .code-copy {
+    top: 0;
+    right: 0;
+    min-width: 44px;
+    min-height: $code-chrome-inset * 2 + $code-chrome-row;
+    padding: 0 (12px + $code-chrome-inset);
+
+    &::before {
+      top: $code-chrome-inset;
+      right: $code-chrome-inset;
+      bottom: $code-chrome-inset;
+      left: $code-chrome-inset;
+    }
+  }
+}
+
+// A label and a button in the same corner would collide, so the button moves
+// to the label's left with an 8px gap. The label is 11px caps in rem, so its
+// width scales with the root (16px, 17px at >=1024); measured in Pretendard
+// 600 +0.06em: SQL 1.5rem, PYTHON 3.25rem (the two languages the posts use),
+// JAVASCRIPT 4.66rem (the longest name enhance.js knows, the fallback here).
+.highlighter-rouge[data-lang] .code-copy {
+  right: calc(#{$code-label-right + $code-chrome-gap} + 4.75rem);
+}
+
+.highlighter-rouge[data-lang="Python"] .code-copy {
+  right: calc(#{$code-label-right + $code-chrome-gap} + 3.25rem);
+}
+
+.highlighter-rouge[data-lang="SQL"] .code-copy {
+  right: calc(#{$code-label-right + $code-chrome-gap} + 1.5rem);
+}
+
+// On phones the button's box extends 8px past its pill; pull it back by that
+// much so the pill, not the box, keeps the 8px gap.
+@include below-tablet {
+  .highlighter-rouge[data-lang] .code-copy {
+    right: calc(#{$code-label-right + $code-chrome-gap - $code-chrome-inset} + 4.75rem);
+  }
+
+  .highlighter-rouge[data-lang="Python"] .code-copy {
+    right: calc(#{$code-label-right + $code-chrome-gap - $code-chrome-inset} + 3.25rem);
+  }
+
+  .highlighter-rouge[data-lang="SQL"] .code-copy {
+    right: calc(#{$code-label-right + $code-chrome-gap - $code-chrome-inset} + 1.5rem);
+  }
+}
