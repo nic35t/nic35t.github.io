@@ -1,5 +1,25 @@
 {%- comment -%}
-  Cross-document view transition (spec 5, M2): owned by u7, which fills this in.
-  Included in <head> right after font-swap.html so the rule is known before the
-  first paint; until then it is an empty stub and renders nothing.
+  Cross-document view transition (spec 5, M2; owner u7). Included in <head>
+  right after font-swap.html. Inline, not in main.css: the new page is
+  revealed, and its crossfade set up, before any stylesheet has arrived, and
+  the old page must already carry the opt-in when the link is followed.
+
+  - @view-transition { navigation: auto } opts same-origin navigations into
+    the browser's crossfade of the whole page. It sits inside
+    prefers-reduced-motion: no-preference, so a reader who asked for less
+    motion never gets one: an opt-in, not an animation to be undone.
+  - Old and new snapshots run 200ms on the SAME literal curve (the
+    --ease-out token's value; tokens are not loaded yet at reveal). The two
+    are blended with plus-lighter, so when both opacities follow one curve
+    they sum to 1 on every frame and a flat white, black or frosted field
+    stays exactly its colour. With the browser's defaults, or with different
+    durations or curves, the sum dips below 1 mid-fade and the page flashes
+    grey. The root group gets the same 200ms so the transition, which lasts
+    as long as its longest animation, ends when the fade does instead of at
+    the default 250ms. The theme toggle's startViewTransition (M3) reuses
+    these same rules.
+  - The reduce block is a safety net for a transition started by script
+    (the blanket in _motion.scss does not reach these pseudo-elements, and
+    main.css may not be loaded yet anyway).
 {%- endcomment -%}
+<style>@media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}::view-transition-group(root),::view-transition-old(root),::view-transition-new(root){animation-duration:200ms;animation-timing-function:cubic-bezier(0.23,1,0.32,1)}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
