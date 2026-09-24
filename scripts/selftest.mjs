@@ -117,7 +117,11 @@ const INP_CASES = [
     // interaction" would invert the conclusion — this page is the fast one.
     name: "an interaction under the 16ms floor reports as fast, not as missing",
     html: `<button id="b" style="min-width:44px;min-height:44px">Press</button>`,
-    expect: (v, driven) => driven > 0 && v.INP == null,
+    // Event Timing only reports interactions of 16ms or more, so a trivial
+    // click usually yields no INP at all. On a slow CI runner the same click
+    // can land on exactly 16ms and be reported. Both mean "fast"; the case
+    // guards against reporting it as missing or slow, not against the entry.
+    expect: (v, driven) => driven > 0 && (v.INP == null || v.INP <= 50),
     describe: (v, driven) => `INP ${v.INP === null ? "null" : v.INP}, ${driven} driven`,
   },
   {
