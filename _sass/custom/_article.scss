@@ -430,6 +430,17 @@ a.post-header__eyebrow {
   transform: rotate(90deg);
 }
 
+// A closed <details> only skips painting its content (Chromium's
+// ::details-content is content-visibility: hidden), so the hidden links still
+// report boxes laid over the article, and anything that probes by geometry
+// (the tap-target and covered-control audits, elementFromPoint) finds every
+// entry "covered" by the article on phones. display: none makes closed mean
+// gone; the
+// open attribute brings the list back on the same frame.
+.toc-disclosure:not([open]) > .toc {
+  display: none;
+}
+
 // The open list sits on a grouped --bg-alt panel, 18px corners like every
 // other grouped surface. Secondary rows on it: 4.66 / 7.03. The left padding
 // is 8px because the rows bring their own 12px inset (it is the rail's gap
