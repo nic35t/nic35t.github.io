@@ -1,65 +1,122 @@
 /*
- * Theme toggle. Three states in effect: follow the system (nothing stored),
- * forced light, forced dark. The button reflects what is currently applied and
- * flips to the other, which is what people expect from a single control.
+ * Theme toggle (spec 4.3, motion M3).
+ *
+ * The button is server-rendered in the masthead (no insertion, so no shift),
+ * and it is a toggle for "dark theme", not a switch between named states: its
+ * label is always "어두운 테마" and aria-pressed says whether dark is showing,
+ * whether chosen here or inherited from a dark system. The icon (moon or sun)
+ * is swapped by CSS from the same state, so this script never writes text.
+ *
+ * Three states in effect: follow the system (no data-theme, nothing stored),
+ * forced light, forced dark. A press flips what is showing. When the flip
+ * lands on what the system already prefers, the override is removed rather
+ * than stored, so a reader can always get back to following the system (and
+ * a later change of the system setting is followed again).
+ *
+ * head/theme-init.html applies a stored choice before first paint; this file
+ * only runs after the page has been parsed.
  */
 (function () {
   "use strict";
 
+  var button = document.querySelector(".theme-toggle");
+  if (!button) { return; }
+
   var root = document.documentElement;
   var STORAGE_KEY = "theme";
+  // --nav-bg-solid in each theme, so the phone's status bar and the bar agree.
+  var CHROME_DARK = "#161617";
+  var CHROME_LIGHT = "#fbfbfd";
+  var darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
 
-  function systemPrefersDark() {
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  function system() {
+    return darkQuery && darkQuery.matches ? "dark" : "light";
   }
 
-  function currentTheme() {
-    return root.getAttribute("data-theme") || (systemPrefersDark() ? "dark" : "light");
+  function effective() {
+    return root.getAttribute("data-theme") || system();
   }
 
-  function apply(theme) {
-    root.setAttribute("data-theme", theme);
-    try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* private mode */ }
-  }
-
-  function build() {
-    var nav = document.querySelector(".greedy-nav");
-    if (!nav || document.querySelector(".theme-toggle")) return;
-
-    var button = document.createElement("button");
-    button.type = "button";
-    button.className = "theme-toggle";
-
-    var label = function () {
-      var dark = currentTheme() === "dark";
-      button.setAttribute("aria-label", dark ? "밝은 테마로 전환" : "어두운 테마로 전환");
-      button.setAttribute("title", button.getAttribute("aria-label"));
-      button.setAttribute("aria-pressed", String(dark));
-      button.textContent = dark ? "☀" : "☾";
-    };
-
-    button.addEventListener("click", function () {
-      apply(currentTheme() === "dark" ? "light" : "dark");
-      label();
-    });
-
-    // While the reader has made no choice, keep following the system.
-    if (window.matchMedia) {
-      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
-        if (!root.getAttribute("data-theme")) label();
-      });
+  function store(value) {
+    try {
+      if (value) {
+        localStorage.setItem(STORAGE_KEY, value);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) {
+      /* Private mode can throw; the choice then lasts for this page only. */
     }
-
-    label();
-    // Before the greedy-nav toggle so it does not get swept into the overflow
-    // menu when the navigation runs out of room.
-    var overflowToggle = nav.querySelector(".greedy-nav__toggle");
-    nav.insertBefore(button, overflowToggle || null);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", build);
-  } else {
-    build();
+  // Reflect the current state: aria-pressed, and the browser chrome colour.
+  // A forced theme sets both theme-color metas (whichever one the browser
+  // picks by its media query must match the page). Following the system,
+  // each meta goes back to the colour for its own media query.
+  function sync() {
+    var forced = root.getAttribute("data-theme");
+    button.setAttribute("aria-pressed", effective() === "dark" ? "true" : "false");
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    for (var i = 0; i < metas.length; i++) {
+      var colour;
+      if (forced === "dark" || forced === "light") {
+        colour = forced === "dark" ? CHROME_DARK : CHROME_LIGHT;
+      } else {
+        colour = /dark/.test(metas[i].getAttribute("media") || "") ? CHROME_DARK : CHROME_LIGHT;
+      }
+      metas[i].setAttribute("content", colour);
+    }
   }
+
+  function apply() {
+    var next = effective() === "dark" ? "light" : "dark";
+    if (next === system()) {
+      root.removeAttribute("data-theme");
+      store(null);
+    } else {
+      root.setAttribute("data-theme", next);
+      store(next);
+    }
+    sync();
+  }
+
+  // theme-switching (styled in _motion.scss) turns every transition off for
+  // the one frame the tokens change, so the page swaps at once instead of each
+  // element fading on its own schedule. Reading a computed style forces that
+  // frame's style to resolve before the class comes off again.
+  function swap() {
+    root.classList.add("theme-switching");
+    apply();
+    void window.getComputedStyle(root).color;
+    window.requestAnimationFrame(function () {
+      root.classList.remove("theme-switching");
+    });
+  }
+
+  button.addEventListener("click", function () {
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // A 200ms crossfade of the whole page (M3), the same one used between
+    // pages, where the browser supports it; otherwise, or when the reader has
+    // asked for less motion, the swap is instant.
+    if (document.startViewTransition && !reduce) {
+      document.startViewTransition(swap);
+    } else {
+      swap();
+    }
+  });
+
+  // While following the system, the CSS already tracks a change of the system
+  // setting; only aria-pressed and the chrome colours need to catch up.
+  function onSystemChange() {
+    if (!root.getAttribute("data-theme")) { sync(); }
+  }
+  if (darkQuery) {
+    if (darkQuery.addEventListener) {
+      darkQuery.addEventListener("change", onSystemChange);
+    } else if (darkQuery.addListener) {
+      darkQuery.addListener(onSystemChange);
+    }
+  }
+
+  sync();
 })();

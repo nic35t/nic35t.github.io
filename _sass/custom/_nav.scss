@@ -1,135 +1,566 @@
 /* ==========================================================================
-   Global nav and masthead (owner: u2, spec 4.3)
+   Global nav and masthead (owner: u2, spec 4.3, motion M3-M7)
 
-   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
-   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
-   the same selectors the old `dark-rules` mixin did:
-     16-35    `.site-logo` 44px box and the square image
-     45-51    `.greedy-nav__toggle` 44px
-     78-84    `.site-title` 44px floor
-     207-224  dark masthead, greedy-nav surfaces and colours
-     344-346  dark `.site-logo img` filter
-     363-382  `.theme-toggle`
-     564-578  opaque masthead paint
-     588-593  `html { scroll-padding-top }`
+   A 48px frosted bar holding the logo, the site title, one list of links and
+   the theme toggle. The list sits inline from 768px and becomes a full-height
+   sheet below that (assets/js/nav.js). Markup: _includes/masthead.html.
+
+   Legacy blocks u0 moved here from _overrides.scss (line numbers at 96601ad)
+   and what became of them:
+     16-35    `.site-logo` 44px box        -> kept: 28px mark, 44px box
+     45-51    `.greedy-nav__toggle` 44px   -> deleted with the greedy markup
+     78-84    `.site-title` 44px floor     -> kept inside `a.site-title`
+     207-224  dark masthead, greedy-nav    -> deleted: the bar paints with tokens
+     344-346  dark `.site-logo img` filter -> kept (a filter, not a colour)
+     363-382  `.theme-toggle`              -> replaced (server-rendered SVG)
+     564-578  opaque masthead paint        -> replaced: material on ::before
+     588-593  `html { scroll-padding-top }`-> replaced: bar + 24px
    ========================================================================== */
 
 /* ==========================================================================
-   Touch targets
+   Keyframes (menu sheet, M7)
    ========================================================================== */
 
-// The site logo is a 32px square, under the 44px a finger needs. Padding round
-// the image rather than scaling it keeps the mark the same size on screen.
-.site-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-
-  // The image carries width/height attributes so the browser can reserve its
-  // space before it loads. Those attributes also become the rendered size
-  // unless CSS says otherwise, and the theme only constrained the height —
-  // which stretched a square mark into a 128x34 sliver. Both dimensions are
-  // set here so the aspect ratio survives.
-  img {
-    width: 2rem;
-    height: 2rem;
-    object-fit: contain;
-  }
+// The sheet drops 8px into place from under the bar and fades in, so it reads
+// as coming out of the bar rather than appearing from nowhere; its rows follow
+// 6px behind. The exit runs the same path back up, faster (180ms against
+// 280ms), because a closing menu is the system responding, not something to
+// watch. Only transform and opacity, so it stays on the compositor.
+@keyframes nav-sheet-in {
+  from { opacity: 0; transform: translateY(-8px); }
 }
 
-// The overflow menu button and the pagination numbers are the two controls a
-// phone user actually aims at, and both sat around 36px. They clear WCAG 2.2's
-// 24px minimum either way; this is the more comfortable 44.
-.greedy-nav__toggle {
-  min-width: 44px;
-  min-height: 44px;
+@keyframes nav-item-in {
+  from { opacity: 0; transform: translateY(-6px); }
 }
 
-// The site title sat at 41px next to a 44px logo link. It is already a flex
-// container, so a floor raises it without touching how the title and subtitle
-// stack, and the masthead does not grow: the logo link was the taller of the
-// two all along.
-.site-title {
-  min-height: 44px;
+@keyframes nav-sheet-out {
+  to { opacity: 0; transform: translateY(-8px); }
 }
 
 /* ==========================================================================
-   Dark mode (legacy dark-rules groups)
+   The bar
    ========================================================================== */
 
-.masthead,
-.masthead__inner-wrap,
-.greedy-nav,
-.greedy-nav__toggle,
-.greedy-nav .hidden-links {
-  @include dark-mode {
-    background-color: var(--surface-raised);
-    color: var(--text);
-  }
-}
-
+// 48px at every width: a 44px tap row with 2px of air above and below, as on
+// Apple's mobile globalnav. The theme's 1px grey rule goes; the scroll-linked
+// hairline below replaces it. The bar itself stays transparent and isolated so
+// the material can sit on ::before at z-index -1, behind the bar's content but
+// still inside the bar's own stacking context (z 100, above the page).
 .masthead {
-  @include dark-mode { border-bottom-color: var(--border); }
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  height: var(--nav-h);
+  border-bottom: 0;
+  background: transparent;
+  animation: none;
+  isolation: isolate;
 }
 
-.greedy-nav a,
-.greedy-nav__toggle,
-.theme-toggle,
-.site-title,
-.site-subtitle {
-  @include dark-mode {
-    color: var(--text);
+// The material lives on a pseudo-element on purpose: backdrop-filter on
+// .masthead itself would make the bar the containing block for the
+// position:fixed menu sheet inside it and trap the sheet in a 48px strip.
+// Text on the glass, worst case (solid black or white content under the 80%
+// tint): light --text 10.15 / 16.39, --nav-text 7.60 / 12.27; dark --text
+// 17.25 / 8.85, --nav-text 15.38 / 7.89. All above 7:1.
+.masthead::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: var(--material);
+  backdrop-filter: var(--material);
+  // Colour only: the bar turns solid while the phone menu is open (below).
+  transition: background-color var(--dur-hover) var(--ease-standard);
+}
+
+// Without backdrop-filter an 80% tint shows the text underneath unblurred,
+// which is the see-through strip 7c61a71 fixed; fall back to the opaque bar
+// colour (--nav-bg-solid, the same as theme-color).
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .masthead::before {
+    background: var(--nav-bg-solid);
   }
 }
 
-// Photographs are fine as-is; flat logo art on a light plate is not, so knock
-// back the glare without inverting anything.
+// Readers who ask for less transparency get the opaque bar and no blur.
+// (prefers-contrast: more is handled by the token: --nav-bg becomes solid.)
+@media (prefers-reduced-transparency: reduce) {
+  .masthead::before {
+    background: var(--nav-bg-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+// Scroll-edge hairline. At the top of the page the bar sits on the page's own
+// white (or black) and a rule would only box it in; once content scrolls
+// under it, a hairline separates the two. It fades in over the first 24px of
+// scroll, driven by the scroll position itself, so no script and no jank.
+// Browsers without scroll timelines keep a static hairline (the @supports
+// block never applies). Decorative: 1.51 / 2.10 is fine for a divider.
+.masthead::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--nav-hairline);
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .masthead::after {
+    opacity: 0;
+    // The shorthand resets animation-timeline, so the timeline comes after it.
+    animation: masthead-edge linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0px 24px;
+  }
+
+  @keyframes masthead-edge {
+    to { opacity: 1; }
+  }
+}
+
+// The inner wrap is also .l-container, so the bar's edges line up with the
+// page content below it at every width. The theme gives it 1em of padding,
+// space-between and a clearfix ::after; in a flex row that ::after is an empty
+// flex item, which the 4px gap would turn into a phantom 4px at the right edge.
+.masthead__inner-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 100%;
+  padding: 0;
+  background: transparent;
+
+  &::after {
+    content: none;
+  }
+}
+
+/* ==========================================================================
+   Logo and title
+   ========================================================================== */
+
+// A 28px mark in a 44px link: Apple's nav scale for the mark, a finger's
+// minimum for the box. The -8px pulls the box into the gutter so the mark
+// itself, not its padding, lines up with the content edge below (the 20px /
+// 32px gutter absorbs it).
+.site-logo {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin-left: -8px;
+
+  // The width/height attributes reserve the space before the image loads;
+  // CSS repeats them so the theme's max-height cannot squash the square.
+  img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+
+// Photographs are fine as-is; flat logo art on a light plate glares on a black
+// page, so knock it back a little without inverting anything.
 .site-logo img {
   @include dark-mode { filter: brightness(0.92); }
+}
+
+// The site title is the bar's one piece of text at body size. `a.site-title`
+// (0,1,1) is needed to hold --text against the theme's a:visited and a:hover
+// (also 0,1,1, earlier in the cascade). 16.28 on the solid bar (light), 16.61
+// (dark); over glass see .masthead::before. min-width:0 lets it give way to
+// the links and toggles instead of pushing them off the bar; margin-right:auto
+// pushes everything after it to the right.
+a.site-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 44px;
+  margin-right: auto;
+  font-size: 1rem;
+  font-weight: var(--fw-heading);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+// Ellipsis lives on the span: text-overflow does not apply to the anonymous
+// text of a flex container, so on the link itself a long title would simply
+// run under the toggles.
+.site-title__text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   Links (inline; the phone sheet restyles them further down)
+   ========================================================================== */
+
+// A flex box so the menu button (phones) and the list (768 up) centre on the
+// bar without an inline line box adding descender space under the button.
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+// The theme gives every `ul li` a .5em bottom margin, which would push the
+// inline links off the bar's centre line.
+.site-nav__list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin: 0;
+  }
+}
+
+// Footnote size, as Apple's globalnav sets its links, with 10px of side
+// padding so each link is a 44px-tall target without looking like a button.
+// --nav-text over glass: 7.60 (light, worst case) / 7.89 (dark, worst case).
+// `.site-nav__list a` is (0,1,1) to beat the theme's a:visited blue.
+// Colour is the only thing that animates on hover (M4), 200ms standard curve.
+.site-nav__list a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: var(--fs-footnote);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--nav-text);
+  text-decoration: none;
+  transition: color var(--dur-hover) var(--ease-standard);
+
+  @include hover {
+    color: var(--nav-text-hover);
+  }
+}
+
+// The current section: full text colour and semibold, no underline bar (the
+// theme's 4px blue bar went with .visible-links). "page" on the destination
+// itself, "true" on a post filed under it; both mean "you are here".
+.site-nav__list a[aria-current] {
+  color: var(--text);
+  font-weight: var(--fw-strong);
 }
 
 /* ==========================================================================
    Theme toggle
    ========================================================================== */
 
+// An icon button: 44px, no chrome, the icon in the nav's text colour. The
+// press shrinks it to .92 (M8's icon-button value) in 100ms and lets it go in
+// 200ms, so a tap is felt at once. --nav-text on glass as for the links.
 .theme-toggle {
-  align-self: center;
-  margin-left: auto;
-  padding: 0 0.6em;
-  min-width: 44px;
-  min-height: 44px;
-  background: none;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
   border: 0;
-  color: $text-color;
-  font-size: 1.15em;
-  line-height: 1;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--nav-text);
   cursor: pointer;
-  border-radius: $border-radius;
+  transition: color var(--dur-hover) var(--ease-standard), transform var(--dur-hover) var(--ease-out);
 
-  &:hover { background: var(--surface-sunken); }
+  @include hover {
+    color: var(--nav-text-hover);
+  }
+
+  &:active {
+    transform: scale(0.92);
+    transition-duration: var(--dur-press);
+  }
+}
+
+// The icon names what pressing the button does: a moon in light, a sun in
+// dark. Not a colour change, so this is one of the two sanctioned dark-mode
+// mixin uses. It follows the same three paths as the tokens (system dark,
+// forced dark, forced light on a dark system).
+.theme-toggle__sun {
+  display: none;
+}
+
+.theme-toggle__moon {
+  @include dark-mode { display: none; }
+}
+
+.theme-toggle__sun {
+  @include dark-mode { display: block; }
+}
+
+// Without script the button cannot do anything, so it is not shown, but it
+// keeps its 44px so the bar looks the same either way.
+.no-js .theme-toggle {
+  visibility: hidden;
+}
+
+// From 768 the theme toggle is the rightmost control. The same 12px pull as
+// the phone menu button, so the glyph, not the empty half of its box, lines
+// up with the right edge of the content below.
+@include tablet-up {
+  .theme-toggle {
+    margin-right: -12px;
+  }
 }
 
 /* ==========================================================================
-   Sticky masthead
+   Focus
    ========================================================================== */
 
-// The theme makes .masthead sticky but never gives it a background — only the
-// .greedy-nav inside it is painted. The inner wrap adds 1em of padding around
-// that nav, so there is a transparent band on all four sides of an element
-// that is pinned over the page, and article text scrolls visibly through it.
-//
-// Both the bar and its wrap are painted, so nothing shows through whichever
-// one the layout happens to stretch.
-.masthead,
-.masthead__inner-wrap {
-  background-color: var(--surface-raised);
+// The theme rings a:focus and button:focus with a 5px outline, which also
+// fires on a mouse click, and on the first sheet link when nav.js moves focus
+// there after a tap. Keyboard users keep the global :focus-visible ring.
+.masthead a:focus:not(:focus-visible),
+.masthead button:focus:not(:focus-visible) {
+  outline: none;
 }
 
-// A sticky header also swallows the top of whatever an in-page link jumps to.
-// scroll-padding-top tells the browser to stop short by the bar's height, so a
-// heading reached from the contents list lands below it rather than beneath it.
+/* ==========================================================================
+   Phone menu (below 768)
+   ========================================================================== */
+
+// The menu button exists only where the sheet does.
+.site-nav__toggle {
+  display: none;
+}
+
+@include below-tablet {
+  // With script the list waits for the menu button. (Without it the links stay
+  // on the page; see the no-JS block.) The .js class is set in <head> before
+  // first paint, so there is no flash of inline links.
+  .js .site-nav__list {
+    display: none;
+  }
+
+  // Icon button, 44px. The -12px pulls its box into the gutter so the bars'
+  // right end sits on the content edge, mirroring the logo on the left.
+  // --text for the bars: they are the one control on the bar a phone reader
+  // is looking for. Press as for the theme toggle.
+  .site-nav__toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin: 0 -12px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    transition: transform var(--dur-hover) var(--ease-out);
+
+    &:active {
+      transform: scale(0.92);
+      transition-duration: var(--dur-press);
+    }
+  }
+
+  // [logo][title .......][theme][menu]: the menu button is the rightmost
+  // control, where a thumb expects it.
+  .theme-toggle {
+    order: 2;
+  }
+
+  .site-nav {
+    order: 3;
+  }
+
+  // Two bars, not three: at 18px wide the third bar crowds the X it turns
+  // into. The bars sit 6.5px apart, so each moves half of that (3.25px) to the
+  // middle and turns 45 degrees (M6: 240ms, the on-screen morph curve). A
+  // transition, not keyframes, so a quick second tap reverses from wherever
+  // the bars are.
+  .site-nav__icon {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 12px;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 1.5px;
+      border-radius: 1px;
+      background: currentColor;
+      transition: transform var(--dur-morph) var(--ease-in-out);
+    }
+
+    &::before {
+      top: 2px;
+    }
+
+    &::after {
+      bottom: 2px;
+    }
+  }
+
+  .site-nav__toggle[aria-expanded="true"] .site-nav__icon::before {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+
+  .site-nav__toggle[aria-expanded="true"] .site-nav__icon::after {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+
+  // aria-expanded only turns false when the 180ms exit has finished, but the
+  // icon should answer the tap itself: it starts back to bars the moment the
+  // close begins, alongside the sheet.
+  .site-nav[data-closing] .site-nav__icon::before,
+  .site-nav[data-closing] .site-nav__icon::after {
+    transform: none;
+  }
+
+  // The sheet: fixed under the bar, the full visible height, opaque. It sits
+  // inside the masthead's stacking context (z 100), so it covers the page.
+  // 100vh first for browsers without dynamic viewport units; 100dvh follows
+  // the phone's toolbars so the last link is never hidden behind them. Its
+  // own scroll does not chain to the page (overscroll contain), and the
+  // bottom padding clears the home indicator where env() reports one.
+  // --text on --nav-bg-solid: 16.28 (light) / 16.61 (dark).
+  .site-nav[data-open] .site-nav__list {
+    display: block;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    height: calc(100vh - #{$nav-h});
+    height: calc(100dvh - var(--nav-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    padding: var(--space-2) var(--gutter) #{"calc(var(--space-7) + env(safe-area-inset-bottom, 0px))"};
+    background: var(--nav-bg-solid);
+    animation: nav-sheet-in var(--dur-enter) var(--ease-out) both;
+  }
+
+  // Exit: the same path back, faster. Declared after the open rule, which has
+  // the same specificity, so it wins while both attributes are set.
+  .site-nav[data-closing] .site-nav__list {
+    animation: nav-sheet-out var(--dur-exit) var(--ease-out) both;
+  }
+
+  // Rows follow the sheet 20ms apart (index from the inline --i; six links end
+  // at 100ms). Written against [data-open] and only inside this query, so the
+  // inline links at 768 and up never animate on page load.
+  .site-nav[data-open] .site-nav__list li {
+    animation: nav-item-in var(--dur-enter) var(--ease-out) both;
+    animation-delay: calc(var(--i) * 20ms);
+  }
+
+  // Sheet links: large and semibold like Apple's phone menu, each a 48px row.
+  // Press dims the row (.55) rather than scaling it: a full-width row that
+  // shrinks looks like it is falling away. (0,3,1) beats the inline link rule.
+  .site-nav[data-open] .site-nav__list a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: var(--fw-heading);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    white-space: normal;
+    color: var(--text);
+    text-decoration: none;
+    transition: opacity var(--dur-hover) var(--ease-out);
+
+    &:active {
+      opacity: 0.55;
+      transition-duration: var(--dur-press);
+    }
+  }
+
+  // Nothing behind the sheet scrolls while it is open.
+  html.nav-open {
+    overflow: hidden;
+  }
+
+  // While the sheet is open the bar and the sheet are one surface: over dark
+  // content an 80% tint would leave a grey strip above a white sheet. The
+  // hairline between them goes for the same reason.
+  html.nav-open .masthead::before {
+    background: var(--nav-bg-solid);
+  }
+
+  html.nav-open .masthead::after {
+    visibility: hidden;
+  }
+}
+
+/* ==========================================================================
+   No JavaScript
+   ========================================================================== */
+
+// No script, no sheet: the menu button would do nothing, so it is removed.
+.no-js .site-nav__toggle {
+  display: none;
+}
+
+// On a phone the links cannot fit beside the title, so they wrap onto a
+// second row of the bar and stay reachable. The bar then grows past 48px, so
+// it stops being sticky (a two-row bar pinned over a phone screen costs too
+// much reading room, and anchors would land under it). From 768 the links fit
+// inline and the bar is the same as with script.
+@include below-tablet {
+  .no-js .masthead {
+    position: relative;
+    height: auto;
+  }
+
+  .no-js .masthead__inner-wrap {
+    flex-wrap: wrap;
+    row-gap: 0;
+    padding-block: 2px;
+  }
+
+  // Its own row; the -10px lets the first link's text, not its padding, sit
+  // on the content edge.
+  .no-js .site-nav {
+    flex-basis: 100%;
+    margin: 0 -10px;
+  }
+
+  // Three equal columns rather than a wrapping row: six links fall into two
+  // tidy rows with left-aligned labels (a free wrap left "Inv. Test" alone on a
+  // third row), and every cell is well over 44px wide, "AI" included.
+  // flex:1 because the list is a flex item of .site-nav and would otherwise
+  // shrink to its content instead of spanning the row.
+  .no-js .site-nav__list {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   In-page anchors
+   ========================================================================== */
+
+// A sticky bar swallows the top of whatever an in-page link jumps to.
+// scroll-padding-top stops the browser short by the bar's height plus 24px, so
+// a heading reached from the table of contents lands clear of the bar.
 html {
-  scroll-padding-top: calc(#{$nav-height} + 3.5em);
+  scroll-padding-top: calc(var(--nav-h) + var(--space-6));
 }
