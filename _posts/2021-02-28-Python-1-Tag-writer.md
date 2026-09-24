@@ -1,5 +1,6 @@
 ---
 title: "[Python] 태그를 작성하는 툴 만들기"
+date: 2021-02-28 00:00:00 +0900
 excerpt: "효율적으로 일을 하려고 만들었습니다."
 header:
   teaser: /assets/images/noteaser.jpg

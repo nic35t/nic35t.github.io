@@ -1,5 +1,6 @@
 ---
 title: "[Python] Pillow를 이용한 이미지 처리"
+date: 2023-04-07 00:00:00 +0900
 excerpt: "파이썬으로 다양한 작업을 쉽게 처리할 수 있도록 도와주는 라이브러리를 추천합니다."
 header:
   teaser: /assets/images/noteaser.jpg

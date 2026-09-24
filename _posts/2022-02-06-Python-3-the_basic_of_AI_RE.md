@@ -1,5 +1,6 @@
 ---
 title: "[AI 기초] Numpy"
+date: 2022-02-06 00:00:00 +0900
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg

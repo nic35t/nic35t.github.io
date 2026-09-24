@@ -1,6 +1,6 @@
 ---
 title: "넷플릭스 'K-POP 데몬 헌터스': 글로벌 신드롬의 현재"
-date: 2025-07-20
+date: 2025-07-20 00:00:00 +0900
 categories: [Tech]
 tags: [K-pop, Demon Hunters, Netflix, Movie, Trend, Culture, Diary]
 header:
