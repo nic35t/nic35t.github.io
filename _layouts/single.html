@@ -60,7 +60,13 @@ layout: default
         `hide_header: true` omits the whole header. It is the contract with the
         investment test (spec 7.3), which draws its own start screen and used
         to hide the theme's title with an `!important` hack in its page body.
+        The page still gets its one h1, visually hidden, the way the home page
+        keeps its title for assistive tech (spec 4.0): the quiz's own headings
+        are h2s, and a page with no h1 has no name in a heading list. An empty
+        title renders no h1 at all rather than an empty one.
       {%- endcomment -%}
+      {%- assign title_text = page.title | strip_html | strip -%}
+      {% if page.hide_header and title_text != "" %}<h1 id="page-title" class="visually-hidden">{{ title_text }}</h1>{% endif %}
       {% unless page.hide_header or page.header.overlay_color or page.header.overlay_image %}
         <header class="post-header">
           {%- comment -%}
@@ -75,7 +81,7 @@ layout: default
             they take four or five lines on a phone. The long variant steps
             them down one size so the byline still lands in the first screen.
           {%- endcomment -%}
-          {% if page.title %}{% assign title_len = page.title | size %}<h1 id="page-title" class="page__title{% if title_len > 36 %} page__title--long{% endif %}" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
+          {% if title_text != "" %}{% assign title_len = page.title | size %}<h1 id="page-title" class="page__title{% if title_len > 36 %} page__title--long{% endif %}" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
           {% if is_post %}{% include post-byline.html %}{% endif %}
         </header>
       {% endunless %}
