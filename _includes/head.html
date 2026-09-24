@@ -34,8 +34,19 @@
 <!-- https://t.co/dKP3o1e -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" href="{{ '/assets/images/mg.png' | relative_url }}" type="image/png">
-<link rel="apple-touch-icon" href="{{ '/assets/images/mg.png' | relative_url }}">
+{%- comment -%}
+  The icon used to be the 128px masthead avatar at every size. In a 16-32px tab
+  the face sat small inside its white margin and read as a pale smudge, iOS
+  upscaled 128px to 180px for the home screen, and with no /favicon.ico every
+  crawler and older client that asks for it by convention got a 404.
+
+  favicon.ico (16/32/48) and favicon-32.png are cropped to the face so it fills
+  the tab; the touch icon keeps the full avatar, because iOS rounds the corners
+  itself.
+{%- endcomment -%}
+<link rel="icon" href="{{ '/favicon.ico' | relative_url }}" sizes="48x48">
+<link rel="icon" href="{{ '/assets/images/favicon-32.png' | relative_url }}" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{{ '/assets/images/apple-touch-icon.png' | relative_url }}">
 
 <script>
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
