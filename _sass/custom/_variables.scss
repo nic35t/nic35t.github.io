@@ -69,10 +69,6 @@ $global-transition: color 0.2s ease, background-color 0.2s ease, border-color 0.
 // so content appeared, vanished and came back when main.css landed.
 $intro-transition: none !default;
 
-// Still read by the theme's .btn--twitter/.btn--linkedin; unused once the share
-// row is neutral pills (u4). Delete at integration.
-$twitter-color: #1878b8 !default;
-$linkedin-color: #00669b !default;
 
 // Our own layout constant (not a theme variable): the global nav height.
 $nav-h: 48px !default;

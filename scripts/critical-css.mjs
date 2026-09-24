@@ -44,6 +44,11 @@ const PAGES = [
   // gives it its own header and tile grid (spec 4.6), and a rule only this
   // template matches can only be collected from a page that has it.
   "/categories/ai/",
+  // Home pages 2..N share the home layout but not its hero: they open straight
+  // on the wide tile band (.home-posts__page), which page 1 never renders. Left
+  // out, /page2/ painted unstyled tiles and jumped when main.css landed (CLS
+  // 0.36 at 768).
+  "/page2/",
 ];
 
 // Three device contexts. The phone is a real touch device (isMobile honours the

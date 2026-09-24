@@ -81,14 +81,6 @@
 <link rel="preload" href="{{ '/assets/css/main.css' | relative_url }}" as="style" onload="this.rel='stylesheet';this.onload=null;">
 <noscript><link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}"></noscript>
 
-{%- comment -%}
-  Font Awesome only draws decorative icons, so blocking first paint on it is a
-  poor trade. `media="print"` makes the browser fetch it at low priority without
-  blocking rendering; onload promotes it to all media. The <noscript> copy keeps
-  icons for anyone without JavaScript.
-{%- endcomment -%}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" media="print" onload="this.media='all';this.onload=null;" crossorigin>
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" crossorigin></noscript>
 
 <!--[if IE]>
   <style>

@@ -200,14 +200,6 @@
   --dur-enter: 280ms;
   --dur-exit: 180ms;
   --dur-lift: 300ms;
-
-  // Legacy aliases, so rules moved verbatim from _overrides.scss keep working
-  // until their owner rewrites them. Deleted at integration when unused.
-  --surface: var(--bg);
-  --surface-raised: var(--card);
-  --surface-sunken: var(--fill);
-  --text-muted: var(--text-secondary);
-  --border: var(--separator);
 }
 
 @media (min-width: 768px) {

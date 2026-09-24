@@ -7,7 +7,16 @@
   and 4x CPU, that staging cost CLS 0.165, against 0.098 for the old static
   build. This holds the system face (html.wf-wait swaps the two font tokens to
   system stacks) until every subset this page's text needs has loaded, then
-  changes face once: 0.061. The `html.wf-wait` selector is (0,1,1) and beats
+  changes face once: 0.061.
+
+  The swap is only allowed in the first 300ms. A single swap still reflows
+  every line, and Pretendard is narrower than the fallbacks, so line counts
+  change: the home header and a long post title each lost a line and pulled
+  everything below up (CLS 0.29 at 375, 0.12 at 1440, routed font, Slow 4G).
+  Inside 300ms the font is in practice coming from cache, so the swap lands
+  around first paint rather than on a page someone is reading. Later than that, this view keeps the system
+  face and the files warm the cache for the next page: font-display: optional,
+  done by hand because the subsets must still arrive as one. The `html.wf-wait` selector is (0,1,1) and beats
   the tokens' `:root` (0,1,0) wherever it sits. Nothing else may style
   html.wf-wait. No-JS readers get plain `font-display: swap`.
 {%- endcomment -%}
@@ -18,12 +27,13 @@
      name system faces only, so no Pretendard subset is requested by layout.
      Once the Pretendard stylesheet has registered its faces and the DOM is
      parsed, load every subset this page's text needs, then drop the class in
-     one frame: one reflow instead of one per subset. After 3s give up and
-     keep the system face for this view; the files still reach the cache. */
+     one frame: one reflow instead of one per subset. After 300ms give up and
+     keep the system face for this view, so the swap can never land on a
+     painted page; the files still reach the cache for the next view. */
   var d = document.documentElement, f = document.fonts, expired = false;
   if (!f || !f.load || !f.forEach || !window.Promise || !window.requestAnimationFrame) { return; }
   d.className += ' wf-wait';
-  setTimeout(function () { expired = true; }, 3000);
+  setTimeout(function () { expired = true; }, 300);
   function swap() {
     if (expired) { return; }
     requestAnimationFrame(function () { d.className = d.className.replace(/\s*\bwf-wait\b/g, ''); });
