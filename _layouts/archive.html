@@ -1,26 +1,24 @@
 ---
 layout: default
 ---
+{%- comment -%}
+  Archive shell (spec 4.6): one container, a header with the page's only H1,
+  then whatever the child layout renders.
 
-{% if page.header.overlay_color or page.header.overlay_image or page.header.image %}
-  {% include page__hero.html %}
-{% elsif page.header.video.id and page.header.video.provider %}
-  {% include page__hero_video.html %}
-{% endif %}
+  No sidebar: the author rail is retired site-wide, and here it pushed the
+  list into a column beside 300px of profile. The hero and breadcrumb includes
+  went with it: no archive page sets a header image, and site.breadcrumbs is
+  off (posts carry their own trail in the footer instead).
 
-{% if page.url != "/" and site.breadcrumbs %}
-  {% unless paginator %}
-    {% include breadcrumbs.html %}
-  {% endunless %}
-{% endif %}
-
-<div id="main" role="main">
-  {% include sidebar.html %}
-
-  <div class="archive">
-    {% unless page.header.overlay_color or page.header.overlay_image %}
+  The two index pages (/categories/, /tags/) are lists of titles, read like a
+  table of contents, so they take the 692px reading column (archive--index).
+  Category and tag landings are tile grids and keep the 980px content width.
+{%- endcomment -%}
+<div id="main" role="main" class="archive-main">
+  <div class="archive l-container{% if page.layout == 'categories' or page.layout == 'tags' %} archive--index{% endif %}">
+    <header class="archive-header">
       <h1 id="page-title" class="page__title">{{ page.title }}</h1>
-    {% endunless %}
+    </header>
     {{ content }}
   </div>
 </div>

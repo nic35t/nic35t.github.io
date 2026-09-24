@@ -1,10 +1,23 @@
 ---
 layout: archive
 ---
+{%- comment -%}
+  Category landing (/categories/ai/, /web3/, /projects/, /diary/; spec 4.6).
+  The page's one-line description becomes the lede under the H1, then every
+  post in the category as a tile, newest first (site.categories lists are
+  already sorted that way). No teasers: 55 of 57 are the same placeholder, so
+  an image row would only repeat itself. Headings are h2 because the tiles sit
+  directly under the page H1.
 
-{{ content }}
-
-{% assign entries_layout = page.entries_layout | default: 'list' %}
-<div class="entries-{{ entries_layout }}">
-  {% include posts-category.html taxonomy=page.taxonomy type=entries_layout %}
+  The previous list (posts-category.html > archive-single.html) printed the
+  theme's list rows with a 160-character excerpt and no date.
+{%- endcomment -%}
+{%- assign lede = content | strip_html | strip -%}
+{%- if lede != "" %}
+<p class="archive-header__lede">{{ lede }}</p>
+{%- endif %}
+<div class="tile-grid">
+  {%- for post in site.categories[page.taxonomy] %}
+  {% include post-tile.html post=post heading="h2" %}
+  {%- endfor %}
 </div>

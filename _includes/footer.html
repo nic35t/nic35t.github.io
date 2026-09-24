@@ -1,22 +1,62 @@
-<div class="page__footer-follow">
-  <ul class="social-icons">
-    {% if site.data.ui-text[site.locale].follow_label %}
-      <li><strong>{{ site.data.ui-text[site.locale].follow_label }}</strong></li>
-    {% endif %}
+{%- comment -%}
+  Site footer (spec 4.7, C16): a three-group directory, then the legal row.
+  Rendered through include_cached, so everything here is site-level; nothing
+  may read `page` (the page-dependent breadcrumb lives in footer/custom.html).
 
-    {% if site.footer.links %}
-      {% for link in site.footer.links %}
-        {% if link.label and link.url %}
-          <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer"><i class="{{ link.icon | default: 'fas fa-link' }}" aria-hidden="true"></i> {{ link.label }}</a></li>
-        {% endif %}
-      {% endfor %}
-    {% endif %}
-
-    {% unless site.atom_feed.hide %}
-      <li><a href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].feed_label | default: "Feed" }}</a></li>
-    {% endunless %}
-  </ul>
+  주제: the six biggest categories, each linked through category-href.html so
+    AI / Web3 / Projects go to their landing pages and the rest to their
+    /categories/ anchor, the same rule the home chips and post eyebrow use.
+  둘러보기: every label is the destination page's own title, looked up rather
+    than typed, so the footer and the H1 it leads to can never disagree.
+  연결: the owner's links from _config.yml and the feed, as before, minus the
+    Font Awesome glyphs.
+{%- endcomment -%}
+{%- assign ui = site.data.ui-text[site.locale] -%}
+{%- capture fd_order -%}
+  {%- for category in site.categories -%}
+    {{ 10000 | minus: category[1].size }}|{{ category[0] }}{% unless forloop.last %}^{% endunless %}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign fd_order = fd_order | split: "^" | sort -%}
+{%- assign fd_archive = site.pages | where: "url", "/categories/" | first -%}
+{%- assign fd_tags = site.pages | where: "url", "/tags/" | first -%}
+{%- assign fd_test = site.pages | where: "url", "/investment-test/" | first -%}
+<div class="footer-dir l-container">
+  <nav class="footer-dir__nav" aria-label="사이트 전체">
+    <div class="footer-dir__group">
+      <h2 class="footer-dir__title">주제</h2>
+      <ul>
+        {%- for entry in fd_order limit: 6 -%}
+          {%- assign fd_cat = entry | split: "|" | last -%}
+          {%- capture fd_href -%}{% include category-href.html name=fd_cat %}{%- endcapture %}
+        <li><a href="{{ fd_href | strip }}">{{ fd_cat }}</a></li>
+        {%- endfor %}
+      </ul>
+    </div>
+    <div class="footer-dir__group">
+      <h2 class="footer-dir__title">둘러보기</h2>
+      <ul>
+        <li><a href="{{ '/categories/' | relative_url }}">{{ fd_archive.title | default: "아카이브" }}</a></li>
+        <li><a href="{{ '/tags/' | relative_url }}">{{ fd_tags.title | default: "태그" }}</a></li>
+        <li><a href="{{ '/investment-test/' | relative_url }}">{{ fd_test.title | default: "투자 성향 테스트" }}</a></li>
+      </ul>
+    </div>
+    <div class="footer-dir__group">
+      <h2 class="footer-dir__title">연결</h2>
+      <ul>
+        {%- for link in site.footer.links -%}
+          {%- if link.label and link.url %}
+        <li><a href="{{ link.url }}" rel="nofollow noopener noreferrer">{{ link.label }}</a></li>
+          {%- endif -%}
+        {%- endfor -%}
+        {%- unless site.atom_feed.hide %}
+        <li><a href="{% if site.atom_feed.path %}{{ site.atom_feed.path }}{% else %}{{ '/feed.xml' | relative_url }}{% endif %}">{{ ui.feed_label | default: "Feed" }}</a></li>
+        {%- endunless %}
+      </ul>
+    </div>
+  </nav>
+  <div class="footer-legal">
+    <p class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. {{ ui.powered_by | default: "Powered by" }} <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</p>
+    <!-- <div class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. All rights reserved. </div> -->
+  </div>
 </div>
-
-<div class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. {{ site.data.ui-text[site.locale].powered_by | default: "Powered by" }} <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
-<!-- <div class="page__footer-copyright">&copy; {{ site.time | date: '%Y' }} {{ site.name | default: site.title }}. All rights reserved. </div> -->
