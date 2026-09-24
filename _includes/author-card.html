@@ -1,0 +1,38 @@
+{%- comment -%}
+  Author card at the end of a post (spec 4.5.1). The retired left rail's job,
+  moved to where a reader who finished the article looks for "who wrote this".
+
+  - The Person microdata lives here now (it moved from author-profile.html,
+    which is no longer rendered), so a built post carries exactly one Person.
+  - The 56px avatar states width and height: without them the browser cannot
+    reserve the box and the card grows when the image lands.
+  - Links are quiet text links with Apple's "›", not pills. The mock put grey
+    pills on tags, share, author links and the pager, and four rows of them
+    read as a template (spec 4.0, decision 5).
+  - No location line: "Somewhere" is the theme's placeholder, not a fact.
+{%- endcomment -%}
+{%- assign author = page.author | default: page.authors[0] | default: site.author -%}
+{%- assign author = site.data.authors[author] | default: author -%}
+{%- if author.name -%}
+{%- capture avatar_srcset -%}{% include img-srcset.html src=author.avatar widths="72,110,220" full="330" %}{%- endcapture -%}
+<section class="author-card" itemscope itemtype="https://schema.org/Person" aria-label="글쓴이">
+  {%- if author.avatar %}
+  <img class="author-card__avatar" itemprop="image" src="{{ author.avatar | relative_url }}"{% if avatar_srcset != "" %} srcset="{{ avatar_srcset }}" sizes="56px"{% endif %} width="56" height="56" alt="">
+  {%- endif %}
+  <div class="author-card__body">
+    <p class="author-card__name" itemprop="name">{{ author.name }}</p>
+    {%- if author.bio %}
+    <div class="author-card__bio" itemprop="description">{{ author.bio | markdownify }}</div>
+    {%- endif -%}
+    {%- if author.links %}
+    <ul class="author-card__links">
+      {%- for link in author.links -%}
+        {%- if link.label and link.url %}
+      <li><a class="link-arrow" href="{{ link.url }}" rel="nofollow noopener noreferrer">{{ link.label }}</a></li>
+        {%- endif -%}
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+</section>
+{%- endif -%}

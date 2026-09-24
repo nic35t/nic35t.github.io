@@ -1,39 +1,47 @@
-{% assign document = post | default: page %}
-{% if document.read_time or document.show_date %}
+{%- comment -%}
+  Date and read-time line for archive rows and the (unused) page hero. Posts
+  themselves use post-byline.html; the two agree on format and arithmetic.
+
+  - No Font Awesome icons. The calendar and clock glyphs came from a deferred
+    sheet that the redesign removes, and the text already says what it is.
+  - Locale decides the date format. It was hardcoded to "%B %-d, %Y", which
+    printed English month names on a Korean site.
+  - On a Korean site read time counts characters (about 500 a minute) and
+    prints "N분 소요" / "1분 미만" (spec 9.1). The theme's words-per-minute
+    figure is an English one and printed "1 분 소요" with a stray space; it
+    stays only for other locales.
+{%- endcomment -%}
+{%- assign document = post | default: page -%}
+{%- if document.read_time or document.show_date -%}
+  {%- if site.locale contains "ko" -%}
+    {%- assign date_format = "%Y년 %-m월 %-d일" -%}
+  {%- else -%}
+    {%- assign date_format = "%B %-d, %Y" -%}
+  {%- endif -%}
   <p class="page__meta">
-    {% if document.show_date and document.date %}
-      {% assign date = document.date %}
-      {%- comment -%}
-        The format was hardcoded to "%B %-d, %Y", which renders English month
-        names on a Korean site. Locale decides now.
-      {%- endcomment -%}
-      {%- if site.locale contains "ko" -%}
-        {%- assign date_format = "%Y년 %-m월 %-d일" -%}
-      {%- else -%}
-        {%- assign date_format = "%B %-d, %Y" -%}
-      {%- endif -%}
-      <span class="page__meta-date">
-        <i class="far {% if include.type == 'grid' and document.read_time and document.show_date %}fa-fw {% endif %}fa-calendar-alt" aria-hidden="true"></i>
-        <time datetime="{{ date | date_to_xmlschema }}">{{ date | date: date_format }}</time>
-      </span>
-    {% endif %}
-
-    {% if document.read_time and document.show_date %}<span class="page__meta-sep"></span>{% endif %}
-
-    {% if document.read_time %}
-      {% assign words_per_minute = document.words_per_minute | default: site.words_per_minute | default: 200 %}
-      {% assign words = document.content | strip_html | number_of_words %}
-
+    {%- if document.show_date and document.date -%}
+      <span class="page__meta-date"><time datetime="{{ document.date | date_to_xmlschema }}">{{ document.date | date: date_format }}</time></span>
+    {%- endif -%}
+    {%- if document.read_time and document.show_date -%}<span class="page__meta-sep"></span>{%- endif -%}
+    {%- if document.read_time -%}
       <span class="page__meta-readtime">
-        <i class="far {% if include.type == 'grid' and document.read_time and document.show_date %}fa-fw {% endif %}fa-clock" aria-hidden="true"></i>
-        {% if words < words_per_minute %}
-          {{ site.data.ui-text[site.locale].less_than | default: "less than" }} 1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-        {% elsif words == words_per_minute %}
-          1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-        {% else %}
-          {{ words | divided_by: words_per_minute }} {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
-        {% endif %}
+        {%- if site.locale contains "ko" -%}
+          {%- assign meta_minutes = document.content | strip_html | strip_newlines | size | divided_by: 500 -%}
+          {%- if meta_minutes < 1 -%}
+            {{ site.data.ui-text[site.locale].less_than_minute | default: "1분 미만" }}
+          {%- else -%}
+            {{ meta_minutes }}{{ site.data.ui-text[site.locale].minute_read | default: "분 소요" }}
+          {%- endif -%}
+        {%- else -%}
+          {%- assign words_per_minute = document.words_per_minute | default: site.words_per_minute | default: 200 -%}
+          {%- assign words = document.content | strip_html | number_of_words -%}
+          {%- if words < words_per_minute -%}
+            {{ site.data.ui-text[site.locale].less_than | default: "less than" }} 1 {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
+          {%- else -%}
+            {{ words | divided_by: words_per_minute }} {{ site.data.ui-text[site.locale].minute_read | default: "minute read" }}
+          {%- endif -%}
+        {%- endif -%}
       </span>
-    {% endif %}
+    {%- endif -%}
   </p>
-{% endif %}
+{%- endif -%}

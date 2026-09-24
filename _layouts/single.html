@@ -2,6 +2,31 @@
 layout: default
 ---
 
+{%- comment -%}
+  Post shell (spec 4.5.1). Everything the markup branches on is decided up
+  front, so the template below reads as structure only.
+
+  The table of contents used to be per-post opt-in, and the opting was
+  inconsistent: 35 posts with three or more headings had none, while 13 posts
+  with one or two headings showed a contents box listing almost nothing.
+  Decide from the article instead. `toc: false` in a post's front matter still
+  wins if one needs to be suppressed by hand, and `toc: true` forces one.
+{%- endcomment -%}
+{%- assign h2_count = content | split: '<h2' | size | minus: 1 -%}
+{%- assign h3_count = content | split: '<h3' | size | minus: 1 -%}
+{%- assign heading_count = h2_count | plus: h3_count -%}
+{%- assign auto_toc = false -%}
+{%- if heading_count >= 3 -%}{%- assign auto_toc = true -%}{%- endif -%}
+{%- if page.toc == false -%}{%- assign auto_toc = false -%}{%- endif -%}
+{%- if page.toc == true -%}{%- assign auto_toc = true -%}{%- endif -%}
+{%- comment -%}
+  Byline, eyebrow and author card belong to articles only. The quiz and the
+  404 also use this layout, and a "Jeremy LEE · 1분 미만" line over a quiz or
+  an error page would be noise.
+{%- endcomment -%}
+{%- assign is_post = false -%}{%- if page.collection == "posts" -%}{%- assign is_post = true -%}{%- endif -%}
+{%- assign toc_label = page.toc_label | default: site.data.ui-text[site.locale].toc_label | default: "목차" -%}
+
 {% if page.header.overlay_color or page.header.overlay_image or page.header.image %}
   {% include page__hero.html %}
 {% elsif page.header.video.id and page.header.video.provider %}
@@ -14,91 +39,131 @@ layout: default
   {% endunless %}
 {% endif %}
 
-<div id="main" role="main">
-  {% include sidebar.html %}
+{%- comment -%}
+  The theme's `.page` and `.page__inner-wrap` wrappers are gone on purpose:
+  they carried a float, a width and `padding-right: 300px` reserved for a
+  sidebar that no longer exists, and every one of them had to be undone. The
+  shell is a plain grid instead (_sass/custom/_article.scss): one column below
+  1024px, the article grouped with a contents rail from 1024px, and the article
+  centred on the page with the rail in the right gutter from 1280px, so a post
+  with a rail and a post without one start at the same x.
+{%- endcomment -%}
+<div id="main" role="main" class="post-main">
+  <div class="post-shell l-container--shell{% if auto_toc %} post-shell--toc{% endif %}">
+    <article class="post" itemscope itemtype="https://schema.org/CreativeWork">
+      {% if page.title %}<meta itemprop="headline" content="{{ page.title | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
+      {% if page.excerpt %}<meta itemprop="description" content="{{ page.excerpt | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
+      {% if page.date %}<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}">{% endif %}
+      {% if page.last_modified_at %}<meta itemprop="dateModified" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}
 
-  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
-    {% if page.title %}<meta itemprop="headline" content="{{ page.title | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if page.excerpt %}<meta itemprop="description" content="{{ page.excerpt | markdownify | strip_html | strip_newlines | escape_once }}">{% endif %}
-    {% if page.date %}<meta itemprop="datePublished" content="{{ page.date | date_to_xmlschema }}">{% endif %}
-    {% if page.last_modified_at %}<meta itemprop="dateModified" content="{{ page.last_modified_at | date_to_xmlschema }}">{% endif %}
-
-    <div class="page__inner-wrap">
-      {% unless page.header.overlay_color or page.header.overlay_image %}
-        <header>
-          {% if page.title %}<h1 id="page-title" class="page__title" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
-          {% include page__meta.html %}
+      {%- comment -%}
+        `hide_header: true` omits the whole header. It is the contract with the
+        investment test (spec 7.3), which draws its own start screen and used
+        to hide the theme's title with an `!important` hack in its page body.
+        The page still gets its one h1, visually hidden, the way the home page
+        keeps its title for assistive tech (spec 4.0): the quiz's own headings
+        are h2s, and a page with no h1 has no name in a heading list. An empty
+        title renders no h1 at all rather than an empty one.
+      {%- endcomment -%}
+      {%- assign title_text = page.title | strip_html | strip -%}
+      {% if page.hide_header and title_text != "" %}<h1 id="page-title" class="visually-hidden">{{ title_text }}</h1>{% endif %}
+      {% unless page.hide_header or page.header.overlay_color or page.header.overlay_image %}
+        <header class="post-header">
+          {%- comment -%}
+            The eyebrow names the post's first category and goes where every
+            other "this topic" link on the site goes: its landing page when
+            one exists, else its anchor on /categories/ (category-href.html).
+            The include ends in a newline, hence the capture and strip.
+          {%- endcomment -%}
+          {% if is_post and page.categories.first %}{%- capture cat_href -%}{% include category-href.html name=page.categories.first %}{%- endcapture -%}<a class="post-header__eyebrow" href="{{ cat_href | strip }}">{{ page.categories.first }}</a>{% endif %}
+          {%- comment -%}
+            Eight of 57 titles run past 36 characters; at the full title1 size
+            they take four or five lines on a phone. The long variant steps
+            them down one size so the byline still lands in the first screen.
+          {%- endcomment -%}
+          {% if title_text != "" %}{% assign title_len = page.title | size %}<h1 id="page-title" class="page__title{% if title_len > 36 %} page__title--long{% endif %}" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>{% endif %}
+          {% if is_post %}{% include post-byline.html %}{% endif %}
         </header>
       {% endunless %}
 
-      <section class="page__content" itemprop="text">
-        {%- comment -%}
-          The table of contents used to be per-post opt-in, and the opting was
-          inconsistent: 35 posts with three or more headings had none, while 13
-          posts with one or two headings showed a contents box listing almost
-          nothing. Decide from the article instead. `toc: false` in a post's
-          front matter still wins if one needs to be suppressed by hand.
-        {%- endcomment -%}
-        {%- assign h2_count = content | split: '<h2' | size | minus: 1 -%}
-        {%- assign h3_count = content | split: '<h3' | size | minus: 1 -%}
-        {%- assign heading_count = h2_count | plus: h3_count -%}
-        {%- assign auto_toc = false -%}
-        {%- if heading_count >= 3 -%}{%- assign auto_toc = true -%}{%- endif -%}
-        {%- if page.toc == false -%}{%- assign auto_toc = false -%}{%- endif -%}
-        {%- if page.toc == true -%}{%- assign auto_toc = true -%}{%- endif -%}
+      {%- comment -%}
+        Two copies of the contents list, on purpose. Below 1024px there is no
+        room for a rail, so the list sits in a closed <details> above the
+        article: one pill-sized row, opened on demand, and closed on load so
+        opening it can never shift the page. From 1024px the disclosure is
+        hidden and the rail after the article takes over.
 
-        {% if auto_toc %}
-          <aside class="sidebar__right sticky">
-            <nav class="toc">
-              <header><h4 class="nav__title"><i class="fas fa-{{ page.toc_icon | default: 'file-alt' }}"></i> {{ page.toc_label | default: site.data.ui-text[site.locale].toc_label | default: "On this page" }}</h4></header>
-              {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" skip_no_ids=true %}
-            </nav>
-          </aside>
-        {% endif %}
+        Known limitation (spec 4.5.1, C10): Gumshoe's scrollspy sorts the
+        links of both copies together and activates the later one, so only
+        the rail ever shows the active section; the disclosure copy never
+        does. Its fixed `offset: 20` also highlights the previous section
+        right after a contents jump, because the heading lands under the 48px
+        bar plus its margin. Integration fixes that offset in _main.js in a
+        separate commit; nothing here depends on it.
+      {%- endcomment -%}
+      {% if auto_toc %}
+        <details class="toc-disclosure">
+          <summary class="toc-disclosure__summary">{{ toc_label }}<svg class="toc-disclosure__chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="14" height="14" fill="currentColor" aria-hidden="true" focusable="false"><path d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"/></svg></summary>
+          <nav class="toc" aria-label="{{ toc_label }}">
+            {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" skip_no_ids=true %}
+          </nav>
+        </details>
+      {% endif %}
+
+      {%- comment -%}
+        `.page__content[itemprop=text]` is a contract: the prose styles, the
+        reading-progress timeline, the heading anchors in _main.js and the
+        critical-CSS list all key off it. The external-link pill carries `btn`
+        as well as the pill classes so the theme's content-link colour and
+        hover underline (`.page__content a:not(.btn)`) pass it by.
+      {%- endcomment -%}
+      <section class="page__content" itemprop="text">
         {{ content }}
-        {% if page.link %}<div><a href="{{ page.link }}" class="btn btn--primary">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
+        {% if page.link %}<div class="post-link"><a href="{{ page.link }}" class="pill pill--primary btn">{{ site.data.ui-text[site.locale].ext_link_label | default: "Direct Link" }}</a></div>{% endif %}
       </section>
 
-      <footer class="page__meta">
-        {% if site.data.ui-text[site.locale].meta_label %}
-          <h4 class="page__meta-title">{{ site.data.ui-text[site.locale].meta_label }}</h4>
-        {% endif %}
+      {%- comment -%}
+        End matter, in reading order: what the post is filed under, when it
+        was last changed, how to pass it on, who wrote it, and where to go
+        next. Captured first so a page with none of it (the quiz, the 404)
+        renders no empty footer and no 64px of blank space above the page end.
+      {%- endcomment -%}
+      {%- capture post_footer -%}
         {% include page__taxonomy.html %}
         {% include page__date.html %}
-      </footer>
+        {% if page.share %}{% include social-share.html %}{% endif %}
+        {% if is_post %}{% include author-card.html %}{% endif %}
+        {% include post_pagination.html %}
+      {%- endcapture -%}
+      {%- assign post_footer_text = post_footer | strip -%}
+      {% if post_footer_text != "" %}
+        <footer class="post-footer">
+          {{ post_footer }}
+        </footer>
+      {% endif %}
 
-      {% if page.share %}{% include social-share.html %}{% endif %}
+      {% if jekyll.environment == 'production' and site.comments.provider and page.comments %}
+        {% include comments.html %}
+      {% endif %}
+    </article>
 
-      {% include post_pagination.html %}
-    </div>
-
-    {% if jekyll.environment == 'production' and site.comments.provider and page.comments %}
-      {% include comments.html %}
+    {%- comment -%}
+      The rail's own title is aria-hidden: the aside already carries the label,
+      and a second "목차" would be announced twice on entry.
+    {%- endcomment -%}
+    {% if auto_toc %}
+      <aside class="toc-rail" aria-label="{{ toc_label }}">
+        <nav class="toc">
+          <p class="toc__title" aria-hidden="true">{{ toc_label }}</p>
+          {% include toc.html sanitize=true html=content h_min=1 h_max=6 class="toc__menu" skip_no_ids=true %}
+        </nav>
+      </aside>
     {% endif %}
-  </article>
+  </div>
 
-  {% comment %}<!-- only show related on a post page when `related: true` -->{% endcomment %}
-  {% if page.id and page.related and site.related_posts.size > 0 %}
-    <div class="page__related">
-      <h4 class="page__related-title">{{ site.data.ui-text[site.locale].related_label | default: "You May Also Enjoy" }}</h4>
-      <div class="grid__wrapper">
-        {% for post in site.related_posts limit:4 %}
-          {% include archive-single.html type="grid" %}
-        {% endfor %}
-      </div>
-    </div>
-  {% comment %}<!-- otherwise show recent posts if no related when `related: true` -->{% endcomment %}
-  {% elsif page.id and page.related %}
-    <div class="page__related">
-      <h4 class="page__related-title">{{ site.data.ui-text[site.locale].related_label | default: "You May Also Enjoy" }}</h4>
-      <div class="grid__wrapper">
-        {% for post in site.posts limit:4 %}
-          {% if post.id == page.id %}
-            {% continue %}
-          {% endif %}
-          {% include archive-single.html type="grid" %}
-        {% endfor %}
-      </div>
-    </div>
-  {% endif %}
+  {%- comment -%}
+    Full-bleed band after the shell, so its grey field runs edge to edge
+    instead of stopping at the reading column.
+  {%- endcomment -%}
+  {% if page.id and page.related %}{% include related-posts.html %}{% endif %}
 </div>

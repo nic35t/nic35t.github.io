@@ -1,7 +1,16 @@
-{% if site.tag_archive.type and page.tags[0] %}
-  {% include tag-list.html %}
-{% endif %}
-
-{% if site.category_archive.type and page.categories[0] %}
-  {% include category-list.html %}
-{% endif %}
+{%- comment -%}
+  Tags and categories at the end of a post (spec 4.5.1): one row each, a small
+  label and a run of chips. The two rows are wrapped in one element so the
+  post footer's 32px rhythm spaces this block from the next one, while the rows
+  themselves sit 12px apart as a single group.
+{%- endcomment -%}
+{%- capture taxonomy_rows -%}
+  {%- if site.tag_archive.type and page.tags[0] -%}{% include tag-list.html %}{%- endif -%}
+  {%- if site.category_archive.type and page.categories[0] -%}{% include category-list.html %}{%- endif -%}
+{%- endcapture -%}
+{%- assign taxonomy_rows_text = taxonomy_rows | strip -%}
+{%- if taxonomy_rows_text != "" -%}
+<div class="post-taxonomy">
+  {{ taxonomy_rows }}
+</div>
+{%- endif -%}

@@ -1,14 +1,29 @@
+{%- comment -%}
+  Previous and next post (spec 4.5.1, M8).
+
+  - The outer guard stays: the quiz and the 404 have neither neighbour and
+    must not render an empty navigation landmark.
+  - Each side is a card that names its destination. The theme's pager said
+    only "이전 포스트" / "다음 포스트" and hid the title in a tooltip, so a
+    reader had to guess where a click would go.
+  - A missing side is omitted. The theme printed a disabled `href="#"` link,
+    which is still a focusable link to the top of the page.
+  - The ‹ › chevrons come from CSS (_article.scss), so the label text stays
+    the ui-text string alone.
+{%- endcomment -%}
 {% if page.previous or page.next %}
-  <nav class="pagination">
-    {% if page.previous %}
-      <a href="{{ page.previous.url | relative_url }}" class="pagination--pager" title="{{ page.previous.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a>
-    {% else %}
-      <a href="#" class="pagination--pager disabled">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</a>
-    {% endif %}
-    {% if page.next %}
-      <a href="{{ page.next.url | relative_url }}" class="pagination--pager" title="{{ page.next.title | markdownify | strip_html }}">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a>
-    {% else %}
-      <a href="#" class="pagination--pager disabled">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</a>
-    {% endif %}
+  <nav class="post-pager" aria-label="이전 글과 다음 글">
+    {%- if page.previous %}
+    <a class="post-pager__link post-pager__link--prev" href="{{ page.previous.url | relative_url }}" rel="prev">
+      <span class="post-pager__label">{{ site.data.ui-text[site.locale].pagination_previous | default: "Previous" }}</span>
+      <span class="post-pager__title">{{ page.previous.title | markdownify | strip_html | strip }}</span>
+    </a>
+    {%- endif -%}
+    {%- if page.next %}
+    <a class="post-pager__link post-pager__link--next" href="{{ page.next.url | relative_url }}" rel="next">
+      <span class="post-pager__label">{{ site.data.ui-text[site.locale].pagination_next | default: "Next" }}</span>
+      <span class="post-pager__title">{{ page.next.title | markdownify | strip_html | strip }}</span>
+    </a>
+    {%- endif %}
   </nav>
 {% endif %}

@@ -1,11 +1,29 @@
-<section class="page__share">
-  {% if site.data.ui-text[site.locale].share_on_label %}
-    <h4 class="page__share-title">{{ site.data.ui-text[site.locale].share_on_label | default: "Share on" }}</h4>
-  {% endif %}
+{%- comment -%}
+  Share row (spec 4.5.1, M16): three text pills and a copy-link button.
 
-  <a href="https://twitter.com/intent/tweet?{% if site.twitter.username %}via={{ site.twitter.username | url_encode }}&{% endif %}text={{ page.title | url_encode }}%20{{ page.url | absolute_url | url_encode }}" class="btn btn--twitter" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="{{ site.data.ui-text[site.locale].share_on_label | default: 'Share on' }} Twitter"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a>
-
-  <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.url | absolute_url | url_encode }}" class="btn btn--facebook" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="{{ site.data.ui-text[site.locale].share_on_label | default: 'Share on' }} Facebook"><i class="fab fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a>
-
-  <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ page.url | absolute_url | url_encode }}" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="{{ site.data.ui-text[site.locale].share_on_label | default: 'Share on' }} LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+  - Plain text pills, no brand icons and no .btn--twitter/--facebook/--linkedin
+    colours: the icons came from the deferred Font Awesome sheet, so below
+    600px (where the theme hid the labels) a share button rendered empty until
+    it landed. "Twitter" reads "X" now, the service's current name. The intent
+    URLs and the popup onclick are the theme's, unchanged.
+  - "링크 복사" is rendered here, visible, as the last action. The deferred JS
+    (enhance.js, u7) only binds it: copy data-share-url, relabel "복사됨" for
+    1.6s, announce through the status span. It never inserts, removes or
+    relabels anything, so the row wraps at first paint exactly as it will
+    after load (at 375px the four pills make two rows) and nothing shifts.
+    Without JS there is nothing to bind, so `.no-js` hides the button rather
+    than leave a dead control (_article.scss).
+  - The status span sits outside the flex row: it is absolutely positioned by
+    .visually-hidden and must not become a flex item or take a gap.
+{%- endcomment -%}
+{%- assign share_label = site.data.ui-text[site.locale].share_on_label | default: "Share on" -%}
+<section class="page__share" aria-labelledby="share-title" data-share-url="{{ page.url | absolute_url }}" data-share-title="{{ page.title | strip_html | escape }}">
+  <h2 id="share-title" class="page__share-title">{{ share_label }}</h2>
+  <div class="page__share-actions">
+    <a href="https://twitter.com/intent/tweet?{% if site.twitter.username %}via={{ site.twitter.username | url_encode }}&{% endif %}text={{ page.title | url_encode }}%20{{ page.url | absolute_url | url_encode }}" class="pill pill--secondary pill--sm" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;">X</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u={{ page.url | absolute_url | url_encode }}" class="pill pill--secondary pill--sm" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;">Facebook</a>
+    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ page.url | absolute_url | url_encode }}" class="pill pill--secondary pill--sm" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;">LinkedIn</a>
+    <button type="button" class="pill pill--secondary pill--sm page__share-copy" data-share-copy>링크 복사</button>
+  </div>
+  <span class="visually-hidden" aria-live="polite" data-share-status></span>
 </section>

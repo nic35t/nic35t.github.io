@@ -1,0 +1,24 @@
+{%- comment -%}
+  Byline under a post title (spec 4.5.1): who, when, how long. It replaces the
+  left author rail (spec C12), which spent 300px of every page on a photo.
+
+  - The avatar is a 24px circle next to the name, so it is decorative (alt="")
+    and carries its own width and height: the row is laid out before the image
+    arrives and never shifts.
+  - The date is Korean long form, the same format the tiles and archives use.
+  - Read time counts characters, not words. The theme divided words by an
+    English 200 a minute and printed "1 분 소요"; Korean reading speed is
+    quoted in characters (about 500 a minute on screen), and the unit takes
+    no space before it (spec 9.1).
+{%- endcomment -%}
+{%- assign author = page.author | default: page.authors[0] | default: site.author -%}
+{%- assign author = site.data.authors[author] | default: author -%}
+{%- capture avatar_srcset -%}{% include img-srcset.html src=author.avatar widths="72,110,220" full="330" %}{%- endcapture -%}
+{%- assign byline_chars = page.content | strip_html | strip_newlines | size -%}
+{%- assign byline_minutes = byline_chars | divided_by: 500 -%}
+<p class="post-byline">
+  {%- if author.avatar -%}
+  <img class="post-byline__avatar" src="{{ author.avatar | relative_url }}"{% if avatar_srcset != "" %} srcset="{{ avatar_srcset }}" sizes="24px"{% endif %} width="24" height="24" alt="">
+  {%- endif -%}
+  <span class="post-byline__text"><span class="post-byline__name">{{ author.name }}</span> <span class="post-byline__meta">· <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %-m월 %-d일" }}</time> · {% if byline_minutes < 1 %}{{ site.data.ui-text[site.locale].less_than_minute | default: "1분 미만" }}{% else %}{{ byline_minutes }}{{ site.data.ui-text[site.locale].minute_read | default: "분 소요" }}{% endif %}</span></span>
+</p>
