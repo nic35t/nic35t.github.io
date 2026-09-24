@@ -1,43 +1,52 @@
-{% capture logo_path %}{{ site.logo }}{% endcapture %}
+{%- comment -%}
+  Global nav (spec 4.3). One list of links, shown inline from 768px and as a
+  full-height sheet below that (nav.js). It replaces the theme's greedy-nav:
+  with .greedy-nav, .visible-links, .hidden-links and .greedy-nav__toggle gone,
+  the plugin in main.min.js finds empty jQuery sets and does nothing, so there
+  is no 1s mouseleave timer, no overflow dropdown touch cannot dismiss, and no
+  "AI" link clipped to a 30px sliver at 375.
 
-<div class="masthead">
-  <div class="masthead__inner-wrap">
-    <div class="masthead__menu">
-      <nav id="site-nav" class="greedy-nav">
-        {% unless logo_path == empty %}
-          {%- comment -%}
-            The image is decorative next to the site title beside it, so its alt
-            stays empty — but the link then has no accessible name at all, which
-            axe flags as a serious link-name violation. The label goes on the
-            link rather than the image.
-          {%- endcomment -%}
-          <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="{{ site.title | markdownify | strip_html | strip_newlines | escape_once }} 홈"><img src="{{ logo_path | relative_url }}" srcset="{{ '/assets/images/mg-64.png' | relative_url }} 64w, {{ logo_path | relative_url }} 128w" sizes="2rem" alt="" width="32" height="32"></a>
-        {% endunless %}
-        <a class="site-title" href="{{ '/' | relative_url }}">
-          {{ site.masthead_title | default: site.title }}
-          {% if site.subtitle %}<span class="site-subtitle">{{ site.subtitle }}</span>{% endif %}
-        </a>
-        <ul class="visible-links">
-          {%- for link in site.data.navigation.main -%}
-            <li class="masthead__menu-item">
-              <a href="{{ link.url | relative_url }}"{% if link.description %} title="{{ link.description }}"{% endif %}>{{ link.title }}</a>
-            </li>
-          {%- endfor -%}
-        </ul>
-        {% if site.search == true %}
-        <button class="search__toggle" type="button">
-          <span class="visually-hidden">{{ site.data.ui-text[site.locale].search_label | default: "Toggle search" }}</span>
-          <svg class="icon" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.99 16">
-            <path d="M15.5,13.12L13.19,10.8a1.69,1.69,0,0,0-1.28-.55l-0.06-.06A6.5,6.5,0,0,0,5.77,0,6.5,6.5,0,0,0,2.46,11.59a6.47,6.47,0,0,0,7.74.26l0.05,0.05a1.65,1.65,0,0,0,.5,1.24l2.38,2.38A1.68,1.68,0,0,0,15.5,13.12ZM6.4,2A4.41,4.41,0,1,1,2,6.4,4.43,4.43,0,0,1,6.4,2Z" transform="translate(-.01)"></path>
-          </svg>
-        </button>
-        {% endif %}
-        <button class="greedy-nav__toggle hidden" type="button">
-          <span class="visually-hidden">{{ site.data.ui-text[site.locale].menu_label | default: "Toggle menu" }}</span>
-          <div class="navicon"></div>
-        </button>
-        <ul class="hidden-links hidden"></ul>
-      </nav>
-    </div>
+  A plain include, not include_cached: aria-current depends on the page, and
+  the list is small enough that rendering it per page costs nothing noticeable.
+{%- endcomment -%}
+<header class="masthead">
+  <div class="masthead__inner-wrap l-container">
+    {%- comment -%}
+      The image is decorative next to the site title beside it, so its alt
+      stays empty, but the link then has no accessible name at all, which axe
+      flags as a serious link-name violation. The label goes on the link.
+      28px mark inside a 44px link: the mark reads at Apple's nav scale and the
+      box still meets the tap-target floor.
+    {%- endcomment -%}
+    <a class="site-logo" href="{{ '/' | relative_url }}" aria-label="{{ site.title | escape_once }} 홈"><img src="{{ site.logo | relative_url }}" srcset="{{ '/assets/images/mg-64.png' | relative_url }} 64w, {{ site.logo | relative_url }} 128w" sizes="28px" alt="" width="28" height="28"></a>
+    {%- comment -%}
+      The span carries the ellipsis: text-overflow only applies to a block
+      box's own text, and the link is a flex container whose text would be an
+      anonymous flex item that simply overflows.
+    {%- endcomment -%}
+    <a class="site-title" href="{{ '/' | relative_url }}"><span class="site-title__text">{{ site.masthead_title | default: site.title }}</span></a>
+    <nav id="site-nav" class="site-nav" aria-label="주 메뉴">
+      <button class="site-nav__toggle" type="button" aria-expanded="false" aria-controls="site-nav-list"><span class="visually-hidden">{{ site.data.ui-text[site.locale].menu_label | default: "메뉴" }}</span><span class="site-nav__icon" aria-hidden="true"></span></button>
+      {%- comment -%}
+        --i is each item's position, read by the sheet's 20ms stagger. The
+        current section is marked in Liquid so it is right on first paint:
+        "page" on the destination itself, "true" on a post inside it.
+      {%- endcomment -%}
+      <ul id="site-nav-list" class="site-nav__list">
+        {%- for link in site.data.navigation.main -%}
+        <li style="--i:{{ forloop.index0 }}"><a href="{{ link.url | relative_url }}"{% if page.url == link.url %} aria-current="page"{% elsif page.categories contains link.title %} aria-current="true"{% endif %}>{{ link.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+    {%- comment -%}
+      Server-rendered so it takes its place on first paint instead of being
+      inserted by script and shifting the bar. A toggle with a constant label:
+      aria-pressed says whether the dark theme is showing (theme-toggle.js).
+    {%- endcomment -%}
+    <button class="theme-toggle" type="button" aria-pressed="false" aria-label="어두운 테마" title="어두운 테마">
+      {%- comment -%} Phosphor Icons "moon" / "sun" (regular), MIT, https://phosphoricons.com. Path data copied verbatim from the package, not drawn. {%- endcomment -%}
+      <svg class="theme-toggle__icon theme-toggle__moon" viewBox="0 0 256 256" width="18" height="18" aria-hidden="true" focusable="false" fill="currentColor"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg>
+      <svg class="theme-toggle__icon theme-toggle__sun" viewBox="0 0 256 256" width="18" height="18" aria-hidden="true" focusable="false" fill="currentColor"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg>
+    </button>
   </div>
-</div>
+</header>
