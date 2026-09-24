@@ -161,6 +161,7 @@ exclude:
   - node_modules
   - package.json
   - package-lock.json
+  - skills-lock.json
   - Rakefile
   - README
   - tmp
