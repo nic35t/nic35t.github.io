@@ -1,23 +1,201 @@
 ---
-layout: archive
+layout: default
 ---
+{%- comment -%}
+  Home (spec 4.4): apple.com's stacked tiles, adapted to a blog with no
+  imagery. Page 1 is a compact local header (the subtitle, the author's name,
+  topic chips), then full-bleed tiles 12px apart: the newest post as the hero,
+  the long-running series as a black tile, and the grey band with the next
+  four posts as a 2x2 grid. Pages 2 and on are the band alone.
 
-{{ content }}
+  Extends default rather than archive: archive printed an empty
+  h1#page-title and reserved the 300px author rail beside the grid.
+{%- endcomment -%}
+{%- assign ui = site.data.ui-text[site.locale] -%}
+{%- comment -%}
+  jekyll-paginate always sets paginator on index.html. The fallback only keeps
+  the layout from rendering an empty hero if it is ever used on a page that is
+  not paginated: it shows the newest five posts, as page 1 would.
+{%- endcomment -%}
+{%- if paginator -%}
+  {%- assign home_posts = paginator.posts -%}
+  {%- assign home_page = paginator.page -%}
+{%- else -%}
+  {%- assign home_posts = site.posts | slice: 0, 5 -%}
+  {%- assign home_page = 1 -%}
+{%- endif -%}
+<div id="main" role="main" class="home">
+{%- if home_page == 1 -%}
+  {%- comment -%}
+    The masthead already shows the site title just above, so the visible H1 is
+    the subtitle. The title stays in the H1, visually hidden, so assistive tech
+    and search still read "[Not a Know-IT-All]: ..." as the page's heading.
+    Name only beside it: no photo (the masthead carries the logo) and no bio.
+  {%- endcomment -%}
+  <header class="home-intro l-container">
+    <div class="home-intro__head">
+      <h1 class="home-intro__title"><span class="visually-hidden">{{ site.title | escape_once }}: </span>{{ site.subtitle | escape_once }}</h1>
+      <p class="home-intro__lede">{{ site.author.name | escape_once }}</p>
+    </div>
+    {%- comment -%}
+      Every category, largest first (the max-count loop from categories.html,
+      since Liquid cannot sort a hash by its values). The href comes from
+      category-href.html, so the "AI" chip and the "AI" nav item land on the
+      same landing page, and categories without one land on their anchor.
+    {%- endcomment -%}
+    {%- assign categories_max = 0 -%}
+    {%- for category in site.categories -%}
+      {%- if category[1].size > categories_max -%}{%- assign categories_max = category[1].size -%}{%- endif -%}
+    {%- endfor -%}
+    <nav class="home-topics" aria-label="주제별 글">
+      <ul class="chip-row chip-row--scroll">
+        {%- for i in (1..categories_max) reversed -%}
+          {%- for category in site.categories -%}
+            {%- if category[1].size == i -%}
+              {%- assign name = category[0] -%}
+              {%- capture cat_href -%}{% include category-href.html name=name %}{%- endcapture -%}
+              <li><a class="chip" href="{{ cat_href | strip }}">{{ name }} <span class="chip__count">{{ i }}</span></a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+      </ul>
+    </nav>
+  </header>
 
-<h1 class="page__title">{{ site.data.ui-text[site.locale].recent_posts | default: "
-  Recent Posts" }} </h1>
+  <div class="home-stack">
+    {%- comment -%}
+      Hero: the newest post. Parsed from the raw title: markdownify would turn
+      quotes into entities and inflate the length the size class is based on.
+      A leading "[Topic] " becomes the eyebrow; a "Head: sub" title splits
+      into a headline and a subhead. The headline's length picks its size, so
+      a 43-character headline never sets at display size (spec 3.3 type roles):
+      up to 16 characters display, 17 to 30 title1, over 30 title1-long.
+    {%- endcomment -%}
+    {%- assign hero = home_posts.first -%}
+    {%- assign hero_title = hero.title | strip_html | strip -%}
+    {%- assign hero_kicker = "" -%}
+    {%- assign first_char = hero_title | slice: 0 -%}
+    {%- if first_char == "[" and hero_title contains "] " -%}
+      {%- assign kicker_parts = hero_title | split: "] " -%}
+      {%- assign hero_kicker = kicker_parts.first | remove_first: "[" -%}
+      {%- assign hero_title = hero_title | remove_first: kicker_parts.first | remove_first: "] " -%}
+    {%- endif -%}
+    {%- assign hero_head = hero_title -%}
+    {%- assign hero_sub = "" -%}
+    {%- if hero_title contains ": " -%}
+      {%- assign title_parts = hero_title | split: ": " -%}
+      {%- assign hero_head = title_parts.first -%}
+      {%- assign hero_sub = hero_title | remove_first: hero_head | remove_first: ": " -%}
+    {%- endif -%}
+    {%- assign head_len = hero_head | size -%}
+    {%- if head_len > 30 -%}
+      {%- assign hero_size = " home-hero__title--l" -%}
+    {%- elsif head_len > 16 -%}
+      {%- assign hero_size = " home-hero__title--m" -%}
+    {%- else -%}
+      {%- assign hero_size = "" -%}
+    {%- endif -%}
+    {%- assign hero_eyebrow = hero_kicker | default: hero.categories.first | default: "" -%}
+    {%- comment -%}
+      The headline link is stretched over .home-hero__inner, so the whole
+      centred block is one tab stop and one target. "읽어 보기" is only its
+      visual affordance: a span, hidden from assistive tech, not a second link
+      to the same URL.
+    {%- endcomment -%}
+    <section class="home-hero" aria-labelledby="home-hero-title">
+      <div class="home-hero__inner">
+        {%- if hero_eyebrow != "" %}<p class="home-hero__eyebrow">{{ hero_eyebrow | escape_once }}</p>{% endif -%}
+        <h2 id="home-hero-title" class="home-hero__title{{ hero_size }}"><a href="{{ hero.url | relative_url }}">{{ hero_head | escape_once }}</a></h2>
+        {%- if hero_sub != "" -%}
+          <p class="home-hero__sub">{{ hero_sub | escape_once }}</p>
+        {%- else -%}
+          {%- capture hero_excerpt -%}{% include excerpt.html post=hero %}{%- endcapture -%}
+          {%- assign hero_excerpt = hero_excerpt | strip -%}
+          {%- if hero_excerpt != "" %}<p class="home-hero__excerpt">{{ hero_excerpt }}</p>{% endif -%}
+        {%- endif -%}
+        <p class="home-hero__meta"><time datetime="{{ hero.date | date_to_xmlschema }}">{{ hero.date | date: "%Y년 %-m월 %-d일" }}</time><span class="link-arrow home-hero__cta" aria-hidden="true">읽어 보기</span></p>
+      </div>
+    </section>
 
-{% if paginator %}
-  {% assign posts = paginator.posts %}
-{% else %}
-  {% assign posts = site.posts %}
-{% endif %}
+    {%- comment -%}
+      Series tile: the blog's signature multi-part series gets its own black
+      surface, built only from strings that already exist (the tag name, its
+      post count, the first three titles). Oldest first is reading order.
+      Rendered only when the tag named in index.html has at least three posts,
+      so renaming or retiring the tag removes the tile instead of breaking it.
+    {%- endcomment -%}
+    {%- assign series_tag = page.home_series.tag -%}
+    {%- assign series_posts = nil -%}
+    {%- if series_tag -%}{%- assign series_posts = site.tags[series_tag] | sort: "date" -%}{%- endif -%}
+    {%- if series_posts and series_posts.size >= 3 -%}
+    <section class="home-series" aria-labelledby="home-series-title">
+      <div class="l-container">
+        <p class="home-series__eyebrow">시리즈 · {{ series_posts.size }}편</p>
+        <h2 id="home-series-title" class="home-series__title">{{ series_tag | escape_once }}</h2>
+        <ol class="home-series__list">
+          {%- for post in series_posts limit: 3 -%}
+            {%- assign s_title = post.title | strip_html | strip -%}
+            {%- assign s_head = s_title -%}
+            {%- assign s_sub = "" -%}
+            {%- if s_title contains ": " -%}
+              {%- assign s_parts = s_title | split: ": " -%}
+              {%- assign s_head = s_parts.first -%}
+              {%- assign s_sub = s_title | remove_first: s_head | remove_first: ": " -%}
+            {%- endif -%}
+            {%- comment -%}
+              The number is decoration (the list is an ol). The hidden colon
+              puts back the separator the split removed, so the link's
+              accessible name reads as the post's own title, not as headline
+              and subhead run together.
+            {%- endcomment -%}
+            <li class="home-series__item"><a href="{{ post.url | relative_url }}"><span class="home-series__num" aria-hidden="true">{{ forloop.index }}</span><span class="home-series__head">{{ s_head | escape_once }}{% if s_sub != "" %}<span class="visually-hidden">:</span>{% endif %}</span>{% if s_sub != "" %}<span class="home-series__sub">{{ s_sub | escape_once }}</span>{% endif %}</a></li>
+          {%- endfor -%}
+        </ol>
+        <a class="link-arrow home-series__more" href="{{ '/tags/' | relative_url }}#{{ series_tag | slugify }}">시리즈 전체 보기</a>
+      </div>
+    </section>
+    {%- endif -%}
 
-{% assign entries_layout = page.entries_layout | default: 'list' %}
-<div class="entries-{{ entries_layout }}">
-  {% for post in posts %}
-    {% include archive-single.html type=entries_layout %}
-  {% endfor %}
+    {%- comment -%}
+      The next four posts as a 2x2 grid of white tiles on the grey band: the
+      hero took the first, and five per page leaves an even four, so no tile
+      ever spans a row alone.
+    {%- endcomment -%}
+    <section class="home-posts l-band" aria-labelledby="home-posts-title">
+      <div class="l-container">
+        <h2 id="home-posts-title" class="l-section__title">{{ ui.recent_posts | default: "Recent Posts" }}</h2>
+        <div class="tile-grid">
+          {%- for post in home_posts offset: 1 -%}
+            {% include post-tile.html post=post %}
+          {%- endfor -%}
+        </div>
+        {% include paginator.html %}
+      </div>
+    </section>
+  </div>
+{%- else -%}
+  {%- comment -%}
+    Pages 2 and on: the band alone, its title the page's one H1 with the page
+    number beside it, so tile headings step down to h2. An odd count (five,
+    or an odd last page) opens with one wide feature tile so the rest pair
+    up; an even count is plain pairs. Five posts give feature + 2x2, two give
+    one row, and no default tile ever spans a row alone.
+  {%- endcomment -%}
+  {%- assign odd = home_posts.size | modulo: 2 -%}
+  <section class="home-posts l-band" aria-labelledby="home-posts-title">
+    <div class="l-container">
+      <h1 id="home-posts-title" class="l-section__title">{{ ui.recent_posts | default: "Recent Posts" }} <span class="home-posts__page">{{ paginator.page }} / {{ paginator.total_pages }}</span></h1>
+      <div class="tile-grid{% if odd == 1 %} tile-grid--with-feature{% endif %}">
+        {%- for post in home_posts -%}
+          {%- if odd == 1 and forloop.first -%}
+            {% include post-tile.html post=post variant="feature" heading="h2" %}
+          {%- else -%}
+            {% include post-tile.html post=post heading="h2" %}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {% include paginator.html %}
+    </div>
+  </section>
+{%- endif -%}
 </div>
-
-{% include paginator.html %}
