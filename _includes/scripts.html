@@ -48,10 +48,13 @@
 
 {%- comment -%}
   Progressive enhancements: copy buttons and language labels on code blocks, a
-  reading-progress bar, and the theme toggle. Deferred — none of it is needed
-  for the page to be read or navigated.
+  reading-progress bar, the global nav's menu sheet, and the theme toggle.
+  Deferred — none of it is needed for the page to be read or navigated: the
+  nav's links are server-rendered and stay visible without JS, and nav.js only
+  turns them into a menu sheet on phones (spec 4.3).
 {%- endcomment -%}
 <script src="{{ '/assets/js/enhance.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/nav.js' | relative_url }}" defer></script>
 <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}" defer></script>
 
 <!-- Lazy Load Images for Performance -->

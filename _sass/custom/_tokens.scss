@@ -1,13 +1,9 @@
 /* ==========================================================================
    Tokens. Imported right after the theme and before every other custom
    partial. No selectors here except :root, so it can never fight a component.
-
-   Legacy blocks received from _overrides.scss (line numbers at 96601ad):
-     163-198  `:root` legacy palette and the `dark-palette` mixin. The mixin's
-              dual emission (system preference, explicit toggle) now goes
-              through `dark-root`, which prints the same two selectors.
-   The `dark-rules` half of that block (200-361) moved to the partial that owns
-   each selector, wrapped in `@include dark-mode` (see each partial's header).
+   Light values on :root; dark values swapped in through dark-root, which emits
+   the same block under both dark paths (system preference without a stored
+   light choice, and an explicit dark choice from the toggle).
    ========================================================================== */
 
 /* ---------- mixins every partial may use ---------- */
@@ -41,39 +37,267 @@
 @mixin desktop-up { @media (min-width: 1024px) { @content; } }
 @mixin wide-up { @media (min-width: 1280px) { @content; } }
 
-/* ==========================================================================
-   Dark mode (legacy palette, 163-198)
-   ========================================================================== */
+/* ---------- light (default) ---------- */
 
-// The theme compiles its palette to literal colours, so a media query cannot
-// re-run the Sass. These custom properties carry the values that change at
-// runtime; the rules below consume them.
 :root {
-  --surface: #fff;
-  --surface-raised: #fff;
-  --surface-sunken: #f2f3f3;
-  --text: #3d4144;
-  --text-muted: #69737f;
-  --border: #f2f3f3;
-  --link: #{$primary-color};
-  --code-bg: #f8f8f8;
+  color-scheme: light;
+
+  // Surfaces
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --band: #f5f5f7;
+  --card: #ffffff;
+  --card-hover: #ffffff;
+  --fill: #e8e8ed;
+  --fill-hover: #dcdce1;
+
+  // Text (on --bg / --bg-alt / --fill)
+  --text: #1d1d1f;              // 16.83 / 15.46 / 13.78
+  --text-secondary: #6e6e73;    // 5.07 / 4.66 / 4.15 FAIL: never on --fill
+  --text-tertiary: #86868b;     // 3.62: icons and disabled only, never text
+  // Long-form prose only (.page__content). Equal to --text in light; softened
+  // in dark, where #f5f5f7 on #000 (19.3:1) halates on OLED for astigmatic
+  // readers over a whole article.
+  --text-body: #1d1d1f;         // 16.83
+
+  // Lines
+  --separator: #d2d2d7;         // decorative only (1.51)
+  --separator-strong: #86868b;  // control boundaries (3.62, WCAG 1.4.11)
+
+  // Blue: links vs fills
+  --link: #0066cc;              // 5.57 / 5.11 / 4.56
+  --link-underline: rgba(0, 102, 204, 0.35);
+  --accent: #0071e3;            // white label 4.70
+  --accent-hover: #0068d1;      // 5.38 (Apple's #0077ed is 4.32: fails)
+  --accent-active: #0062c4;     // 5.93
+  --on-accent: #ffffff;
+  --focus: #0071e3;             // 4.70 on white, 4.31 on #f5f5f7
+  --selection: #c7e0f9;         // text 12.39
+
+  // Global nav material. Frosted (reverses the opaque bar of 7c61a71, whose
+  // cause was an UNblurred transparent strip; see spec 9.1). One-token revert:
+  // --nav-bg: var(--nav-bg-solid).
+  --nav-bg: rgba(251, 251, 253, 0.8);
+  --nav-bg-solid: #fbfbfd;
+  --nav-text: #333336;          // 12.28 over white, 7.61 over black content
+  --nav-text-hover: #1d1d1f;
+  --nav-hairline: rgba(0, 0, 0, 0.08);
+  --material: saturate(180%) blur(20px);
+
+  // Misc surfaces
+  --code-bg: #f5f5f7;
+  --footer-link: #424245;       // 9.20 on #f5f5f7
+
+  // Inverse tile: the one dark surface on a light page (home series tile).
+  // Apple's black "pro" tile. In dark it lifts to the card colour instead.
+  --tile-inverse-bg: #000000;
+  --tile-inverse-text: #f5f5f7;       // 19.29
+  --tile-inverse-secondary: #a1a1a6;  // 8.16
+  --tile-inverse-link: #2997ff;       // 6.96 (focus ring #0071e3 on it: 4.47)
+  --tile-inverse-separator: #424245;  // decorative hairline, 2.10 on #000
+
+  // Elevation (light only; dark uses lighter surfaces instead)
+  --shadow-card: 2px 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 2px 4px 16px rgba(0, 0, 0, 0.16);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  // Syntax (Xcode default light, on --code-bg #f5f5f7)
+  --syn-plain: #1d1d1f;         // 15.46
+  --syn-keyword: #9b2393;       // 6.31
+  --syn-string: #c41a16;        // 5.50
+  --syn-number: #1c00cf;        // 9.89
+  --syn-comment: #5d6c79;       // 4.96
+  --syn-type: #0b4f79;          // 8.01
+  --syn-function: #326d74;      // 5.39
+  --syn-preproc: #643820;       // 9.06
+  --syn-attr: #815f03;          // 5.40
+
+  // Font stacks (read by the theme through the tokenized $sans-serif and
+  // $monospace). Pretendard's own recommended order, variable build first; the
+  // Korean fallbacks are each platform's Korean UI face. 32% of code lines
+  // contain Hangul, so the mono stack ends in Pretendard. head/font-swap.html
+  // overrides both on html.wf-wait (system faces only) until the swap.
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, "D2Coding", "Pretendard Variable", Pretendard, monospace;
+
+  // Type scale. Mixed-unit clamp() must be interpolated for Ruby Sass 3.7.4.
+  --fs-display: #{"clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem)"};      // 36 / 48.6 / 59.5
+  --fs-title1: #{"clamp(1.75rem, 1.2rem + 2.4vw, 2.75rem)"};      // 28 / 37.6 / 46.75
+  --fs-title1-long: #{"clamp(1.625rem, 1.2rem + 1.6vw, 2.25rem)"};// 26 / 31.5 / 38.25
+  --fs-feature: #{"clamp(1.5rem, 1.1rem + 1.8vw, 2.25rem)"};      // 24 / 31.4 / 38.25
+  --fs-title2: #{"clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem)"};     // 22 / 24.6 / 29.75
+  --fs-title3: #{"clamp(1.1875rem, 1.13rem + 0.25vw, 1.25rem)"};  // 19 / 20 / 21.25
+  --fs-headline: 1.0625rem;
+  --fs-body: 1.0625rem;
+  --fs-callout: 1rem;
+  --fs-subhead: 0.9375rem;
+  --fs-footnote: 0.8125rem;
+  --fs-caption: 0.75rem;        // floor for any Hangul
+
+  --lh-display: 1.1;
+  --lh-title1: 1.28;            // Hangul fills the em box: 2-3 line titles need air on phones; 1.22 from 768
+  --lh-title2: 1.32;
+  --lh-title3: 1.4;
+  --lh-body: 1.75;
+  --lh-ui: 1.45;
+
+  --track-display: -0.025em;
+  --track-title1: -0.02em;
+  --track-title2: -0.015em;
+  --track-title3: -0.01em;
+  --track-small: 0.01em;
+
+  // Weights. Only display and title1 are bold; every smaller heading role is
+  // semibold so the size step, not the weight, carries the hierarchy (Hangul
+  // at 700 reads heavy below ~28px). Pretendard Variable renders any value.
+  --fw-display: 700;
+  --fw-title1: 700;
+  --fw-heading: 600;            // feature, title2, title3, headline, tile titles, section titles
+  --fw-strong: 600;             // strong/b in running text
+
+  // Space (4pt)
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --gutter: 20px;
+  --section-y: 48px;
+
+  // Widths
+  --nav-h: #{$nav-h};
+  --w-text: 692px;
+  --w-content: 980px;
+  --w-shell: 1280px;
+  --w-rail: 220px;
+
+  // Shape
+  --r-xs: 6px;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-pill: 980px;
+
+  // Layers
+  --z-local-nav: 90;
+  --z-nav: 100;
+  --z-progress: 120;
+  --z-skip: 2000;
+
+  // Motion
+  --ease-standard: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-press: 100ms;
+  --dur-hover: 200ms;
+  --dur-morph: 240ms;
+  --dur-enter: 280ms;
+  --dur-exit: 180ms;
+  --dur-lift: 300ms;
+
+  // Legacy aliases, so rules moved verbatim from _overrides.scss keep working
+  // until their owner rewrites them. Deleted at integration when unused.
+  --surface: var(--bg);
+  --surface-raised: var(--card);
+  --surface-sunken: var(--fill);
+  --text-muted: var(--text-secondary);
+  --border: var(--separator);
 }
 
-// Dark values, written once. Applied from two places: the system preference,
-// and an explicit choice from the toggle. A reader who has chosen light is
-// excluded from the media-query branch so their choice survives a system that
-// says otherwise.
-@include dark-root {
-  --surface: #14171a;
-  --surface-raised: #1c2024;
-  --surface-sunken: #22272b;
-  --text: #d7dade;
-  --text-muted: #9aa3ab;
-  --border: #2b3137;
-  // Lightened so it clears 4.5:1 against the dark surface, the same bar the
-  // light palette has to meet.
-  --link: #7fb0ff;
-  --code-bg: #1c2024;
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+    --section-y: 64px;
+    --lh-title1: 1.22;
+  }
+}
 
+@media (min-width: 1024px) {
+  :root { --section-y: 80px; }
+}
+
+/* ---------- dark ---------- */
+
+@include dark-root {
   color-scheme: dark;
+
+  --bg: #000000;
+  --bg-alt: #161617;
+  --band: #000000;
+  --card: #1d1d1f;
+  --card-hover: #242426;
+  --fill: #2c2c2e;
+  --fill-hover: #3a3a3c;
+
+  --text: #f5f5f7;              // 19.29 / 16.61 / 15.46 / 12.80
+  --text-secondary: #a1a1a6;    // 8.16 / 7.03 / 6.54 / 5.42
+  --text-tertiary: #86868b;
+  --text-body: #e0e0e5;         // 15.96 on #000, 13.75 on #161617, 10.59 on #2c2c2e
+
+  --separator: #424245;
+  --separator-strong: #6e6e73;  // 4.14 on black
+
+  --link: #2997ff;              // 6.96 / 6.00 / 5.58 / 4.62
+  --link-underline: rgba(41, 151, 255, 0.45);
+  --accent: #0071e3;            // white on #2997ff is 3.02, so fills stay #0071e3
+  --accent-hover: #0068d1;
+  --accent-active: #0062c4;
+  --on-accent: #ffffff;
+  --focus: #2997ff;             // 6.96 on black, 5.58 on #1d1d1f
+  --selection: #0e3559;         // text 11.53
+
+  --nav-bg: rgba(22, 22, 23, 0.8);
+  --nav-bg-solid: #161617;
+  --nav-text: #e8e8ed;          // 15.34 over black, 7.85 over white content
+  --nav-text-hover: #ffffff;
+  --nav-hairline: rgba(255, 255, 255, 0.1);
+
+  --code-bg: #161617;
+  --footer-link: #d2d2d7;       // 12.00 on #161617
+
+  --tile-inverse-bg: #1d1d1f;         // = --card: on a black page the lift is the contrast
+  --tile-inverse-text: #f5f5f7;       // 15.46
+  --tile-inverse-secondary: #a1a1a6;  // 6.54
+  --tile-inverse-link: #2997ff;       // 5.58 (focus ring #2997ff: 5.58)
+  --tile-inverse-separator: #424245;  // decorative hairline, 1.68 on #1d1d1f
+
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-float: none;
+
+  // Xcode default dark, on #161617 (comment lightened: Xcode's #6c7986 is 3.78)
+  --syn-plain: #dfdfe0;         // 13.58
+  --syn-keyword: #fc5fa3;       // 6.29
+  --syn-string: #fc6a5d;        // 6.34
+  --syn-number: #d0bf69;        // 9.76
+  --syn-comment: #7f8c98;       // 5.26 (4.89 on #1d1d1f)
+  --syn-type: #5dd8ff;          // 10.96
+  --syn-function: #67b7a4;      // 7.65
+  --syn-preproc: #fd8f3f;       // 7.90
+  --syn-attr: #bf8555;          // 5.77
+}
+
+// An explicit light choice on a dark system keeps light scrollbars and form
+// controls; the meta color-scheme tag would otherwise let the UA go dark.
+:root[data-theme="light"] { color-scheme: light; }
+
+/* ---------- increased contrast ---------- */
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-secondary: #424245;
+    --separator: #86868b;
+    --nav-bg: var(--nav-bg-solid);
+  }
+  @include dark-root {
+    --text-secondary: #d2d2d7;
+    --separator: #6e6e73;
+    --nav-bg: var(--nav-bg-solid);
+  }
 }

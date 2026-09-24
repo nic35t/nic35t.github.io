@@ -5,9 +5,9 @@
    moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
    the same selectors the old `dark-rules` mixin did:
      121-144  `:focus-visible` ring and the visible skip link
-     201-205  dark `html, body` surface and text
-     226-227  dark link colour
-     229-239  dark heading colours
+     201-205  dark `html, body` surface and text (deleted in the token commit)
+     226-227  dark link colour (deleted in the token commit)
+     229-239  dark heading colours (deleted in the token commit)
      241-274  dark muted list, this part: `.breadcrumbs, .help-block,
               .help-inline, .nav__list label, .comment__date`
      331-334  dark skip link
@@ -43,32 +43,10 @@
    Dark mode (legacy dark-rules groups)
    ========================================================================== */
 
-html,
-body {
-  @include dark-mode {
-    background-color: var(--surface);
-    color: var(--text);
-  }
-}
-
-a:not(.btn):not(.theme-toggle),
-.page__content a:not(.btn) {
-  @include dark-mode { color: var(--link); }
-}
-
-.page__title,
-.page__content h1,
-.page__content h2,
-.page__content h3,
-.page__content h4,
-.page__content h5,
-.page__content h6,
-.archive__item-title,
-.archive__item-title a {
-  @include dark-mode {
-    color: var(--text);
-  }
-}
+// The dark `html, body`, link and heading groups are gone: the theme now prints
+// $background-color, $text-color and $link-color* as var(--bg), var(--text)
+// and var(--link) (_variables.scss), so the tokens' dark swap recolours them
+// with no per-selector override.
 
 // Everything the theme paints with $muted-text-color. That grey is tuned to
 // 4.8:1 on white and lands at 3.7:1 on the dark surface, so each of these

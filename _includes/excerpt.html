@@ -1,0 +1,7 @@
+{%- assign ex_post = include.post -%}
+{%- assign ex_html = ex_post.excerpt | default: "" | markdownify -%}
+{%- if ex_html contains "</h" -%}
+  {%- assign ex_parts = ex_post.content | split: "</h2>" -%}
+  {%- if ex_parts.size > 1 -%}{%- assign ex_html = ex_parts[1] | split: "</p>" | first -%}{%- else -%}{%- assign ex_html = "" -%}{%- endif -%}
+{%- endif -%}
+{{- ex_html | strip_html | strip_newlines | strip | truncate: 120 -}}

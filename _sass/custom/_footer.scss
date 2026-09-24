@@ -6,7 +6,8 @@
    the same selectors the old `dark-rules` mixin did:
      241-274  dark muted list, this part: `.page__footer, .page__footer a,
               .page__footer .fas/.fab/.far/.fal`
-     283-289  dark surfaces, this part: `.page__footer`
+     283-289  dark surfaces, this part: `.page__footer` (deleted in the token
+              commit)
      540-562  running-text link underline, this part: `.page__footer a`, and
               `.page__footer a.btn` without it
    ========================================================================== */
@@ -27,12 +28,9 @@
   }
 }
 
-.page__footer {
-  @include dark-mode {
-    background-color: var(--surface);
-    color: var(--text);
-  }
-}
+// The dark `.page__footer` surface group is gone: the theme now prints
+// $footer-background-color as var(--bg-alt) (_variables.scss), which the
+// tokens' dark swap recolours.
 
 /* ==========================================================================
    Links in running text

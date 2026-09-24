@@ -113,7 +113,7 @@ author:
   location         : "Somewhere"
   email            :
   links:
-    - label: "Email"
+    - label: "이메일"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:nicest@kakao.com"
     - label: "GitHub"
@@ -130,7 +130,7 @@ footer:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/nic35t"
-    - label: "Email"
+    - label: "이메일"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:nicest@kakao.com"
 
@@ -291,7 +291,9 @@ defaults:
       type: posts
     values:
       layout: single
-      author_profile: true
+      # The left author rail is retired (spec C12): a post carries a byline
+      # under its title and an author card at the end instead.
+      author_profile: false
       read_time: true
       # No post carried a visible date anywhere on the site — not in listings,
       # not on the article. On a blog that covers policy and fast-moving tech,

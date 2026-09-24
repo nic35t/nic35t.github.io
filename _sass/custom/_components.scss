@@ -5,6 +5,9 @@
    moved verbatim; the dark group wrapped in `@include dark-mode`, which prints
    the same selectors the old `dark-rules` mixin did:
      325-329  dark `.btn--inverse`
+
+   The `.l-*` layout primitives at the end were written by u0, verbatim from
+   spec 4.2, so the page units can build against them from the start.
    ========================================================================== */
 
 /* ==========================================================================
@@ -18,3 +21,24 @@
     border-color: var(--border);
   }
 }
+
+/* ==========================================================================
+   Layout primitives (spec 4.2)
+   ========================================================================== */
+
+// One container width rule for the whole site, so the nav, every section and
+// the footer share their left and right edges. min() rather than max-width plus
+// padding: the gutter is part of the width, so a full-bleed parent never needs
+// its own padding. Mixed units, so the min() is interpolated for Ruby Sass.
+// Full-bleed sections are full-width elements with an .l-container child; never
+// 100vw (it includes the scrollbar and overflows).
+.l-container        { width: #{"min(100% - 2 * var(--gutter), var(--w-content))"}; margin-inline: auto; }
+.l-container--text  { width: #{"min(100% - 2 * var(--gutter), var(--w-text))"}; margin-inline: auto; }
+.l-container--shell { width: #{"min(100% - 2 * var(--gutter), var(--w-shell))"}; margin-inline: auto; }
+// A band is the grey field that tiles sit on; its vertical rhythm is the
+// section step (48 / 64 / 80px) so every band on every page breathes the same.
+.l-band             { background-color: var(--band); padding-block: var(--section-y); }
+// Section titles are title2 at semibold: the size step, not weight, carries the
+// hierarchy. --text on --band: 15.46 light, 19.29 dark.
+.l-section__title   { margin: 0 0 var(--space-6); font-size: var(--fs-title2); line-height: var(--lh-title2);
+                      font-weight: var(--fw-heading); letter-spacing: var(--track-title2); color: var(--text); }

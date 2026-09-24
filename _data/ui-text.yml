@@ -594,36 +594,36 @@ ne-NP:
 # Korean
 # ------
 ko: &DEFAULT_KO
-  skip_links                 :
-  skip_primary_nav           :
-  skip_content               :
-  skip_footer                :
+  skip_links                 : "바로가기"
+  skip_primary_nav           : "주 메뉴로 건너뛰기"
+  skip_content               : "본문으로 건너뛰기"
+  skip_footer                : "하단 정보로 건너뛰기"
   page                       : "페이지"
-  pagination_previous        : "이전 포스트"
-  pagination_next            : "다음 포스트"
-  breadcrumb_home_label      : "Home"
+  pagination_previous        : "이전 글"
+  pagination_next            : "다음 글"
+  breadcrumb_home_label      : "홈"
   breadcrumb_separator       : "/"
-  menu_label                 : "토글 메뉴"
+  menu_label                 : "메뉴"
   search_label               :
-  toc_label                  : "On This Page"
+  toc_label                  : "목차"
   ext_link_label             : "직접 링크"
   less_than                  : "최대"
   minute_read                : "분 소요"
   share_on_label             : "공유하기"
   meta_label                 :
-  tags_label                 : "태그:"
-  categories_label           : "카테고리:"
-  date_label                 : "업데이트:"
+  tags_label                 : "태그"
+  categories_label           : "카테고리"
+  date_label                 : "업데이트"
   comments_label             : "댓글남기기"
   comments_title             : "댓글"
   more_label                 : "더 보기"
-  related_label              : "참고"
+  related_label              : "함께 읽을 글"
   # follow_label               : ""
   feed_label                 : "Feed"
   powered_by                 : "Powered by 😘Me &"
   website_label              : "웹사이트"
   email_label                : "이메일"
-  recent_posts               : "📃 최근 포스트"
+  recent_posts               : "최근 글"
   undefined_wpm              : "Undefined parameter words_per_minute at _config.yml"
   comment_form_info          : "이메일은 공개되지 않습니다. 작성 필요 필드:"
   comment_form_comment_label : "댓글"
@@ -640,7 +640,13 @@ ko: &DEFAULT_KO
   search_placeholder_text    : "검색어를 입력하세요..."
   search_algolia_no_results  :
   results_found              : "개 결과 발견"
-  back_to_top                : "맨 위로 이동"
+  back_to_top                : "맨 위로"
+  # Added for the redesign (spec 9.1): the home pager's two links, the link
+  # below the home grid, and the read time for posts under a minute.
+  page_previous              : "이전 페이지"
+  page_next                  : "다음 페이지"
+  more_posts                 : "지난 글 더 보기"
+  less_than_minute           : "1분 미만"
 ko-KR:
   <<: *DEFAULT_KO
 
