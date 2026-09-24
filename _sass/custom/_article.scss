@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Post shell, header, byline, TOC, end matter (owner: u4, spec 4.5.1)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     7-14     `.toc__menu a` 24px rows
+     53-58    `.author__urls-wrapper button.btn` 44px
+     65-76    `.page__share .btn` 44px box
+     86-95    `(pointer: coarse) .toc__menu a` 44px
+     241-274  dark muted list, this part: `.page__meta, .page__date,
+              .pagination--pager, .toc`
+     283-289  dark surfaces, this part: `.sidebar, .author__avatar,
+              .author__content`
+     291-308  dark TOC
+     557-562  `.page__content .toc__menu a` no underline (one selector changed,
+              see the rule)
+     580-586  `.sidebar__right.sticky { top }`
+   ========================================================================== */
+
+/* ==========================================================================
+   Touch targets
+   ========================================================================== */
+
+// WCAG 2.2 AA asks for 24x24 CSS pixels. Table-of-contents rows were 17px
+// tall, so the whole list failed. Padding rather than a fixed height keeps
+// two-line entries intact.
+.toc__menu a {
+  min-height: 24px;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+}
+
+// The author card's "Follow" toggle was 32px tall. It is an ordinary control
+// with room to spare around it, so it gets the comfortable 44px rather than
+// the 24px WCAG floor.
+.author__urls-wrapper button.btn {
+  min-height: 44px;
+}
+
+// Below 600px the share buttons hide their labels and rely on an icon from the
+// deferred Font Awesome sheet. Until that sheet lands — or if it never does —
+// the button has no rendered content at all and collapses to its own padding:
+// a 29x14 tap target on the widest-reaching breakpoint. A flex box with a
+// floor is the same size whether the glyph arrives or not.
+.page__share .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+// Table-of-contents rows are 34px: fine under a mouse, tight under a thumb.
+// Only coarse pointers get the extra height — a desktop sidebar keeps the
+// compact list instead of growing 10px for every heading in the post.
+@media (pointer: coarse) {
+  .toc__menu a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
+.page__meta,
+.page__date,
+.pagination--pager,
+.toc {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}
+
+.sidebar,
+.author__avatar,
+.author__content {
+  @include dark-mode {
+    background-color: var(--surface);
+    color: var(--text);
+  }
+}
+
+.toc,
+.nav__title,
+.toc .nav__title {
+  @include dark-mode {
+    background-color: var(--surface-raised);
+    color: var(--text);
+  }
+}
+
+.toc__menu a {
+  @include dark-mode {
+    background-color: var(--surface-raised);
+    color: var(--text);
+    border-bottom-color: var(--border);
+  }
+}
+
+.toc__menu a:hover,
+.toc__menu .active a {
+  @include dark-mode {
+    background-color: var(--surface-sunken);
+    color: var(--link);
+  }
+}
+
+/* ==========================================================================
+   Links in running text
+   ========================================================================== */
+
+// The contents list is chrome, not running text, and should not gain the
+// underline _prose gives `.page__content li a`. The legacy selector was
+// `.page__content .toc__menu a` (0,2,1), which tied with `.page__content li a`
+// and won by coming later in one file. _prose is now imported after this
+// partial, so the tie would go the other way and underline every TOC entry;
+// the `li` lifts this to (0,2,2) and keeps today's rendering. Every TOC link
+// sits in an `li` (_includes/toc.html), so it matches the same elements.
+.page__content .toc__menu li a {
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Sticky sidebar
+   ========================================================================== */
+
+// The right sidebar sticks at top: 2em, which puts it under a masthead that is
+// about 79px tall — the contents list tucked itself behind the bar. Clearing
+// the bar's height plus its shadow keeps it fully visible. This became visible
+// when the contents list was made sticky.
+.sidebar__right.sticky {
+  top: calc(#{$nav-height} + 3.5em);
+}

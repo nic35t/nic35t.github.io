@@ -1,0 +1,50 @@
+/* ==========================================================================
+   Article body typography (owner: u5, spec 4.5.2)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     241-274  dark muted list, this part: `figcaption, a.reversefootnote`
+     318-323  dark borders, this part: `hr, .page__content blockquote`
+     540-562  running-text link underline, this part: `.page__content p a,
+              .page__content li a`, and `.page__content a.btn` without it
+   ========================================================================== */
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
+figcaption,
+a.reversefootnote {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}
+
+hr,
+.page__content blockquote {
+  @include dark-mode {
+    border-color: var(--border);
+  }
+}
+
+/* ==========================================================================
+   Links in running text
+   ========================================================================== */
+
+// Colour alone is not enough to mark a link (WCAG 1.4.1), and in dark mode the
+// link colour sits at 1.82:1 against the surrounding text — indistinguishable
+// for anyone who does not perceive the hue. Underline them.
+.page__content p a,
+.page__content li a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+
+  &:hover { text-decoration-thickness: 2px; }
+}
+
+// Buttons are not running text and should not gain an underline.
+.page__content a.btn {
+  text-decoration: none;
+}

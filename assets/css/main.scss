@@ -11,5 +11,24 @@
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
-// Rules that need to beat the theme's own, so they come last.
-@import "custom/overrides";
+// Everything below comes after the theme so it can beat the theme's own rules
+// at equal specificity. One partial per owner (spec 3.1, 7.1), so parallel
+// work never edits the same file.
+//
+// Tokens first: :root custom properties, the dark swap and the mixins every
+// later partial uses. It holds no component selectors, so it cannot fight one.
+@import "custom/tokens";
+
+@import "custom/base";       // element defaults, focus, skip link, text-wrap
+@import "custom/components"; // shared primitives: containers, pills, chips, tiles
+@import "custom/nav";        // global nav, masthead, theme toggle
+@import "custom/home";       // home page and its paginator
+@import "custom/article";    // post shell, header, TOC, end matter
+@import "custom/prose";      // article body typography
+@import "custom/code";       // code blocks
+@import "custom/archive";    // archives, taxonomy pages
+@import "custom/footer";     // footer
+
+// Last on purpose: the reduced-motion blanket and the theme-switch suppression
+// use !important and must also win the tie on order.
+@import "custom/motion";

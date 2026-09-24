@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Code blocks (owner: u5, spec 4.5.3)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     310-316  dark `pre, code, .highlight`
+     336-340  dark `.code-copy`
+     342      dark language label
+     384-442  language label in the corner, `.code-copy` button
+   ========================================================================== */
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+pre,
+code,
+.highlight,
+.highlight pre {
+  @include dark-mode {
+    background-color: var(--code-bg);
+    color: var(--text);
+  }
+}
+
+.code-copy {
+  @include dark-mode {
+    background: var(--surface-sunken);
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+}
+
+.highlighter-rouge[data-lang]::before {
+  @include dark-mode { color: var(--text-muted); }
+}
+
+/* ==========================================================================
+   Code blocks
+   ========================================================================== */
+
+.page__content {
+  .highlighter-rouge,
+  figure.highlight {
+    position: relative;
+  }
+
+  // The language sits in the block's corner rather than above it, so it costs
+  // no vertical space in an article that is mostly code.
+  .highlighter-rouge[data-lang]::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: 0.35em;
+    right: 0.6em;
+    font-size: 0.7em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $muted-text-color;
+    pointer-events: none;
+  }
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.3em;
+  right: 0.3em;
+  z-index: 1;
+  padding: 0.3em 0.7em;
+  min-height: 24px;
+  font-size: 0.72em;
+  font-family: $global-font-family;
+  color: $muted-text-color;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  cursor: pointer;
+  // Hidden until the block is hovered or the button itself is focused, so it
+  // does not sit on top of the code while reading. Always visible on touch,
+  // where there is no hover to reveal it.
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  &.is-done { color: $success-color; }
+}
+
+.has-copy:hover .code-copy,
+.code-copy:focus-visible {
+  opacity: 1;
+}
+
+// A language label and a copy button in the same corner would collide.
+.highlighter-rouge[data-lang] .code-copy { right: 3.6em; }
+
+@media (hover: none) {
+  .code-copy { opacity: 1; }
+}

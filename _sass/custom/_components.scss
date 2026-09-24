@@ -1,0 +1,20 @@
+/* ==========================================================================
+   Shared components (owner: u1, spec 4.2)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; the dark group wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     325-329  dark `.btn--inverse`
+   ========================================================================== */
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+.btn--inverse {
+  @include dark-mode {
+    background-color: var(--surface-raised);
+    color: var(--text);
+    border-color: var(--border);
+  }
+}

@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Home (owner: u3, spec 4.4)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; the dark group wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     97-103   `.pagination li a` 44px
+     112-119  `.pagination a.disabled` opaque colour
+     241-274  dark muted list, this part: `.pagination a, .pagination li a`
+   ========================================================================== */
+
+/* ==========================================================================
+   Touch targets
+   ========================================================================== */
+
+// The pagination numbers are one of the two controls a phone user actually
+// aims at, and they sat around 36px: this is the more comfortable 44.
+.pagination li a {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// The theme paints disabled pagination as `rgba($muted-text-color, .5)`, which
+// composites to 1.98:1 on white. WCAG exempts inactive controls from contrast,
+// and these do carry `pointer-events: none` — but a state nobody can read is
+// not much of a state. Opaque, and still clearly recessed next to body text.
+.pagination a.disabled,
+.pagination li a.disabled {
+  color: #6b7178;
+}
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
+.pagination a,
+.pagination li a {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}

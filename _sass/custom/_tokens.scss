@@ -1,0 +1,79 @@
+/* ==========================================================================
+   Tokens. Imported right after the theme and before every other custom
+   partial. No selectors here except :root, so it can never fight a component.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad):
+     163-198  `:root` legacy palette and the `dark-palette` mixin. The mixin's
+              dual emission (system preference, explicit toggle) now goes
+              through `dark-root`, which prints the same two selectors.
+   The `dark-rules` half of that block (200-361) moved to the partial that owns
+   each selector, wrapped in `@include dark-mode` (see each partial's header).
+   ========================================================================== */
+
+/* ---------- mixins every partial may use ---------- */
+
+// Component-level dark override, e.g. `.tile { @include dark-mode { box-shadow: none; } }`.
+// Only for things a token cannot express. Colours belong in tokens.
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) & { @content; }
+  }
+  :root[data-theme="dark"] & { @content; }
+}
+
+@mixin dark-root {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { @content; }
+  }
+  :root[data-theme="dark"] { @content; }
+}
+
+// Hover only where a pointer can hover; on touch :hover sticks after a tap.
+@mixin hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover { @content; }
+  }
+}
+
+// Width queries only (the critical-CSS extractor evaluates widths, not pointers).
+@mixin below-tablet { @media (max-width: 767px) { @content; } }
+@mixin tablet-up { @media (min-width: 768px) { @content; } }
+@mixin desktop-up { @media (min-width: 1024px) { @content; } }
+@mixin wide-up { @media (min-width: 1280px) { @content; } }
+
+/* ==========================================================================
+   Dark mode (legacy palette, 163-198)
+   ========================================================================== */
+
+// The theme compiles its palette to literal colours, so a media query cannot
+// re-run the Sass. These custom properties carry the values that change at
+// runtime; the rules below consume them.
+:root {
+  --surface: #fff;
+  --surface-raised: #fff;
+  --surface-sunken: #f2f3f3;
+  --text: #3d4144;
+  --text-muted: #69737f;
+  --border: #f2f3f3;
+  --link: #{$primary-color};
+  --code-bg: #f8f8f8;
+}
+
+// Dark values, written once. Applied from two places: the system preference,
+// and an explicit choice from the toggle. A reader who has chosen light is
+// excluded from the media-query branch so their choice survives a system that
+// says otherwise.
+@include dark-root {
+  --surface: #14171a;
+  --surface-raised: #1c2024;
+  --surface-sunken: #22272b;
+  --text: #d7dade;
+  --text-muted: #9aa3ab;
+  --border: #2b3137;
+  // Lightened so it clears 4.5:1 against the dark surface, the same bar the
+  // light palette has to meet.
+  --link: #7fb0ff;
+  --code-bg: #1c2024;
+
+  color-scheme: dark;
+}

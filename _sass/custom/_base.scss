@@ -1,0 +1,114 @@
+/* ==========================================================================
+   Global base (owner: u1, spec 4.1)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     121-144  `:focus-visible` ring and the visible skip link
+     201-205  dark `html, body` surface and text
+     226-227  dark link colour
+     229-239  dark heading colours
+     241-274  dark muted list, this part: `.breadcrumbs, .help-block,
+              .help-inline, .nav__list label, .comment__date`
+     331-334  dark skip link
+     466-486  `text-wrap` balance on titles, pretty on paragraphs
+   ========================================================================== */
+
+/* ==========================================================================
+   Keyboard focus
+   ========================================================================== */
+
+// The theme leaves focus to the browser default, which several themes then
+// remove. :focus-visible shows a ring for keyboard users without putting one
+// on every mouse click.
+:focus-visible {
+  outline: 3px solid $primary-color;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+// A skip link is useless if it never becomes visible when focused.
+.screen-reader-shortcut:focus {
+  clip: auto;
+  width: auto;
+  height: auto;
+  z-index: 1000;
+  padding: 0.5em 1em;
+  background: #fff;
+  color: $primary-color;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+html,
+body {
+  @include dark-mode {
+    background-color: var(--surface);
+    color: var(--text);
+  }
+}
+
+a:not(.btn):not(.theme-toggle),
+.page__content a:not(.btn) {
+  @include dark-mode { color: var(--link); }
+}
+
+.page__title,
+.page__content h1,
+.page__content h2,
+.page__content h3,
+.page__content h4,
+.page__content h5,
+.page__content h6,
+.archive__item-title,
+.archive__item-title a {
+  @include dark-mode {
+    color: var(--text);
+  }
+}
+
+// Everything the theme paints with $muted-text-color. That grey is tuned to
+// 4.8:1 on white and lands at 3.7:1 on the dark surface, so each of these
+// fails until it is redirected. (The list was split by owner; this is the part
+// for components no other partial styles.)
+.breadcrumbs,
+.help-block,
+.help-inline,
+.nav__list label,
+.comment__date {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}
+
+.screen-reader-shortcut:focus {
+  @include dark-mode {
+    background: var(--surface-raised);
+    color: var(--link);
+  }
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+// Headings break where the line is balanced rather than wherever the last word
+// happens to fall — noticeably better on the long Korean titles here, which
+// otherwise leave one or two characters stranded on a second line.
+.page__title,
+.archive__item-title,
+.page__content h1,
+.page__content h2,
+.page__content h3,
+.page__content h4 {
+  text-wrap: balance;
+}
+
+// Avoids a single short word alone on the last line of a paragraph.
+.page__content p,
+.archive__item-excerpt {
+  text-wrap: pretty;
+}

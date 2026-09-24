@@ -1,0 +1,143 @@
+/* ==========================================================================
+   Archive and taxonomy pages (owner: u6, spec 4.6)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     37-43    `.archive__item-teaser img { height: auto }`
+     60-63    `.back-to-top` padding
+     105-110  `.taxonomy__index a`, `.entries-list .archive__item-title a`
+     241-274  dark muted list, this part: `.archive__item-excerpt,
+              .taxonomy__title, .taxonomy__count, .back-to-top,
+              .archive__subtitle, .taxonomy__post time`
+     278-281  dark borders `.archive__subtitle`, `.taxonomy__section + ...`
+     318-323  dark borders, this part: `.taxonomy__post,
+              .archive__item + .archive__item`
+     488-538  `.taxonomy__section` content-visibility, `.taxonomy__posts`,
+              `.taxonomy__post`
+     540-562  running-text link underline, this part: `.archive__item-excerpt a`
+   ========================================================================== */
+
+/* ==========================================================================
+   Touch targets
+   ========================================================================== */
+
+// The theme sets `width: 100%` on a teaser and leaves the height alone. That
+// was fine while the img had no dimension attributes; now that it carries them
+// so the grid can reserve space, the height attribute would win and render a
+// 3:2 teaser 832px tall. `height: auto` hands the ratio back to the width.
+.archive__item-teaser img {
+  height: auto;
+}
+
+// The back-to-top link was 18px tall. It is an ordinary control with room to
+// spare around it, so it gets the comfortable 44px rather than the 24px WCAG
+// floor.
+.back-to-top {
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+
+// Tag and category clouds sit close together; give them room to be tapped.
+.taxonomy__index a,
+.entries-list .archive__item-title a {
+  display: inline-block;
+  min-height: 24px;
+}
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
+.archive__item-excerpt,
+.taxonomy__title,
+.taxonomy__count,
+.back-to-top,
+.archive__subtitle,
+.taxonomy__post time {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}
+
+// The same grey is used for borders, where it reads as a hard line against
+// the dark surface rather than a divider.
+.archive__subtitle,
+.taxonomy__section + .taxonomy__section {
+  @include dark-mode {
+    border-color: var(--border);
+  }
+}
+
+.taxonomy__post,
+.archive__item + .archive__item {
+  @include dark-mode {
+    border-color: var(--border);
+  }
+}
+
+/* ==========================================================================
+   Long taxonomy pages
+   ========================================================================== */
+
+// /tags/ renders every tag and every post beneath it on one page — 2581 DOM
+// nodes and 418 links — because GitHub Pages cannot run jekyll-archives, so
+// per-tag pages are not an option and the anchors all live here.
+//
+// content-visibility lets the browser skip layout and paint for sections that
+// are off screen, and do the work when they scroll into view. The markup is
+// unchanged, so every anchor still resolves and crawlers still see the whole
+// page; only the up-front rendering cost goes away.
+//
+// `auto` on contain-intrinsic-size makes the browser remember each section's
+// real height once measured, so the scrollbar stops jumping on second visit.
+// The 320px is only the first guess for a section never yet rendered.
+.taxonomy__section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+
+// Compact taxonomy rows. Title on the left, date on the right, each row a
+// comfortable tap target so /tags/ does not reintroduce the target-size
+// problem the TOC had.
+.taxonomy__posts {
+  margin: 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+
+.taxonomy__post {
+  display: flex;
+  gap: 1em;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border, #f2f3f3);
+
+  a {
+    flex: 1 1 auto;
+    min-height: 24px;
+    padding: 0.45em 0;
+    font-size: $type-size-6;
+  }
+
+  time {
+    flex: 0 0 auto;
+    color: $muted-text-color;
+    font-size: $type-size-7;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ==========================================================================
+   Links in running text
+   ========================================================================== */
+
+// Colour alone is not enough to mark a link (WCAG 1.4.1), and in dark mode the
+// link colour sits at 1.82:1 against the surrounding text. Underline them.
+.archive__item-excerpt a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+
+  &:hover { text-decoration-thickness: 2px; }
+}

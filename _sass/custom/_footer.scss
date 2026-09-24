@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Footer (owner: u6, spec 4.7)
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
+   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
+   the same selectors the old `dark-rules` mixin did:
+     241-274  dark muted list, this part: `.page__footer, .page__footer a,
+              .page__footer .fas/.fab/.far/.fal`
+     283-289  dark surfaces, this part: `.page__footer`
+     540-562  running-text link underline, this part: `.page__footer a`, and
+              `.page__footer a.btn` without it
+   ========================================================================== */
+
+/* ==========================================================================
+   Dark mode (legacy dark-rules groups)
+   ========================================================================== */
+
+// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
+.page__footer,
+.page__footer a,
+.page__footer .fas,
+.page__footer .fab,
+.page__footer .far,
+.page__footer .fal {
+  @include dark-mode {
+    color: var(--text-muted);
+  }
+}
+
+.page__footer {
+  @include dark-mode {
+    background-color: var(--surface);
+    color: var(--text);
+  }
+}
+
+/* ==========================================================================
+   Links in running text
+   ========================================================================== */
+
+// Colour alone is not enough to mark a link (WCAG 1.4.1), and in dark mode the
+// link colour sits at 1.82:1 against the surrounding text. Underline them.
+.page__footer a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+
+  &:hover { text-decoration-thickness: 2px; }
+}
+
+// Buttons are not running text and should not gain an underline.
+.page__footer a.btn {
+  text-decoration: none;
+}
