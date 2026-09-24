@@ -9,6 +9,10 @@
 
   So it renders only when there is a real modification date, and only when that
   date actually differs from publication.
+
+  No icon (spec 4.5.1): the Font Awesome calendar came from a deferred sheet
+  the redesign removes, and the label already says what the date is. The label
+  sits in the same line as plain text, set in footnote size by _article.scss.
 {%- endcomment -%}
 {%- if site.locale contains "ko" -%}
   {%- assign date_format = "%Y년 %-m월 %-d일" -%}
@@ -20,6 +24,6 @@
   {%- assign modified_day = page.last_modified_at | date: "%Y-%m-%d" -%}
   {%- assign published_day = page.date | date: "%Y-%m-%d" -%}
   {%- if modified_day != published_day -%}
-    <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> {{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</strong> <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">{{ page.last_modified_at | date: date_format }}</time></p>
+    <p class="page__date"><span class="page__date-label">{{ site.data.ui-text[site.locale].date_label | default: "Updated:" }}</span> <time datetime="{{ page.last_modified_at | date_to_xmlschema }}">{{ page.last_modified_at | date: date_format }}</time></p>
   {%- endif -%}
 {%- endif -%}

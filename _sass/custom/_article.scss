@@ -1,59 +1,311 @@
 /* ==========================================================================
    Post shell, header, byline, TOC, end matter (owner: u4, spec 4.5.1)
 
-   Legacy blocks received from _overrides.scss (line numbers at 96601ad),
-   moved verbatim; dark groups wrapped in `@include dark-mode`, which prints
-   the same selectors the old `dark-rules` mixin did:
-     7-14     `.toc__menu a` 24px rows
-     53-58    `.author__urls-wrapper button.btn` 44px
-     65-76    `.page__share .btn` 44px box
-     86-95    `(pointer: coarse) .toc__menu a` 44px
-     241-274  dark muted list, this part: `.page__meta, .page__date,
-              .pagination--pager, .toc`
-     283-289  dark surfaces, this part: `.sidebar, .author__avatar,
-              .author__content`
-     291-308  dark TOC
-     557-562  `.page__content .toc__menu a` no underline (one selector changed,
-              see the rule)
-     580-586  `.sidebar__right.sticky { top }`
+   One centred 692px reading column. Below 1024px the contents list is a
+   closed disclosure above the article; from 1024px it is a quiet rail beside
+   it, and from 1280px the rail moves into the right gutter so the column sits
+   dead centre whether or not a post has a rail. After the article: taxonomy
+   chips, the updated date, a share row, the author card, a titled pager, and
+   a full-bleed "함께 읽을 글" shelf.
+
+   Legacy blocks received from _overrides.scss (line numbers at 96601ad) and
+   what became of them:
+     7-14     `.toc__menu a` 24px rows: replaced by the 6px-padded rows below
+              (31px at the 14px rail size, still above the 24px WCAG floor)
+     53-58    `.author__urls-wrapper button.btn` 44px: deleted, the rail and
+              its "Follow" button are no longer rendered
+     65-76    `.page__share .btn` 44px box: deleted, the share row is text
+              pills that are 44px tall below 768px on their own (spec 4.2)
+     86-95    `(pointer: coarse) .toc__menu a` 44px: kept
+     241-274  dark muted `.page__meta, .page__date, .pagination--pager, .toc`:
+              deleted; .page__meta and .page__date read --text-secondary in
+              both themes, the old pager markup is gone, and the TOC colours
+              are tokens now
+     283-289  dark `.sidebar, .author__avatar, .author__content` surfaces:
+              deleted with the rail
+     291-308  dark TOC surfaces: deleted, the TOC has no surface of its own
+              (the disclosure panel uses --bg-alt, which the dark swap covers)
+     557-562  `.page__content .toc__menu li a` no underline: deleted, the
+              contents list is no longer inside .page__content
+     580-586  `.sidebar__right.sticky { top }`: deleted, the rail sticks at
+              var(--nav-h) plus 24px
+
+   Contrast figures are WCAG 2.x, light / dark, from spec 3.3.
    ========================================================================== */
 
 /* ==========================================================================
-   Touch targets
+   Shell
    ========================================================================== */
 
-// WCAG 2.2 AA asks for 24x24 CSS pixels. Table-of-contents rows were 17px
-// tall, so the whole list failed. Padding rather than a fixed height keeps
-// two-line entries intact.
-.toc__menu a {
-  min-height: 24px;
-  padding-top: 0.4em;
-  padding-bottom: 0.4em;
+// The theme's #main is a centred max-width box with 1em side padding and a
+// clearfix, built for its float-and-sidebar layout. The shell below owns width
+// and gutters now (.l-container--shell), so #main steps out of the way:
+// otherwise the gutter would be 20px plus 16px on a phone.
+.layout--single #main {
+  float: none;
+  max-width: none;
+  padding: 0;
 }
 
-// The author card's "Follow" toggle was 32px tall. It is an ordinary control
-// with room to spare around it, so it gets the comfortable 44px rather than
-// the 24px WCAG floor.
-.author__urls-wrapper button.btn {
-  min-height: 44px;
+// One column by default. The top padding separates the title from the frosted
+// bar (32px on a phone, 64px from 768px, where the title is 37px and needs the
+// air); the bottom padding is the section step, so the page ends on the same
+// rhythm as every band (spec 7.3: "each #main ends with a band or section-y").
+.post-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: var(--space-7);
+  padding-bottom: var(--section-y);
+
+  @include tablet-up {
+    padding-top: var(--space-10);
+  }
 }
 
-// Below 600px the share buttons hide their labels and rely on an icon from the
-// deferred Font Awesome sheet. Until that sheet lands — or if it never does —
-// the button has no rendered content at all and collapses to its own padding:
-// a 29x14 tap target on the widest-reaching breakpoint. A flex box with a
-// floor is the same size whether the glyph arrives or not.
-.page__share .btn {
-  display: inline-flex;
+// The reading column: 692px is about 41 Hangul syllables a line at 17px, the
+// comfortable end of the 35-45 range. min-width: 0 lets a wide code block or
+// table scroll inside it instead of widening the grid track.
+.post-shell > .post {
+  width: 100%;
+  min-width: 0;
+  max-width: var(--w-text);
+  margin-inline: auto;
+}
+
+// Rail hidden until there is room for it (spec C10).
+.toc-rail {
+  display: none;
+}
+
+// 1024-1279px: the column and a 220px rail as one centred group, 48px apart.
+// At 1024 that is exactly the 960px shell (692 + 48 + 220). The disclosure is
+// display:none here, so its copy of the list is not announced twice.
+@include desktop-up {
+  .post-shell--toc {
+    grid-template-columns: minmax(0, var(--w-text)) var(--w-rail);
+    column-gap: var(--space-9);
+    justify-content: center;
+  }
+
+  .post-shell--toc > .post {
+    margin-inline: 0;
+  }
+
+  .toc-rail {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .toc-disclosure {
+    display: none;
+  }
+}
+
+// 1280px and up: three tracks, the column in the middle one, so a post with a
+// rail starts at the same x as a post without one (the rail lives in the right
+// gutter, capped at 240px so its lines stay short).
+@include wide-up {
+  .post-shell--toc {
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--w-text)) minmax(0, 1fr);
+  }
+
+  .post-shell--toc > .post {
+    grid-column: 2;
+  }
+
+  .toc-rail {
+    grid-column: 3;
+    max-width: 240px;
+  }
+}
+
+/* ==========================================================================
+   Header: eyebrow, title, byline
+   ========================================================================== */
+
+.post-header {
+  margin-bottom: var(--space-8);
+}
+
+// The category above the title, as a link to that topic (spec 4.5.1). Link
+// blue on white 5.57 / 6.96 on black. a.post-header__eyebrow (0,1,1) is needed
+// to beat the theme's a:visited, which would otherwise repaint it after one
+// visit. Semibold at 13px, sentence case: Apple's eyebrows are not uppercase.
+a.post-header__eyebrow {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  color: var(--link);
+  text-decoration: none;
+
+  @include hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+}
+
+// title1: 28 / 37.6 / 46.75px at 375 / 768 / 1440, bold, tracked in. The theme
+// set line-height: 1, which clips Hangul descenders on multi-line titles and
+// stacks the lines into each other; 1.28 below 768 and 1.22 above comes from
+// the --lh-title1 step. --text on --bg: 16.83 / 19.29.
+.post-header .page__title {
+  margin: 0;
+  font-size: var(--fs-title1);
+  font-weight: var(--fw-title1);
+  line-height: var(--lh-title1);
+  letter-spacing: var(--track-title1);
+  color: var(--text);
+}
+
+// Titles over 36 characters step down to 26 / 31.5 / 38.25px, so the
+// 43-character Havruta title is 4 lines at 375 instead of 5 and 2 at 1440.
+.post-header .page__title--long {
+  font-size: var(--fs-title1-long);
+}
+
+// "Jeremy LEE · 2026년 4월 13일 · 2분 소요". Avatar and text as two flex items;
+// the text wraps as ordinary inline text, so every "·" keeps a space on both
+// sides wherever the line breaks.
+.post-byline {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  font-size: 0.875rem;
+  line-height: var(--lh-ui);
 }
 
-// Table-of-contents rows are 34px: fine under a mouse, tight under a thumb.
-// Only coarse pointers get the extra height — a desktop sidebar keeps the
-// compact list instead of growing 10px for every heading in the post.
+// 24px circle from a portrait photo: cover plus a 20% focal point keeps the
+// face in frame instead of the shoulders.
+.post-byline__avatar {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+.post-byline__text {
+  min-width: 0;
+}
+
+// Name in --text semibold (16.83 / 19.29), the rest in secondary (5.07 /
+// 8.16): who first, then when. Tabular figures keep dates from jittering
+// between posts.
+.post-byline__name {
+  font-weight: var(--fw-strong);
+  color: var(--text);
+}
+
+.post-byline__meta {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+// page__meta.html still renders the date and read time on archive rows. The
+// theme prints it in $muted-text-color, a literal that is about 2:1 on the
+// black dark page; secondary is 5.07 / 8.16 and follows the theme swap.
+.page__meta {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Table of contents (both copies)
+   ========================================================================== */
+
+// Quiet by design: no box, no shadow, no blue title slab. The list is
+// navigation, not content, so it recedes to secondary text at 14px and lets
+// the article lead (spec 1.3: hierarchy from size and space, not boxes).
+.toc {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+// The theme shrinks the list to 0.75em (0.6875em from 1024px) of the nav's
+// size, which put rail entries at 11-12px: below the 12px floor for Hangul.
+.toc__menu {
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  list-style: none;
+
+  li {
+    margin: 0;
+  }
+}
+
+// Rows: 6px of padding makes a 31px row at 14px, above the 24px WCAG minimum
+// with no fixed height, so two-line entries stay intact. The theme's bold
+// weight and per-row hairline are removed. Secondary on --bg 5.07 / 8.16,
+// on the --bg-alt disclosure panel 4.66 / 7.03. Colour and the marker shadow
+// animate (M12, 200ms standard), so the scrollspy's change reads as a
+// settle rather than a blink; nothing moves.
+.toc__menu a {
+  display: block;
+  padding: 6px 0 6px var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--text-secondary);
+  font-weight: 400;
+  line-height: 1.45;
+  text-decoration: none;
+  transition:
+    color var(--dur-hover) var(--ease-standard),
+    box-shadow var(--dur-hover) var(--ease-standard);
+}
+
+// Nesting by indent alone. The theme indents with `.toc__menu li ul > li a`
+// (0,1,4) and deeper chains; the extra .toc here (0,2,3) outranks all of them,
+// so every level indents on the same 12px step.
+.toc .toc__menu li ul a {
+  padding-left: var(--space-6);
+}
+
+.toc .toc__menu li ul li ul a {
+  padding-left: calc(var(--space-6) + var(--space-3));
+}
+
+// THEME RESET. The theme paints the scrollspy's active item with
+// `.toc .active a { yiq-contrasted($active-color) }` at (0,2,1): a #cce3f9
+// slab with #191f28 text. With dark tokens the link colour lands on that slab
+// at 1.21:1, and because the selector is a descendant one it also paints every
+// link nested under an active h2. First undo it for all descendants at the
+// same specificity (later wins), then mark the active link itself.
+.toc .active a {
+  background: none;
+  color: var(--text-secondary);
+}
+
+// The active entry: --text on --bg, 16.83 / 19.29. Both copies get it; only
+// the rail ever receives .active (see single.html, known limitation).
+.toc li.active > a {
+  background: none;
+  color: var(--text);
+}
+
+// Hover lifts a row to --text (fine pointer only; on touch a hover sticks
+// after the tap and would look like the active state).
+.toc .toc__menu a {
+  @include hover {
+    color: var(--text);
+  }
+}
+
+// Phones and tablets: 44px rows under a thumb. Kept from the legacy file. It
+// cannot shift first paint: below 1024px the list is inside a closed
+// disclosure, and the rail is only shown from 1024px.
 @media (pointer: coarse) {
   .toc__menu a {
     display: flex;
@@ -62,77 +314,481 @@
   }
 }
 
+/* ---------- rail (1024px and up) ---------- */
+
+// Sticky under the 48px bar with 24px of air, the same offset anchor jumps
+// land at, so the rail's top and a jumped-to heading line up. A long list
+// scrolls inside the rail (its own scroll does not chain to the page) rather
+// than running under the bottom of the window.
+.toc-rail .toc {
+  position: sticky;
+  top: calc(var(--nav-h) + var(--space-6));
+  max-height: calc(100vh - var(--nav-h) - var(--space-9));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--separator-strong) transparent;
+}
+
+// "목차" above the rail: 12px semibold secondary (5.07 / 8.16), inset to the
+// text of the rows below it.
+.toc__title {
+  margin: 0 0 var(--space-2) var(--space-3);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--track-small);
+  color: var(--text-secondary);
+}
+
+// A 1px separator line (decorative, 1.51 / 2.10) that the active marker sits
+// on: links pull 1px left so their inset shadow covers the line exactly.
+.toc-rail .toc__menu {
+  border-left: 1px solid var(--separator);
+}
+
+.toc-rail .toc__menu a {
+  margin-left: -1px;
+}
+
+// Hover previews the marker in the control-boundary grey (3.62 / 4.14), so it
+// reads as "you could go here" and never as a second active section.
+.toc-rail .toc__menu a {
+  @include hover {
+    box-shadow: inset 2px 0 0 var(--separator-strong);
+  }
+}
+
+// The active section: a 2px --text marker on the line (16.83 / 19.29 as a
+// graphic, well above 3:1). (0,3,2) so hovering the active row keeps it.
+.toc-rail .toc__menu li.active > a {
+  box-shadow: inset 2px 0 0 var(--text);
+}
+
+// The rail scrolls, and a scroll container clips an outline drawn outside the
+// row. Draw the keyboard ring inside instead, so it is never cut off.
+.toc-rail .toc__menu a:focus-visible {
+  outline-offset: -3px;
+}
+
+/* ---------- disclosure (below 1024px) ---------- */
+
+.toc-disclosure {
+  margin: 0 0 var(--space-8);
+}
+
+// The closed state is one pill: --text on --fill 13.78 / 12.80, on
+// --fill-hover 12.32 / 10.42. 44px tall for a thumb. It opens instantly (no
+// height animation: animating <details> reflows the whole article); only the
+// chevron turns. Text selection is off so a long press does not highlight
+// the label instead of opening it.
+.toc-disclosure__summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--r-pill);
+  background-color: var(--fill);
+  color: var(--text);
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-heading);
+  line-height: 1.2;
+  list-style: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  transition:
+    background-color var(--dur-hover) var(--ease-standard),
+    transform var(--dur-hover) var(--ease-out);
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  @include hover {
+    background-color: var(--fill-hover);
+  }
+
+  // M8: the pill press every other pill has (0.97, 100ms in, 200ms out).
+  &:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur-press);
+  }
+}
+
+// M11: the chevron turns to point down when open, 200ms standard. Under
+// reduced motion the global blanket makes it instant.
+.toc-disclosure__chevron {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  transition: transform var(--dur-hover) var(--ease-standard);
+}
+
+.toc-disclosure[open] .toc-disclosure__chevron {
+  transform: rotate(90deg);
+}
+
+// The open list sits on a grouped --bg-alt panel, 18px corners like every
+// other grouped surface. Secondary rows on it: 4.66 / 7.03. The left padding
+// is 8px because the rows bring their own 12px inset (it is the rail's gap
+// from its line): top-level text starts 20px in, the grouped-list inset.
+.toc-disclosure[open] > .toc {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-2);
+  border-radius: var(--r-md);
+  background-color: var(--bg-alt);
+}
+
 /* ==========================================================================
-   Dark mode (legacy dark-rules groups)
+   Article body extras
    ========================================================================== */
 
-// $muted-text-color is 4.8:1 on white but 3.7:1 on the dark surface.
-.page__meta,
-.page__date,
-.pagination--pager,
-.toc {
-  @include dark-mode {
-    color: var(--text-muted);
-  }
-}
-
-.sidebar,
-.author__avatar,
-.author__content {
-  @include dark-mode {
-    background-color: var(--surface);
-    color: var(--text);
-  }
-}
-
-.toc,
-.nav__title,
-.toc .nav__title {
-  @include dark-mode {
-    background-color: var(--surface-raised);
-    color: var(--text);
-  }
-}
-
-.toc__menu a {
-  @include dark-mode {
-    background-color: var(--surface-raised);
-    color: var(--text);
-    border-bottom-color: var(--border);
-  }
-}
-
-.toc__menu a:hover,
-.toc__menu .active a {
-  @include dark-mode {
-    background-color: var(--surface-sunken);
-    color: var(--link);
-  }
+// The optional external-link pill (front matter `link:`) sits a paragraph's
+// distance below the last line of the article.
+.post-link {
+  margin-top: var(--space-7);
 }
 
 /* ==========================================================================
-   Links in running text
+   End matter
    ========================================================================== */
 
-// The contents list is chrome, not running text, and should not gain the
-// underline _prose gives `.page__content li a`. The legacy selector was
-// `.page__content .toc__menu a` (0,2,1), which tied with `.page__content li a`
-// and won by coming later in one file. _prose is now imported after this
-// partial, so the tie would go the other way and underline every TOC entry;
-// the `li` lifts this to (0,2,2) and keeps today's rendering. Every TOC link
-// sits in an `li` (_includes/toc.html), so it matches the same elements.
-.page__content .toc__menu li a {
+// One 32px rhythm between the blocks after the article, and 64px above them,
+// so the end matter reads as its own group rather than as more article.
+// minmax(0, 1fr) keeps a long unbroken tag from widening the column.
+.post-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  margin-top: var(--space-10);
+}
+
+/* ---------- taxonomy ---------- */
+
+// Rows 12px apart where the label sits beside its chips; 20px below 768px,
+// where each label starts its own line and would otherwise read as a caption
+// for the chips above it.
+.post-taxonomy {
+  display: grid;
+  gap: var(--space-5);
+
+  @include tablet-up {
+    gap: var(--space-3);
+  }
+}
+
+// Below 768px: label, then the chips on the next line. From 768px: a label
+// column and the chips wrapping beside it, never under it, so a row of six
+// tags and a row of one keep the same shape. Baseline alignment puts the
+// label on the first chip row's text line.
+.post-taxonomy__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+
+  @include tablet-up {
+    flex-wrap: nowrap;
+    align-items: baseline;
+  }
+}
+
+// "태그" / "카테고리": 13px semibold secondary (5.07 / 8.16). From 768px it is
+// a fixed-width column, so the chips of both rows start at the same x.
+.post-taxonomy__label {
+  flex: none;
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--track-small);
+  color: var(--text-secondary);
+
+  @include tablet-up {
+    min-width: 4.5em;
+  }
+}
+
+// Below 768px the chips always start on their own line under the label, so a
+// row with one short chip and a row with five look the same.
+.post-taxonomy__items {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+
+  @include below-tablet {
+    flex-basis: 100%;
+  }
+}
+
+// THEME RESET. The theme's `.page__taxonomy-item` draws a #9e9ea1 border and
+// adds 5px/8px margins and 5px 10px padding. (0,2,1) beats it and restores the
+// chip's own padding, so a tag chip is identical to every other chip.
+a.chip.page__taxonomy-item {
+  margin: 0;
+  padding: 0 var(--space-4);
+  border: 0;
+}
+
+// THEME RESET. The theme's `.page__taxonomy-item:hover` turns the label link
+// blue, which on the chip's --fill-hover is 4.07 / 3.76 (fails). (0,3,1) keeps
+// --text (12.32 / 10.42). A plain :hover, not the fine-pointer mixin, because
+// the theme's rule fires on touch too.
+a.chip.page__taxonomy-item:hover {
+  color: var(--text);
   text-decoration: none;
 }
 
+/* ---------- updated date ---------- */
+
+// "업데이트 2026년 5월 2일", only when the post really changed after
+// publication. Footnote secondary (5.07 / 8.16), label semibold.
+.page__date {
+  margin: 0;
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-ui);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.page__date-label {
+  font-weight: var(--fw-heading);
+}
+
+/* ---------- share ---------- */
+
+// THEME RESET. The theme floats the share block, draws a 1px #d2d2d7 rule
+// above it (bright on the black dark page) and adds 2em + 1em of space. The
+// footer grid owns the spacing now, and a rule between two groups that are
+// already 32px apart is redundant.
+.page__share {
+  float: none;
+  width: auto;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+// "공유하기": the same small label as the taxonomy rows (5.07 / 8.16), not the
+// theme's uppercase h4 look. It is an h2 for the outline; the size is chrome.
+.page__share-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-footnote);
+  font-weight: var(--fw-heading);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--track-small);
+  text-transform: none;
+  color: var(--text-secondary);
+}
+
+.page__share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+// No JS, no copy handler: hide the button rather than show a control that does
+// nothing. The inline head script swaps `no-js` for `js` before first paint,
+// so with JS on the button is visible from the first frame and never appears
+// late. (0,2,0) beats the pill's `button.pill` display (0,1,1).
+.no-js .page__share-copy {
+  display: none;
+}
+
+/* ---------- author card ---------- */
+
+// A grouped --bg-alt panel (18px), photo left, words right. It replaces the
+// rail, so it carries the only full-size mention of the author on the page.
+.author-card {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: var(--r-md);
+  background-color: var(--bg-alt);
+}
+
+.author-card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+// Name: headline semibold, --text on --bg-alt 15.46 / 16.61.
+.author-card__name {
+  margin: 0;
+  font-size: var(--fs-headline);
+  font-weight: var(--fw-heading);
+  line-height: 1.45;
+  color: var(--text);
+}
+
+// Bio: subhead secondary on --bg-alt, 4.66 / 7.03. The bold words keep --text
+// (15.46 / 16.61), as the owner's own emphasis intends.
+.author-card__bio {
+  margin-top: 2px;
+  font-size: var(--fs-subhead);
+  line-height: 1.55;
+  color: var(--text-secondary);
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    color: var(--text);
+  }
+}
+
+// Quiet "이메일 ›  GitHub ›" link arrows (link on --bg-alt 5.11 / 6.00). Each
+// is a 44px row for the thumb; the -10px bottom margin gives back the space
+// below the text, so the card's bottom padding looks the same as its top.
+.author-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
+  margin: var(--space-1) 0 -10px;
+  padding: 0;
+  font-size: var(--fs-subhead);
+  list-style: none;
+
+  li {
+    margin: 0;
+  }
+}
+
+/* ---------- pager ---------- */
+
+// Previous left, next right from 768px; stacked below. A lone "next" stays in
+// the right column, so the direction still maps to the side.
+.post-pager {
+  display: grid;
+  gap: var(--space-4);
+
+  @include tablet-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// Cards that name their destination, on --bg-alt (18px). 88px minimum, so a
+// one-line title still makes a comfortable target. Press is a 0.99 scale (M8:
+// 100ms in, 200ms out on --ease-out). Hover changes only the title colour,
+// never the background: the label is --text-secondary, which fails on --fill
+// (4.15) and --fill-hover (3.71).
+a.post-pager__link {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 88px;
+  padding: 20px 24px;
+  border-radius: var(--r-md);
+  background-color: var(--bg-alt);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform var(--dur-hover) var(--ease-out);
+
+  &:active {
+    transform: scale(0.99);
+    transition-duration: var(--dur-press);
+  }
+
+  // Title to link blue on --bg-alt: 5.11 / 6.00.
+  @include hover {
+    .post-pager__title {
+      color: var(--link);
+    }
+  }
+}
+
+@include tablet-up {
+  .post-pager__link--next {
+    grid-column: 2;
+    text-align: right;
+  }
+}
+
+// "‹ 이전 글" / "다음 글 ›": footnote secondary on --bg-alt, 4.66 / 7.03. The
+// chevrons are drawn here, with a no-break space so they never wrap alone.
+.post-pager__label {
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-ui);
+  color: var(--text-secondary);
+}
+
+.post-pager__link--prev .post-pager__label::before {
+  content: "\2039\00a0";
+}
+
+.post-pager__link--next .post-pager__label::after {
+  content: "\00a0\203A";
+}
+
+// The destination title: headline semibold, --text on --bg-alt 15.46 / 16.61.
+// Shown whole: the pager is where a reader decides whether to go on, and the
+// two cards already match heights as one grid row. The spec's 2-line clamp
+// was tried and dropped: Chromium omits the clamp's "…" on right-aligned
+// keep-all text, so the next card cut "…뻔한 이유? ‘하브루타식 문답 기획법’…"
+// after "이유?" and read as a complete, different title. The longest title
+// today is 4 lines in a 290px card; the 4-line clamp is only a guard.
+.post-pager__title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: var(--fs-headline);
+  font-weight: var(--fw-heading);
+  line-height: 1.4;
+  color: var(--text);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  transition: color var(--dur-hover) var(--ease-standard);
+}
+
 /* ==========================================================================
-   Sticky sidebar
+   Related shelf ("함께 읽을 글")
    ========================================================================== */
 
-// The right sidebar sticks at top: 2em, which puts it under a masthead that is
-// about 79px tall — the contents list tucked itself behind the bar. Clearing
-// the bar's height plus its shadow keeps it fully visible. This became visible
-// when the contents list was made sticky.
-.sidebar__right.sticky {
-  top: calc(#{$nav-height} + 3.5em);
+// Four compact tiles: 2 columns from 768px, 4 from 1024px.
+.post-related__shelf {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+
+  @include desktop-up {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  // Below 768px a horizontal shelf of 80%-wide tiles, so the next one peeks in
+  // and says "swipe". It bleeds to the screen edges (negative gutter margins)
+  // and pads back in, so the first tile lines up with the title above. The 8px
+  // top and 16px bottom padding keep tile shadows and the 5px focus ring
+  // inside the scroller, which clips on both axes once overflow-x is set; an
+  // equal negative top margin gives the 8px back, so the title-to-tiles gap
+  // stays the 24px it is at every other width. Horizontal swipes stay in the
+  // shelf and never become back gestures.
+  @include below-tablet {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 80%;
+    gap: var(--space-3);
+    margin: calc(-1 * var(--space-2)) calc(-1 * var(--gutter)) 0;
+    padding: var(--space-2) var(--gutter) var(--space-4);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    > * {
+      scroll-snap-align: start;
+    }
+  }
 }

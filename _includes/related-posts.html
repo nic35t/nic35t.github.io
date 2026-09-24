@@ -1,0 +1,51 @@
+{%- comment -%}
+  "함께 읽을 글" (spec 4.5.1, C13): four compact tiles after the article.
+
+  The theme's `site.related_posts` is the newest posts unless lsi is on, which
+  GitHub Pages never runs, so "related" meant "recent" and often led away from
+  the topic. Now: the post's first category newest-first, then the newest
+  posts site-wide to fill up to four, never the post itself, never twice.
+
+  Deduplication keeps a "|url|url|" string and asks `contains "|url|"`. The
+  bars make it an exact match (one URL can be a prefix of another), and it is
+  plain string work, which behaves the same under Liquid 4.0.4 on GitHub
+  Pages as it does locally. Variable names carry an `rp_` prefix because
+  Liquid includes share the page's scope.
+
+  Compact tiles have no eyebrow (spec 4.2): four posts from one category would
+  print the same label four times. No teaser images either: 55 of 57 teasers
+  are the same placeholder.
+{%- endcomment -%}
+{%- assign rp_shown = "|" | append: page.url | append: "|" -%}
+{%- assign rp_count = 0 -%}
+{%- assign rp_pool = site.categories[page.categories.first] | default: site.posts -%}
+{%- capture rp_tiles -%}
+  {%- for rp_post in rp_pool -%}
+    {%- if rp_count >= 4 -%}{%- break -%}{%- endif -%}
+    {%- capture rp_key -%}|{{ rp_post.url }}|{%- endcapture -%}
+    {%- unless rp_shown contains rp_key -%}
+      {% include post-tile.html post=rp_post variant="compact" %}
+      {%- assign rp_shown = rp_shown | append: rp_post.url | append: "|" -%}
+      {%- assign rp_count = rp_count | plus: 1 -%}
+    {%- endunless -%}
+  {%- endfor -%}
+  {%- for rp_post in site.posts -%}
+    {%- if rp_count >= 4 -%}{%- break -%}{%- endif -%}
+    {%- capture rp_key -%}|{{ rp_post.url }}|{%- endcapture -%}
+    {%- unless rp_shown contains rp_key -%}
+      {% include post-tile.html post=rp_post variant="compact" %}
+      {%- assign rp_shown = rp_shown | append: rp_post.url | append: "|" -%}
+      {%- assign rp_count = rp_count | plus: 1 -%}
+    {%- endunless -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- if rp_count > 0 -%}
+<section class="post-related l-band" aria-labelledby="post-related-title">
+  <div class="l-container">
+    <h2 id="post-related-title" class="l-section__title">{{ site.data.ui-text[site.locale].related_label | default: "함께 읽을 글" }}</h2>
+    <div class="post-related__shelf">
+      {{ rp_tiles }}
+    </div>
+  </div>
+</section>
+{%- endif -%}
