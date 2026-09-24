@@ -2,7 +2,8 @@
 title: "Projects Posts"
 permalink: /categories/projects/
 layout: category
-author_profile: true
+# The author rail is retired site-wide (spec 4.6); archives are one column.
+author_profile: false
 taxonomy: Projects
 ---
 

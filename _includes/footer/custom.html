@@ -1,3 +1,23 @@
-<!-- start custom footer snippets -->
+{%- comment -%}
+  Post breadcrumb (spec 4.7). Not cached: it reads `page`. Shown on posts
+  only (pages have no category to sit under), and it mirrors the
+  BreadcrumbList JSON-LD in head/structured-data.html: home, the post's first
+  category, the post. The category link follows category-href.html (landing
+  page where one exists, else the /categories/ anchor).
 
-<!-- end custom footer snippets -->
+  It sits at the top of the footer, so a reader who reaches the end of a post
+  sees where it lives before the site directory. One line at every width: the
+  title is cut to 40 characters here and ellipsized by CSS below that.
+{%- endcomment -%}
+{%- if page.collection == "posts" and page.categories.size > 0 -%}
+  {%- assign ui = site.data.ui-text[site.locale] -%}
+  {%- assign bc_cat = page.categories.first -%}
+  {%- capture bc_href -%}{% include category-href.html name=bc_cat %}{%- endcapture %}
+<nav class="footer-breadcrumb l-container" aria-label="현재 위치">
+  <ol>
+    <li><a href="{{ '/' | relative_url }}">{{ ui.breadcrumb_home_label | default: "홈" }}</a></li>
+    <li><a href="{{ bc_href | strip }}">{{ bc_cat }}</a></li>
+    <li aria-current="page">{{ page.title | strip_html | strip_newlines | strip | truncate: 40, "…" }}</li>
+  </ol>
+</nav>
+{%- endif -%}

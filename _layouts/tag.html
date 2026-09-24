@@ -1,10 +1,26 @@
 ---
 layout: archive
 ---
-
-{{ content }}
-
-{% assign entries_layout = page.entries_layout | default: 'list' %}
-<div class="entries-{{ entries_layout }}">
-  {% include posts-tag.html taxonomy=page.taxonomy type=entries_layout %}
+{%- comment -%}
+  Tag landing (/tags/TIL/, /tags/PJT/, /tags/Diary/; spec 4.6): the lede,
+  then the tag's posts as tiles, newest first. Like /tags/, case variants of
+  the tag are merged (taxonomy "Diary" also collects the one post tagged
+  "diary"), so the landing and the /tags/#diary section count the same posts.
+  Headings are h2 because the tiles sit directly under the page H1.
+{%- endcomment -%}
+{%- assign tag_key = page.taxonomy | downcase -%}
+{%- assign tag_posts = "" | split: "" -%}
+{%- for tag in site.tags -%}
+  {%- assign this_key = tag[0] | downcase -%}
+  {%- if this_key == tag_key -%}{%- assign tag_posts = tag_posts | concat: tag[1] -%}{%- endif -%}
+{%- endfor -%}
+{%- assign tag_posts = tag_posts | uniq | sort: "date" | reverse -%}
+{%- assign lede = content | strip_html | strip -%}
+{%- if lede != "" %}
+<p class="archive-header__lede">{{ lede }}</p>
+{%- endif %}
+<div class="tile-grid">
+  {%- for post in tag_posts %}
+  {% include post-tile.html post=post heading="h2" %}
+  {%- endfor %}
 </div>

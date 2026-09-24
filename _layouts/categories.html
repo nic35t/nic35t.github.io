@@ -1,43 +1,52 @@
 ---
 layout: archive
 ---
+{%- comment -%}
+  /categories/ (spec 4.6): a one-line summary, the topics as chips that jump
+  to their section, then one grouped inset list per topic, largest first.
 
+  The order is computed once. Each entry is "<10000 - count>|<name>", so a
+  plain string sort puts the biggest topic first and breaks ties by name; the
+  old nested count loop walked (1..max) x every category twice to get the same
+  order. Section ids are unchanged (`name | slugify | downcase`), so every
+  existing /categories/#slug link still lands.
+
+  The chips wrap and do not stick (C14): eight topics fit in two or three rows,
+  and a sticky bar would sit on top of the very headings it jumps to. One
+  "맨 위로" at the end replaces the per-section back-to-top links; its arrow
+  comes from .link-arrow--up, so the label carries no glyph of its own.
+
+  --rows on each section feeds content-visibility's first size guess
+  (_archive.scss): Tech has 17 rows, Diary 1, and one fixed guess for both
+  made the scrollbar jump as sections rendered.
+{%- endcomment -%}
+{%- assign ui = site.data.ui-text[site.locale] -%}
+{%- capture cat_order -%}
+  {%- for category in site.categories -%}
+    {{ 10000 | minus: category[1].size }}|{{ category[0] }}{% unless forloop.last %}^{% endunless %}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign cat_order = cat_order | split: "^" | sort -%}
+<p class="archive-header__summary">글 {{ site.posts.size }}편 · 주제 {{ site.categories.size }}개</p>
 {{ content }}
-
-{% assign categories_max = 0 %}
-{% for category in site.categories %}
-  {% if category[1].size > categories_max %}
-    {% assign categories_max = category[1].size %}
-  {% endif %}
-{% endfor %}
-
-<ul class="taxonomy__index">
-  {% for i in (1..categories_max) reversed %}
-    {% for category in site.categories %}
-      {% if category[1].size == i %}
-        <li>
-          <a href="#{{ category[0] | slugify }}">
-            <strong>{{ category[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
-          </a>
-        </li>
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
-</ul>
-
-{% assign entries_layout = page.entries_layout | default: 'list' %}
-{% for i in (1..categories_max) reversed %}
-  {% for category in site.categories %}
-    {% if category[1].size == i %}
-      <section id="{{ category[0] | slugify | downcase }}" class="taxonomy__section">
-        <h3 class="archive__subtitle">{{ category[0] }}</h3>
-        <ul class="taxonomy__posts">
-          {% for post in category.last %}
-            {%- include archive-single-compact.html -%}
-          {% endfor %}
-        </ul>
-        <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
-      </section>
-    {% endif %}
-  {% endfor %}
-{% endfor %}
+<nav class="taxonomy__nav" aria-label="주제 바로가기">
+  <ul class="taxonomy__index chip-row">
+    {%- for entry in cat_order -%}
+      {%- assign cat_name = entry | split: "|" | last -%}
+      <li><a class="chip" href="#{{ cat_name | slugify | downcase }}">{{ cat_name }} <span class="chip__count">{{ site.categories[cat_name].size }}</span></a></li>
+    {%- endfor -%}
+  </ul>
+</nav>
+{%- for entry in cat_order -%}
+  {%- assign cat_name = entry | split: "|" | last -%}
+  {%- assign cat_posts = site.categories[cat_name] %}
+<section id="{{ cat_name | slugify | downcase }}" class="taxonomy__section" style="--rows: {{ cat_posts.size }}">
+  <h2 class="taxonomy__title">{{ cat_name }} <span class="taxonomy__title-count">{{ cat_posts.size }}</span></h2>
+  <ul class="taxonomy__posts">
+    {%- for post in cat_posts -%}
+      {%- include archive-single-compact.html -%}
+    {%- endfor -%}
+  </ul>
+</section>
+{%- endfor %}
+<p class="archive__top"><a class="link-arrow link-arrow--up" href="#page-title">{{ ui.back_to_top | default: "맨 위로" }}</a></p>
