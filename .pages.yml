@@ -1,0 +1,134 @@
+# Pages CMS (https://app.pagescms.org) — browser editor for this blog.
+#
+# Posts stay plain Markdown files in _posts/. Saving in the CMS commits to the
+# repository, and GitHub Pages rebuilds the site exactly as it does for a push.
+# How to use it: docs/WRITING.md.
+
+media:
+  input: assets/images
+  output: /assets/images
+  categories: [image]
+  # Korean or spaced filenames become safe ASCII names, so image URLs never
+  # need percent-encoding.
+  rename: safe
+
+content:
+  - name: posts
+    label: 글
+    type: collection
+    path: _posts
+    # Jekyll only publishes files named YYYY-MM-DD-slug.md. A Korean title
+    # cannot be the slug (it would be stripped to nothing), so the slug is its
+    # own English field, and the filename is shown for a final check before the
+    # first save.
+    filename:
+      template: "{year}-{month}-{day}-{fields.slug}.md"
+      field: create
+    view:
+      fields: [title, date, categories, published]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+      search: [title, excerpt]
+    fields:
+      - name: title
+        label: 제목
+        type: string
+        required: true
+      - name: slug
+        label: 영문 주소
+        type: string
+        description: "새 글이면 꼭 입력하세요. 글 주소(URL)와 파일 이름이 됩니다. 영문 소문자, 숫자, 하이픈만. 예: stablecoin-regulation-2026"
+        pattern:
+          regex: "^([a-z0-9]+(-[a-z0-9]+)*)?$"
+          message: "영문 소문자, 숫자, 하이픈(-)만 쓸 수 있습니다."
+      - name: excerpt
+        label: 요약
+        type: text
+        description: "홈 화면과 글 카드에 보이는 한두 문장. 비워 두면 본문 첫 문단이 쓰입니다."
+      - name: date
+        label: 발행 일시
+        type: date
+        required: true
+        options:
+          time: true
+          # Matches the existing posts, e.g. 2026-04-13 00:50:00 +0900.
+          format: "yyyy-MM-dd HH:mm:ss xx"
+      - name: categories
+        label: 카테고리
+        type: select
+        required: true
+        description: "첫 번째 카테고리가 글 주소와 제목 위 라벨이 됩니다."
+        options:
+          multiple: true
+          values: [AI, Web3, Policy, Tech, SQL, Projects, Diary, Business Strategy]
+      - name: tags
+        label: 태그
+        type: string
+        list: true
+        description: "시리즈 글이면 '원화 스테이블코인 심층분석' 태그를 넣어야 홈의 시리즈 타일에 모입니다."
+      - name: toc
+        label: 목차 표시
+        type: boolean
+        default: true
+      - name: toc_sticky
+        label: 목차 고정 (넓은 화면에서 오른쪽에 따라다님)
+        type: boolean
+        default: true
+      - name: published
+        label: 공개 (끄면 초안으로 저장만 되고 사이트에는 안 보임)
+        type: boolean
+        default: true
+      - name: header
+        label: 대표 이미지
+        type: object
+        fields:
+          - name: teaser
+            label: 카드 이미지 (선택)
+            type: image
+      - name: body
+        label: 본문
+        type: rich-text
+        options:
+          format: markdown
+        # The general column skeleton. The other templates live in _templates/
+        # (the "글 템플릿" section below) to copy from.
+        default: |
+          ## 시작하며
+
+          이 글에서 다룰 문제와, 왜 지금 이 이야기를 하는지 두세 문장으로 적습니다.
+
+          ## 핵심 내용
+
+          주장과 근거를 적습니다. 소제목(##)마다 목차 항목이 하나씩 생깁니다.
+
+          ## 정리하며
+
+          핵심을 한 문단으로 다시 묶고, 다음에 다룰 질문을 남깁니다.
+
+  - name: templates
+    label: 글 템플릿 (복사해서 사용)
+    description: "새 글을 만들 때 본문에 붙여 넣을 뼈대입니다. 여기서 수정하면 다음 글부터 바뀐 뼈대를 쓰게 됩니다."
+    type: collection
+    path: _templates
+    operations:
+      create: false
+      delete: false
+      rename: false
+    view:
+      fields: [title]
+      primary: title
+    fields:
+      - name: title
+        label: 템플릿 이름
+        type: string
+      - name: usage
+        label: 언제 쓰나
+        type: text
+      - name: body
+        label: 본문 뼈대
+        type: code
+        options:
+          format: markdown

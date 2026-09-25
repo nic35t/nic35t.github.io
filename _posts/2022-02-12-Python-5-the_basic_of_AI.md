@@ -1,5 +1,6 @@
 ---
 title: "[AI 기초] Linear Regression"
+date: 2022-02-12 00:00:00 +0900
 excerpt: "3주차 머신러닝 기초를 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg

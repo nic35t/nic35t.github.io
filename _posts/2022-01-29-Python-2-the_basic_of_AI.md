@@ -1,5 +1,6 @@
 ---
 title: "[AI 기초] 클래스 - super, self"
+date: 2022-01-29 00:00:00 +0900
 excerpt: "5주 과정으로 조별과제 중입니다."
 header:
   teaser: /assets/images/noteaser.jpg

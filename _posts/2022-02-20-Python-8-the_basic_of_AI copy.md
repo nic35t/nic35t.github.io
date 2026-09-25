@@ -1,5 +1,6 @@
 ---
 title: "[AI 기초] Multivariable Linear Regression w.Pytorch"
+date: 2022-02-20 00:00:00 +0900
 excerpt: "5주차 다항 선형 회귀 구현을 배우고 있습니다."
 header:
   teaser: /assets/images/noteaser.jpg

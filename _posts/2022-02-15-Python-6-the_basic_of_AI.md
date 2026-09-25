@@ -1,5 +1,6 @@
 ---
 title: "[AI 기초] Pandas"
+date: 2022-02-15 00:00:00 +0900
 excerpt: "4주차 Pandas 활용법을 배웠습니다."
 header:
   teaser: /assets/images/noteaser.jpg

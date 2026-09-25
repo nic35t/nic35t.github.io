@@ -1,5 +1,6 @@
 ---
 title: "[Python] 두 문장의 일치도를 계산하는 툴 만들기"
+date: 2021-03-03 00:00:00 +0900
 excerpt: "하기 어렵다고 하길래 직접 만들어 봤습니다."
 header:
   teaser: /assets/images/noteaser.jpg

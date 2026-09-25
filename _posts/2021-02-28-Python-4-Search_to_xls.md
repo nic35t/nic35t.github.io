@@ -1,5 +1,6 @@
 ---
 title: "[Python] 검색 API로 패턴 문장 바로 뒷 단어 모으기"
+date: 2021-02-28 00:00:00 +0900
 excerpt: "대신 일하게 하려고 만들었습니다."
 header:
   teaser: /assets/images/noteaser.jpg
