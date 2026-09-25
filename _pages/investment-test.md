@@ -3,6 +3,8 @@ layout: single
 title: "투자 성향 테스트"
 description: "위험을 얼마나 견디는가, 그리고 무엇을 근거로 결정하는가. 두 축으로 나누어 보는 10문항"
 permalink: /investment-test/
+# Lives under the "Test" nav entry (/tests/), which is marked current here.
+nav_parent: /tests/
 classes: wide
 author_profile: false
 sidebar:
