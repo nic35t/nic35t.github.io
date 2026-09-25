@@ -3,6 +3,8 @@ layout: single
 title: "AI 에이전트 활용 성향 테스트"
 description: "AI에게 얼마나 맡기는가, 그리고 어디까지 연결하는가. MCP와 스킬로 보는 AI 에이전트 활용 10문항"
 permalink: /ai-agent-test/
+# Lives under the "Test" nav entry (/tests/), which is marked current here.
+nav_parent: /tests/
 classes: wide
 author_profile: false
 sidebar:

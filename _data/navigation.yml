@@ -10,8 +10,6 @@ main:
     url: /categories/diary/
   - title: "Archive"
     url: /categories/
-  - title: "Inv. Test"
-    url: /investment-test/
-  - title: "AI Test"
-    url: /ai-agent-test/
+  - title: "Test"
+    url: /tests/
 
