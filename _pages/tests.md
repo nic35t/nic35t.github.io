@@ -6,23 +6,21 @@ layout: archive
 author_profile: false
 ---
 {%- comment -%}
-  One nav entry for every self-check test. The tests are pages, not posts, so
-  post-tile.html (which reads post dates and categories) does not fit; the
-  markup below is the same tile shape by hand, on the category landings'
-  grid, so it picks up the same styles.
+  One nav entry for every self-check test. Each test is a data file in
+  _pages/tests/ (layout: quiz), so this list builds itself: a test added in
+  the CMS appears here, ordered by its "order" field. The tests are pages, not
+  posts, so post-tile.html (which reads post dates and categories) does not
+  fit; the tile markup is written out on the category landings' grid.
 {%- endcomment -%}
-<p class="archive-header__lede">스스로를 돌아보는 짧은 자기 점검 테스트입니다. 각 10문항, 2~3분이면 끝납니다.</p>
+{%- assign tests = site.pages | where: "layout", "quiz" | sort: "order" -%}
+<p class="archive-header__lede">스스로를 돌아보는 짧은 자기 점검 테스트입니다. 각 10문항 안팎, 2~3분이면 끝납니다.</p>
 <div class="tile-grid">
+  {%- for t in tests %}
   <article class="tile tile--default">
-    <p class="tile__eyebrow">AI</p>
-    <h2 class="tile__title no_toc"><a href="{{ '/ai-agent-test/' | relative_url }}">AI 에이전트 활용 성향 테스트</a></h2>
-    <p class="tile__excerpt">AI에게 얼마나 맡기는가, 그리고 어디까지 연결하는가. MCP와 스킬로 보는 10문항.</p>
-    <p class="tile__meta">10문항 · 두 축 · 결과 유형 5가지</p>
+    {%- if t.eyebrow %}<p class="tile__eyebrow">{{ t.eyebrow }}</p>{% endif %}
+    <h2 class="tile__title no_toc"><a href="{{ t.url | relative_url }}">{{ t.title }}</a></h2>
+    <p class="tile__excerpt">{{ t.description }}</p>
+    <p class="tile__meta">{{ t.questions.size }}문항 · 두 축 · 결과 유형 {{ t.results.size }}가지</p>
   </article>
-  <article class="tile tile--default">
-    <p class="tile__eyebrow">투자</p>
-    <h2 class="tile__title no_toc"><a href="{{ '/investment-test/' | relative_url }}">투자 성향 테스트</a></h2>
-    <p class="tile__excerpt">위험을 얼마나 견디는가, 그리고 무엇을 근거로 결정하는가. 행동경제학의 편향으로 보는 10문항.</p>
-    <p class="tile__meta">10문항 · 두 축 · 결과 유형 5가지</p>
-  </article>
+  {%- endfor %}
 </div>

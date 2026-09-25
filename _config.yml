@@ -303,3 +303,21 @@ defaults:
       comments: # true
       share: true
       related: true
+  # Self-check tests (/tests/). Each file in _pages/tests/ is data only: the
+  # quiz layout builds the page from its front matter, so a test can be
+  # written and edited in the CMS without touching HTML. These are widgets,
+  # not articles: no contents list, and the start screen draws its own title.
+  - scope:
+      path: "_pages/tests"
+    values:
+      layout: quiz
+      # The quiz layout sits on single.html, and the post shell is styled per
+      # body class, so the pages keep layout--single alongside their own
+      # layout--quiz to render exactly as the hand-written tests did.
+      classes: [wide, layout--single]
+      author_profile: false
+      sidebar:
+        nav: false
+      toc: false
+      hide_header: true
+      nav_parent: /tests/
