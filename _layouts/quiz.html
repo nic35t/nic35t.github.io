@@ -1,0 +1,89 @@
+---
+layout: single
+---
+{%- comment -%}
+  Self-check test page, built entirely from the page's front matter
+  (_pages/tests/*.md, editable in the CMS under "테스트"). The markup and
+  styles are the ones /investment-test/ was hand-written with; the logic lives
+  in assets/js/quiz.js and reads the page's data from the JSON block below.
+
+  Scoring: every question feeds one of two axes (a or b), each answer adds
+  score / (highest score in that question) so a four-option question does not
+  outweigh a three-option one, and each axis ends as 0-100. Both axes between
+  35 and 65 is the "middle" result; otherwise the quadrant (low/high on a,
+  then low/high on b) picks the result.
+{%- endcomment -%}
+{%- assign related_url = page.related_url | default: "/tests/" -%}
+{%- assign related_label = page.related_label | default: "다른 테스트 둘러보기" -%}
+{% include quiz-styles.html %}
+
+<div class="investment-test-container">
+  <div id="start-screen" class="screen active">
+    <h1 class="test-title">{{ page.title }}</h1>
+    <p class="test-desc">{{ page.intro | escape | strip | newline_to_br }}</p>
+    <button class="btn-primary" type="button" data-quiz-start>테스트 시작하기</button>
+    {%- if page.disclaimer %}
+    <p class="test-disclaimer">{{ page.disclaimer | escape }}</p>
+    {%- endif %}
+  </div>
+
+  <div id="quiz-screen" class="screen">
+    <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+    <h2 id="question-text" class="test-title" tabindex="-1">질문</h2>
+    <div id="options-container" style="width: 100%;"></div>
+  </div>
+
+  <div id="result-screen" class="screen">
+    <div id="result-emoji" class="result-emoji" aria-hidden="true"></div>
+    <div id="result-type" class="result-type"></div>
+    <h2 id="result-name" class="result-name" tabindex="-1">결과</h2>
+
+    <div class="result-box">
+      <h3>두 축으로 본 나의 위치</h3>
+      {%- assign axis_keys = "a,b" | split: "," %}
+      {%- for key in axis_keys %}
+      {%- assign axis = page.axes[key] %}
+      <div class="axis">
+        <div class="axis-head"><span>{{ axis.label | escape }}</span><span id="axis-{{ key }}-value">0</span></div>
+        <div class="axis-track"><div id="axis-{{ key }}-bar" class="axis-fill"></div></div>
+        <div class="axis-ends"><span>{{ axis.low | escape }}</span><span>{{ axis.high | escape }}</span></div>
+      </div>
+      {%- endfor %}
+      <p id="result-desc" class="result-desc"></p>
+    </div>
+
+    {%- if page.concepts and page.concepts.size > 0 %}
+    <div class="result-box result-box--accent">
+      <h3>{{ page.concepts_title | default: "답변과 맞닿은 개념" | escape }}</h3>
+      {%- if page.concepts_intro %}<p class="bias-intro">{{ page.concepts_intro | escape }}</p>{% endif %}
+      <ul id="result-biases" class="bias-list"></ul>
+    </div>
+    {%- endif %}
+
+    <div class="result-box">
+      <h3>스스로 점검해 볼 것</h3>
+      <ul id="result-advice"></ul>
+      <a href="{{ related_url | relative_url }}" class="link-arrow recommend-link">{{ related_label | escape }}</a>
+    </div>
+
+    {%- if page.result_disclaimer %}
+    <p class="test-disclaimer">{{ page.result_disclaimer | escape }}</p>
+    {%- endif %}
+
+    <div class="result-actions">
+      <button class="btn-primary btn-secondary" type="button" data-quiz-share>결과 공유</button>
+      <button class="btn-primary" type="button" data-quiz-restart>다시하기</button>
+    </div>
+  </div>
+</div>
+
+{%- comment -%}
+  application/json is inert: the browser never executes it, and jsonify
+  escapes quotes, so text written in the CMS cannot break out into script.
+  "</" is escaped as well, so a closing tag in any answer cannot end the block.
+{%- endcomment -%}
+{%- capture quiz_json -%}
+{"title": {{ page.title | jsonify }}, "shareText": {{ page.share_text | default: page.description | jsonify }}, "questions": {{ page.questions | jsonify }}, "concepts": {{ page.concepts | jsonify }}, "conceptsEmpty": {{ page.concepts_empty | default: "" | jsonify }}, "results": {{ page.results | jsonify }}}
+{%- endcapture -%}
+<script type="application/json" id="quiz-data">{{ quiz_json | replace: "</", "<\/" }}</script>
+<script src="{{ '/assets/js/quiz.js' | relative_url }}" defer></script>
