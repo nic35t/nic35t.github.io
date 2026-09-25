@@ -21,6 +21,7 @@
 {%- assign fd_archive = site.pages | where: "url", "/categories/" | first -%}
 {%- assign fd_tags = site.pages | where: "url", "/tags/" | first -%}
 {%- assign fd_test = site.pages | where: "url", "/investment-test/" | first -%}
+{%- assign fd_ai_test = site.pages | where: "url", "/ai-agent-test/" | first -%}
 <div class="footer-dir l-container">
   <nav class="footer-dir__nav" aria-label="사이트 전체">
     <div class="footer-dir__group">
@@ -39,6 +40,7 @@
         <li><a href="{{ '/categories/' | relative_url }}">{{ fd_archive.title | default: "아카이브" }}</a></li>
         <li><a href="{{ '/tags/' | relative_url }}">{{ fd_tags.title | default: "태그" }}</a></li>
         <li><a href="{{ '/investment-test/' | relative_url }}">{{ fd_test.title | default: "투자 성향 테스트" }}</a></li>
+        <li><a href="{{ '/ai-agent-test/' | relative_url }}">{{ fd_ai_test.title | default: "AI 에이전트 활용 성향 테스트" }}</a></li>
       </ul>
     </div>
     <div class="footer-dir__group">
