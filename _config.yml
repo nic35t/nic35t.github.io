@@ -95,7 +95,7 @@ social:
   type                   : "Person"
   name                   : "Jeremy LEE"
   links: # An array of links to social media profiles
-    - "https://github.com/nic35t"
+    # - "https://github.com/nic35t"
 
 # Analytics
 analytics:
@@ -116,9 +116,9 @@ author:
     - label: "이메일"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:nicest@kakao.com"
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/nic35t"
+    # - label: "GitHub"
+    #   icon: "fab fa-fw fa-github"
+    #   url: "https://github.com/nic35t"
 
 # Site Footer
 #
@@ -127,9 +127,9 @@ author:
 # are listed; an icon with no destination is worse than no icon.
 footer:
   links:
-    - label: "GitHub"
-      icon: "fab fa-fw fa-github"
-      url: "https://github.com/nic35t"
+    # - label: "GitHub"
+    #   icon: "fab fa-fw fa-github"
+    #   url: "https://github.com/nic35t"
     - label: "이메일"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:nicest@kakao.com"
