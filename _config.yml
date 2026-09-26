@@ -162,6 +162,7 @@ exclude:
   - package.json
   - package-lock.json
   - skills-lock.json
+  - CLAUDE.md
   - Rakefile
   - README
   - tmp
